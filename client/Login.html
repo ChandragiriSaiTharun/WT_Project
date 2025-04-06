@@ -26,6 +26,28 @@
       max-width: 400px;
       animation: fadeIn 1s ease-in-out;
     }
+
+    /* New styles for password container and eye icon */
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  .password-container input {
+    padding-right: 14px; /* Make room for the icon */
+  }
+  .eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    cursor: pointer;
+    color: #666;
+  }
+  .eye-icon:hover {
+    color: #28a745; /* Match your theme */
+  }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -115,7 +137,10 @@
       <div class="error" id="emailPhoneError">Please enter a valid email or 10-digit phone number</div>
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      <div class="password-container">
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <span class="eye-icon" id="togglePassword">👁️</span>
+      </div>
       <div class="error" id="passwordError">Password is required</div>
 
       <button type="submit">Login</button>
@@ -146,6 +171,8 @@
     const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     const forgotPasswordLink = document.getElementById('forgotPasswordLink');
     const backToLogin = document.getElementById('backToLogin');
+    const passwordInput = document.getElementById('password');
+  const togglePassword = document.getElementById('togglePassword');
 
     // Toggle between login and forgot password forms
     forgotPasswordLink.addEventListener('click', (e) => {
@@ -158,6 +185,14 @@
       loginForm.style.display = 'block';
       forgotPasswordForm.style.display = 'none';
     });
+
+    // Toggle password visibility on hover
+  togglePassword.addEventListener('mouseover', () => {
+    passwordInput.type = 'text'; // Show password
+  });
+  togglePassword.addEventListener('mouseout', () => {
+    passwordInput.type = 'password'; // Hide password
+  });
 
     // Login form submission
     loginForm.addEventListener('submit', async (e) => {

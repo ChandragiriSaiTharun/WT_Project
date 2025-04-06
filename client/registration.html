@@ -248,7 +248,15 @@
 
       <!-- Confirm Password -->
       <label for="confirmPassword">Confirm Password</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+        <span 
+            onmouseover="showPassword('confirmPassword')" 
+            onmouseout="hidePassword('confirmPassword')" 
+            class="eye-icon">
+            👁️
+        </span>
+        </div>
       <div class="error" id="confirmPasswordError">Passwords do not match.</div>
 
       <!-- State Dropdown -->
@@ -257,7 +265,7 @@
         <select class="form-control" id="inputState" name="inputState" required>
         
           <option value="SelectState">Select State</option>
-          <option value="Andhra Pradesh">Andra Pradesh</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
           <option value="Arunachal Pradesh">Arunachal Pradesh</option>
           <option value="Assam">Assam</option>
           <option value="Bihar">Bihar</option>

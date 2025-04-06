@@ -5,149 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <title>Kisaan Connect - Home</title>
+    <title>Kisaan Connect - Marketplace</title>
     <style>
       /* Main body styles */
-body {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 20px;
-  position: relative;
-  width: auto;
-  height: 100vh;
-   background: 
-  url("blob:https://www.canva.com/5b7f0f05-aff6-41dc-9a8c-97c7dfcefc55") no-repeat center center fixed;
-  background-size: cover;
-}
+      body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 20px;
+        position: relative;
+        width: auto;
+        height: 100vh;
+        background: url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80") no-repeat center center fixed;
+        background-size: cover;
+      }
 
-/* Background Overlay */
-#backgroundOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Default opacity */
-  z-index: -1; /* Keep it behind content */
-  transition: opacity 0.3s ease-in-out; /* Smooth transition */
-}
-
+      #backgroundOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+        transition: opacity 0.3s ease-in-out;
+      }
 
       /* Navbar */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 5%;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+      }
 
       .menu-icon {
-          font-size: 36px;
-          color: #7be7a8;
-          cursor: pointer;
+        font-size: 36px;
+        color: #28a745;
+        cursor: pointer;
       }
 
-
-      @keyframes vibrate {
-          0% { transform: translateY(0); }
-          25% { transform: translateX(-2px); }
-          50% { transform: translateX(2px); }
-          75% { transform: translateY(-3px); }
-          100% { transform: translateX(3px); }
-      }
-      
-      .vibrating-text {
-          display: inline-block;
-          animation: vibrate 0.2s infinite alternate;
-          font-size: 18px;
-      }
-      
-
-
-      .filter-dropdown {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-      }
-      select, input, button {
-          padding: 6px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-      }
-      button {
-          cursor: pointer;
-          background-color: #28a745;
-          color: white;
-      }
-
-
-      header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px 5%; /* Percentage padding for better responsiveness */
-          background: rgba(255, 255, 255, 0.9);
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          position: fixed;
-          width: 100%; /* Adjusted width with padding */
-          left: 50%;
-          transform: translateX(-50%); /* Center align header */
-          top: 0;
-          z-index: 1000;
-          box-sizing: border-box; /* Include padding in width calculation */
-        }
-        
-        header nav {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          flex-wrap: wrap; /* Allow items to wrap on small screens */
-        }
-        
-        header .auth-buttons {
-          display: flex;
-          gap: 10px;
-          margin-left: auto; /* Push auth buttons to right */
-        }
-        
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-          header {
-            padding: 15px 5%;
-            width: 90%;
-          }
-          
-          header nav {
-            gap: 10px;
-            font-size: 14px;
-          }
-          
-          header .auth-buttons button {
-            padding: 8px 15px;
-            font-size: 14px;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          header {
-            flex-wrap: wrap;
-            gap: 10px;
-          }
-          
-          header .logo {
-            order: 1;
-            width: 100%;
-            justify-content: center;
-          }
-          
-          header nav {
-            order: 3;
-            width: 100%;
-            justify-content: center;
-          }
-          
-          header .auth-buttons {
-            order: 2;
-            width: 100%;
-            justify-content: center;
-            margin-left: 0;
-          }
-        }
-  
       header .logo {
         display: flex;
         align-items: center;
@@ -155,425 +60,244 @@ body {
         font-weight: 700;
         color: #28a745;
       }
-  
+
       header .logo .icon {
         margin-right: 20px;
-        margin-left: 20px;
         font-size: 38px;
         color: #007bff;
       }
-  
+
       header .logo .connect {
         color: #007bff;
       }
-  
+
       header nav {
         display: flex;
         align-items: center;
-        gap: 20px; /* Add spacing between nav items */
+        gap: 20px;
       }
-  
+
       header nav a {
         text-decoration: none;
         color: #333;
         font-weight: 500;
         transition: color 0.3s ease;
       }
-  
+
       header nav a:hover {
         color: #28a745;
       }
-  
-      header .auth-buttons {
-        display: flex;
-        gap: 10px; /* Add spacing between buttons */
-      }
-  
+
       header .auth-buttons button {
         padding: 10px 20px;
-        border:#e9e9e9;
         border-radius: 8px;
         font-size: 16px;
         cursor: pointer;
         transition: all 0.3s ease;
-        position:relative;
-        overflow: hidden;
       }
-  
+
       header .auth-buttons .register {
         background-color: #28a745;
         color: #fff;
       }
-  
-      header .auth-buttons .register:hover {
-        background-color: #218838;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      }
-  
+
       header .auth-buttons .login {
         background-color: #f4f4f4;
         color: #333;
       }
-  
-      header .auth-buttons .login:hover {
-        background-color: #e9e9e9;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      }
-  
-      /* Dynamic Hover Effects */
-      header .auth-buttons button::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 300%;
-        height: 300%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%) rotate(45deg);
-        transition: all 0.5s ease;
-        z-index: 0;
-      }
-  
-      header .auth-buttons button:hover::before {
-        width: 0;
-        height: 0;
-      }
-  
-      header .auth-buttons button span {
-        position: relative;
-        z-index: 1;
+
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        background-color: #333;
+        top: 83px;
+        left: -320px;
+        width: 315px;
+        height: calc(100vh - 60px);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        transition: left 0.42s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        color: white;
       }
 
-      /* Marketplace Header */
+      .sidebar.active {
+        left: 0;
+      }
+
+      .menu {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .menu a {
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        transition: background 0.3s, padding-left 0.3s;
+        border-radius: 25px;
+        margin: 5px 10px;
+      }
+
+      .menu a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        padding-left: 30px;
+      }
+
+      .menu a i {
+        margin-right: 15px;
+      }
+
+      /* Marketplace */
       .marketplace-header {
-          text-align: center;
-          margin-bottom: 20px;
+        text-align: center;
+        margin: 100px 0 20px;
+        color: white;
       }
 
       .marketplace-header h1 {
-          color: #28a745;
+        color: #28a745;
       }
 
-      /* Crop Grid */
       .crop-grid {
-          
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Increased min width */
-          gap: 25px; /* Increased gap for better spacing */
-          max-width: 1600px; /* Increased max-width */
-          margin: 0 auto;
-          padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 10px;
       }
-      
 
       .crop-card {
-          background: white;
-          border-radius: 12px;
-          padding: 15px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          transition: transform 0.3s ease;
-          position: relative;
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        position: relative;
       }
 
       .crop-card:hover {
-          transform: translateY(-5px);
+        transform: translateY(-5px);
       }
 
       .crop-image {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          border-radius: 8px;
-          margin-bottom: 10px;
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
       }
 
       .price-tag {
-          font-size: 20px;
-          color: #28a745;
-          font-weight: 600;
-          margin-bottom: 5px;
+        font-size: 20px;
+        color: #28a745;
+        font-weight: 600;
       }
 
-      .quantity-available {
-          color: #666;
-          margin-bottom: 10px;
-      }
-
-      .seller-info {
-          display: flex;
-          align-items: center;
-          margin-bottom: 45px;
-          margin-top: 20px;
-      }
-
-      .seller-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          margin-right: 12px;
-          margin-top: -15px;
-      }
-
-      /* Buttons */
       .button-group {
-          display: flex;
-          gap: 14px;
-          justify-content: center;
-          margin-top: 90px; /* Increased margin for better visibility */
-          width: 80%;
-          position: absolute;
-          bottom: 10px;
-          left: 0;
-      }
-  
-      .buy-button, .chat-button {
-          flex: 1;
-          font-size: 17px;
-          border-radius: 13%;
-          padding: 10px;
-          border: none;
-          cursor: pointer;
-          transition: background 0.3s ease;
-      }
-  
-      .buy-button {
-          background: #ffc107;
-          color: black;
-          margin-left: 6px;
-      }
-  
-      .buy-button:hover {
-          background: #e0a800;
-      }
-  
-      .chat-button {
-          background: #28a745;
-          color: white;
-      }
-  
-      .chat-button:hover {
-          background: #218838;
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        margin-top: 20px;
       }
 
-      /* Hidden Crop Submission Form */
+      .buy-button, .chat-button {
+        flex: 1;
+        font-size: 17px;
+        padding: 10px;
+        border: none;
+        border-radius: 13px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+
+      .buy-button {
+        background: #ffc107;
+        color: black;
+      }
+
+      .buy-button:hover {
+        background: #e0a800;
+      }
+
+      .chat-button {
+        background: #28a745;
+        color: white;
+      }
+
+      .chat-button:hover {
+        background: #218838;
+      }
+
+      /* Crop Form */
       .crop-form-container {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          justify-content: center;
-          align-items: center;
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
       }
 
       .crop-form {
-          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-          url('https://images.squarespace-cdn.com/content/v1/62e7a92f066fa3730dcd4604/33539c45-b4ba-42fb-aa75-4002b5d08b46/Texas+Cash+Crops.jpg')  no-repeat center center/cover;
-          padding: 20px;
-          max-width: 500px;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          text-align: center;
+        background: white;
+        padding: 20px;
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
       }
-      .form-group {
-           margin: 5px;
-      }
-      .form-group label{
-          text-align: left;
-      }
-      .crop-form input, select {
-          width: 60%;
-          padding: 8px;
-          margin: 5px 0;
-          border: 1px solid #25c717;
-          border-radius: 5px;
+
+      .crop-form input, .crop-form select {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #28a745;
+        border-radius: 5px;
       }
 
       .crop-form button {
-          background: #28a745;
-          color: white;
-          border: none;
-          padding: 10px;
-          width: 100%;
-          cursor: pointer;
-          border-radius: 5px;
-          margin-top: 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 10px;
       }
 
-      .crop-form button:hover {
-          background: #218838;
-      }
-
-      /* Add Crop Button */
       #addCropButton {
-          position: fixed;
-          bottom: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: #28a745;
-          color: white;
-          font-size: 18px;
-          padding: 12px 24px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-          transition: background-color 0.3s ease, transform 0.2s;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #28a745;
+        color: white;
+        font-size: 18px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s;
       }
-      
+
       #addCropButton:hover {
-          background-color: #218838;
-          transform: translateX(-50%) scale(1.05);
+        background: #218838;
+        transform: translateX(-50%) scale(1.05);
       }
-      
-
-      .sidebar {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 318px;
-          height: 100%;
-          color: white;
-          display: flex;
-          flex-direction: column;
-          padding-top: 20px;
-      }
-      
-      /* Brand Name */
-      .brand {
-          font-size: 22px;
-          font-weight: 600;
-          text-align: center;
-          padding: 15px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-      }
-      
-      /* Sidebar Menu */
-      .menu {
-          display: flex;
-          flex-direction: column;
-          padding: 5px; /* Reduced padding */
-          align-items: start;
-          gap: 5px; /* Added gap to control spacing */
-      }
-      
-      /* Sidebar Links */
-      .menu a {
-          text-decoration: none;
-          font-size: 18px;
-          color: white;
-          padding: 12px 20px;
-          display: flex;
-          align-items: center;
-          transition: background 0.3s, padding-left 0.3s;
-          border-radius: 25px;
-          margin: 5px 10px;
-      }
-      
-      /* Icons */
-      .menu a i {
-          margin-right: 15px;
-      }
-      
-      /* Hover Effect */
-      .menu a:hover {
-          background: rgba(255, 255, 255, 0.2);
-          padding-left: 30px;
-      }
-      
-      /* Content Area */
-      .content {
-          margin-left: 250px;
-          padding: 40px;
-          transition: margin-left 0.3s ease-in-out;
-      }
-      
-      .menu-icon {
-          font-size: 55px; /* Increased size */
-          cursor: pointer;
-          position: fixed;
-          /* Removed invalid comment syntax */
-          top: 5px; /* Adjusted position */
-          left: 30px;
-          color: #25c717;
-          transition: transform 0.3s;
-          z-index: 1000;
-      }
-      
-      .menu-icon:hover {
-          transform: scale(2.1);
-      }
-      
-      /* Sidebar Active (Open) */
-      .sidebar.active {
-          left: 0;
-      }
-  
-      
-      /* Close Button (✖) */
-      .close-btn {
-          position: absolute;
-          top: 15px;
-          right: 20px;
-          font-size: 24px;
-          cursor: pointer;
-          color: white;
-          transition: transform 0.3s;
-      }
-      
-      .close-btn:hover {
-          transform: scale(1.1);
-      }
-      
-      /* Sidebar Menu */
-      .menu {
-          display: flex;
-          
-          background-color:#333;
-          flex-direction: column;
-          padding: 10px;
-      }
-      
-      
-      .menu a:hover {
-          background: rgba(255, 255, 255, 0.2);
-          padding-left: 30px;
-      }
-      
-      /* Content Shift Effect */
-      .content {
-          margin-left: 0;
-          padding: 40px;
-          transition: margin-left 0.3s ease-in-out;
-      }
-      
-      .content.shifted {
-          margin-left: 250px;
-      }
-
-      
-      /* Sidebar Styling */
-      .sidebar {
-          position: fixed;
-          background-color: #333;
-          top: 83px; /* Starts below navbar */
-          left: -320px; /* Initially hidden */
-          width: 315px;
-          height: calc(100vh - 60px); /* Full height below navbar */
-          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-          transition: left 0.42s ease-in-out;
-          display: flex;
-          flex-direction: column;
-      }
-      
-  </style>
-
+    </style>
 </head>
 <body>
+    <div id="backgroundOverlay"></div>
     <header>
         <div class="menu-icon" onclick="toggleSidebar()"><i class="material-icons">menu</i></div>
         <div class="sidebar" id="sidebar">
@@ -594,78 +318,37 @@ body {
             <span class="connect">Connect</span>
         </div>
         <nav>
-            <div class="filter-dropdown">
-                <select id="filterCategory">
-                    <option value="">Filter By</option>
-                    <option value="price">Price</option>
-                    <option value="crop">Crop Type</option>
-                    <option value="quantity">Quantity</option>
-                    <option value="location">Nearby Places</option>
-                </select>
-                <input type="text" id="filterInput" placeholder="Enter filter value">
-                <button onclick="applyFilter()">Apply</button>
-            </div>
             <div class="auth-buttons">
-                <a href="registration.html"><button class="register"><span>Register</span></button></a>
-                <a href="Login.html"><button class="login"><span>Login</span></button></a>
+                <a href="/registration.html"><button class="register">Register</button></a>
+                <a href="/Login.html"><button class="login">Login</button></a>
+                <a href="/logout"><button class="login">Logout</button></a>
             </div>
         </nav>
     </header>
 
     <div class="marketplace-header">
-        <br><br><br>
-        <h1>Your Farming Hub</h1>
-        <p class="vibrating-text">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13L16 7"></path>
-                <circle cx="16" cy="7" r="3"></circle>
-                <path d="M10 17H6"></path>
-                <path d="M10 21H4"></path>
-                <path d="M10 9H8"></path>
-            </svg> 
-            Sell and Buy Directly from Farmers
-        </p>
+        <h1>Your Farming Marketplace</h1>
+        <p>Sell and Buy Directly from Farmers</p>
     </div>
 
-    <div class="crop-grid"></div>
+    <div class="crop-grid" id="cropGrid"></div>
 
     <div class="crop-form-container" id="cropFormContainer" onclick="closeForm(event)">
         <div class="crop-form" onclick="event.stopPropagation()">
-            <h2>Sell Your Crop<span class="icon">🌾</span></h2>
-            <div class="form-group">
-                <label for="cropName"><b>Crop Name:</b></label>
-                <input type="text" id="cropName" placeholder="Enter Crop Name" required>
-            </div>
-            <div class="form-group">
-                <label for="cropImage"><b>Crop Image:</b></label>
-                <input type="file" id="cropImage" accept="image/*" required>
-            </div>
-            <div class="form-group">
-                <label for="cropUnit"><b>Select Unit:</b></label>
-                <select id="cropUnit" required>
-                    <option value="unit" selected>--Select Unit--</option>
-                    <option value="kg">Kilogram (kg)</option>
-                    <option value="quintal">Quintal (100 kg)</option>
-                    <option value="ton">Ton (1000 kg)</option>
-                    <option value="pound">Pounds (lb)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="cropQuantity"><b>Quantity:</b></label>
-                <input type="number" id="cropQuantity" placeholder="Enter Quantity" required>
-            </div>
-            <div class="form-group">
-                <label for="cropPrice"><b>Price per Unit:</b></label>
-                <input type="number" id="cropPrice" placeholder="Enter Price per Unit" required>
-            </div>
-            <div class="form-group">
-                <label for="sellerName"><b>Seller Name:</b></label>
-                <input type="text" id="sellerName" placeholder="Enter Seller Name" required>
-            </div>
-            <div class="form-group">
-                <label for="sellerLocation"><b>Location:</b></label>
-                <input type="text" id="sellerLocation" placeholder="Enter Location" required>
-            </div>
+            <h2>Sell Your Crop <span class="icon">🌾</span></h2>
+            <input type="text" id="cropName" placeholder="Crop Name" required>
+            <input type="file" id="cropImage" accept="image/*" required>
+            <select id="cropUnit" required>
+                <option value="" selected>--Select Unit--</option>
+                <option value="kg">Kilogram (kg)</option>
+                <option value="quintal">Quintal (100 kg)</option>
+                <option value="ton">Ton (1000 kg)</option>
+                <option value="pound">Pounds (lb)</option>
+            </select>
+            <input type="number" id="cropQuantity" placeholder="Quantity" required>
+            <input type="number" id="cropPrice" placeholder="Price per Unit" required>
+            <input type="text" id="sellerName" placeholder="Seller Name" required>
+            <input type="text" id="sellerLocation" placeholder="Location" required>
             <button onclick="addCrop()">Add Crop</button>
         </div>
     </div>
@@ -685,8 +368,9 @@ body {
         function openCropForm() {
             checkLogin().then(isLoggedIn => {
                 if (!isLoggedIn) {
-                    alert('Please login to add a crop');
-                    window.location.href = '/Login.html';
+                    if (confirm('You need to log in to add a crop. Go to login page?')) {
+                        window.location.href = '/Login.html';
+                    }
                 } else {
                     document.getElementById('cropFormContainer').style.display = 'flex';
                     document.getElementById('addCropButton').style.visibility = 'hidden';
@@ -710,7 +394,7 @@ body {
             const location = document.getElementById('sellerLocation').value;
             const unit = document.getElementById('cropUnit').value;
 
-            if (!name || !imageInput.files.length || !price || !quantity || !seller || !location || unit === "unit") {
+            if (!name || !imageInput.files.length || !price || !quantity || !seller || !location || !unit) {
                 alert("Please fill all fields correctly!");
                 return;
             }
@@ -736,9 +420,9 @@ body {
                     alert('Crop added successfully!');
                     document.getElementById('cropFormContainer').style.display = 'none';
                     document.getElementById('addCropButton').style.visibility = 'visible';
-                    fetchCrops();
+                    fetchCrops(); // Refresh crop list
                 } else {
-                    alert(result.error);
+                    alert(result.error || 'Failed to add crop');
                 }
             } catch (error) {
                 console.error('Error adding crop:', error);
@@ -750,21 +434,19 @@ body {
             try {
                 const response = await fetch('/crops');
                 const crops = await response.json();
-                const cropGrid = document.querySelector('.crop-grid');
+                const cropGrid = document.getElementById('cropGrid');
                 cropGrid.innerHTML = '';
 
                 crops.forEach(crop => {
                     const card = document.createElement('div');
                     card.className = 'crop-card';
                     card.innerHTML = `
-                        <img src="${crop.image || 'https://via.placeholder.com/150'}" class="crop-image" alt="${crop.name}">
+                        <img src="/uploads/${crop.image || 'placeholder.jpg'}" class="crop-image" alt="${crop.name}">
                         <div class="crop-details">
                             <h3>${crop.name}</h3>
                             <div class="price-tag">₹${crop.price}/${crop.unit}</div>
-                            <div class="quantity-available">Available: ${crop.quantity} ${crop.unit}</div>
-                            <div class="seller-info">
-                                <b>${crop.seller}</b> - ${crop.location}
-                            </div>
+                            <div>Available: ${crop.quantity} ${crop.unit}</div>
+                            <div>Seller: ${crop.seller} - ${crop.location}</div>
                             <div class="button-group">
                                 <button class="buy-button" onclick="buyCrop('${crop.id}')">Buy Now</button>
                                 <button class="chat-button">Chat</button>
@@ -775,48 +457,36 @@ body {
                 });
             } catch (error) {
                 console.error('Error fetching crops:', error);
+                document.getElementById('cropGrid').innerHTML = '<p>Failed to load crops. Please try again later.</p>';
             }
         }
 
         async function buyCrop(cropId) {
             const isLoggedIn = await checkLogin();
             if (!isLoggedIn) {
-                alert('Please login to buy a crop');
-                window.location.href = '/Login.html';
+                if (confirm('You need to log in to buy a crop. Go to login page?')) {
+                    window.location.href = '/Login.html';
+                }
             } else {
                 alert(`Buying crop with ID: ${cropId} (Feature TBD)`);
                 // Add buy logic here later
             }
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            var sidebar = document.getElementById("sidebar");
-            var menuIcon = document.querySelector(".menu-icon");
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
-            function toggleSidebar() {
-                sidebar.classList.toggle("active");
-            }
-
-            menuIcon.addEventListener("click", function (event) {
-                event.stopPropagation();
-                toggleSidebar();
-            });
-
-            document.addEventListener("click", function (event) {
-                if (sidebar.classList.contains("active") && !sidebar.contains(event.target) && event.target !== menuIcon) {
-                    sidebar.classList.remove("active");
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCrops(); // Load crops on page load
+            document.addEventListener('click', (event) => {
+                const sidebar = document.getElementById('sidebar');
+                const menuIcon = document.querySelector('.menu-icon');
+                if (sidebar.classList.contains('active') && !sidebar.contains(event.target) && event.target !== menuIcon) {
+                    sidebar.classList.remove('active');
                 }
             });
-
-            fetchCrops();
         });
-
-        function applyFilter() {
-            const category = document.getElementById('filterCategory').value;
-            const value = document.getElementById('filterInput').value;
-            console.log(`Filtering by ${category} with value ${value}`);
-            // Add filter logic later
-        }
     </script>
 </body>
 </html>
