@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Kisaan Connect</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+      url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover fixed;
+      color: #333;
+    }
+    .login-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #28a745;
+      font-size: 24px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #333;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    input:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+      outline: none;
+    }
+    button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    .forgot-password, .bottom-links {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .forgot-password a, .bottom-links a {
+      color: #28a745;
+      text-decoration: none;
+    }
+    .forgot-password a:hover, .bottom-links a:hover {
+      text-decoration: underline;
+    }
+    .error {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+      text-align: center;
+    }
+    .alert {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #28a745;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+    }
+    #forgotPasswordForm {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="alert" id="successAlert">Logged in successfully! Redirecting...</div>
+  <div class="alert" id="resetAlert">Password reset email sent! Check your inbox.</div>
+
+  <div class="login-container">
+    <h2>Login to Kisaan Connect</h2>
+    <form id="loginForm" method="POST" action="/login/">
+      <label for="emailPhone">Email or Phone Number</label>
+      <input type="text" id="emailPhone" name="emailPhone" placeholder="Enter your email or phone number" required>
+      <div class="error" id="emailPhoneError">Please enter a valid email or 10-digit phone number</div>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      <div class="error" id="passwordError">Password is required</div>
+
+      <button type="submit">Login</button>
+
+      <div class="forgot-password">
+        <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+      </div>
+
+      <div style="text-align: center; margin-top: 20px;">
+        <p>New Farmer? <a href="registration.html">Register here</a></p>
+        <p><a href="index.html">Back to Home</a></p>
+    </div>
+    </form>
+
+    <form id="forgotPasswordForm">
+      <label for="resetEmail">Enter your email</label>
+      <input type="email" id="resetEmail" name="resetEmail" placeholder="Enter your email" required>
+      <div class="error" id="resetEmailError">Please enter a valid email</div>
+      <button type="submit">Send Reset Link</button>
+      <div class="forgot-password">
+        <a href="#" id="backToLogin">Back to Login</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const backToLogin = document.getElementById('backToLogin');
+
+    // Toggle between login and forgot password forms
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'none';
+      forgotPasswordForm.style.display = 'block';
+    });
+    backToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.style.display = 'block';
+      forgotPasswordForm.style.display = 'none';
+    });
+
+    // Login form submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.error').forEach(err => err.style.display = 'none');
+      document.querySelectorAll('input').forEach(input => input.classList.remove('input-error'));
+
+      const emailPhone = document.getElementById('emailPhone').value.trim();
+      const password = document.getElementById('password').value;
+
+      let isValid = true;
+      if (!emailPhone || (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailPhone) && !/^\d{10}$/.test(emailPhone))) {
+        showError('emailPhone', 'emailPhoneError');
+        isValid = false;
+      }
+      if (!password) {
+        showError('password', 'passwordError');
+        isValid = false;
+      }
+
+      if (isValid) {
+        const formData = new URLSearchParams();
+        formData.append('emailPhone', emailPhone);
+        formData.append('password', password);
+
+        try {
+          const response = await fetch('/login/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+          });
+          const result = await response.json();
+
+          if (response.ok) {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.style.display = 'block';
+            setTimeout(() => {
+              successAlert.style.display = 'none';
+              window.location.href = '/dashboard';
+            }, 2000);
+          } else {
+            alert(result.error || 'Login failed. Please check your credentials.');
+          }
+        } catch (error) {
+          console.error('Error during login:', error);
+          alert('An error occurred. Please try again.');
+        }
+      }
+    });
+
+    // Forgot password form submission
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.error').forEach(err => err.style.display = 'none');
+      document.querySelectorAll('input').forEach(input => input.classList.remove('input-error'));
+
+      const resetEmail = document.getElementById('resetEmail').value.trim();
+      if (!resetEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
+        showError('resetEmail', 'resetEmailError');
+        return;
+      }
+
+      try {
+        const response = await fetch('/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: resetEmail })
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          const resetAlert = document.getElementById('resetAlert');
+          resetAlert.style.display = 'block';
+          setTimeout(() => {
+            resetAlert.style.display = 'none';
+            loginForm.style.display = 'block';
+            forgotPasswordForm.style.display = 'none';
+          }, 2000);
+        } else {
+          alert(result.error || 'Failed to send reset email.');
+        }
+      } catch (error) {
+        console.error('Error during reset request:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+
+    function showError(inputId, errorId) {
+      document.getElementById(inputId).classList.add('input-error');
+      document.getElementById(errorId).style.display = 'block';
+    }
+  </script>
+</body>
+</html>

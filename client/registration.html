@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Registration - Kisaan Connect</title>
+  <style>
+    /* General Styles */
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Ensure body covers full screen height */
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+        url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover fixed; /* Fixed background */
+        color: #333;
+      }
+  
+      .form-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        max-height: 90vh; /* Limit height to 90% of viewport */
+        overflow-y: auto; /* Make form scrollable if content exceeds height */
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      .password-wrapper {
+        position: relative;
+        width: 100%;
+      }
+      
+      .password-wrapper input {
+        width: 100%;
+        padding-right: 18px;
+      }
+      
+      .eye-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+      }
+      
+  
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+  
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #28a745;
+        font-size: 24px;
+      }
+  
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #333;
+      }
+  
+      input, select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+  
+      input:focus, select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+        outline: none;
+      }
+  
+      button {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+      }
+  
+      button:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+      }
+  
+      .file-upload {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+  
+      .file-upload input[type="file"] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+      }
+  
+      .file-upload-label {
+        display: block;
+        padding: 12px;
+        background: #f4f4f4;
+        border: 1px dashed #ccc;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        color: #666;
+        font-size: 16px;
+      }
+  
+      .file-upload-label:hover {
+        background: #e9e9e9;
+      }
+  
+      .terms {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+      }
+  
+      .terms input {
+        width: auto;
+        margin-right: 10px;
+      }
+  
+      .error-message {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+
+    /* Clean and simple buttons */
+    .simple-button {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 15px;
+        font-weight: 500;
+        border: none;
+    }
+
+    .simple-button:hover {
+        background-color: #449d48;
+    }
+
+      
+      .alert {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #28a745;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1000;
+      }
+    /* Adding a class for error display */
+    .error {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    .input-error {
+      border-color: #dc3545;
+    }
+
+      @media (max-width: 480px) {
+        .form-container {
+          padding: 20px;
+        }
+  
+        h2 {
+          font-size: 20px;
+        }
+  
+        input, select, button {
+          font-size: 14px;
+        }
+      }
+  
+      form{
+        padding:50px;
+      }
+
+      
+  </style>
+</head>
+<body>
+
+    <div class="alert" id="successAlert">Registration successful! Redirecting to login...</div>
+
+  <div class="form-container">
+    <h2>Farmer Registration</h2>
+    <form id="registrationForm" method="POST" action="/register/" enctype="multipart/form-data">
+      <!-- Full Name -->
+      <label for="fullName">Full Name</label>
+      <input type="text" name="fullName" id="fullName" placeholder="Enter your full name" required>
+      <div class="error" id="fullNameError">Full name must be at least 3 characters.</div>
+
+      <!-- Phone Number -->
+      <label for="phoneNumber">Phone Number</label>
+      <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required>
+      <div class="error" id="phoneNumberError">Phone number must be 10 digits.</div>
+
+      <!-- Email -->
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email">
+      <div class="error" id="emailError">Please enter a valid email address.</div>
+
+      <!-- Password -->
+    <label for="password">Password</label>
+    <div class="password-wrapper">
+    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+    <span 
+        onmouseover="showPassword('password')" 
+        onmouseout="hidePassword('password')" 
+        class="eye-icon">
+        👁️
+    </span>
+    </div>
+    <div class="error" id="passwordError">Password must be at least 6 characters.</div>
+
+
+      <!-- Confirm Password -->
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+      <div class="error" id="confirmPasswordError">Passwords do not match.</div>
+
+      <!-- State Dropdown -->
+      <div class="form-group col-md-4">
+        <label for="inputState">State</label>
+        <select class="form-control" id="inputState" name="inputState" required>
+        
+          <option value="SelectState">Select State</option>
+          <option value="Andhra Pradesh">Andra Pradesh</option>
+          <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+          <option value="Assam">Assam</option>
+          <option value="Bihar">Bihar</option>
+          <option value="Chhattisgarh">Chhattisgarh</option>
+          <option value="Goa">Goa</option>
+          <option value="Gujarat">Gujarat</option>
+          <option value="Haryana">Haryana</option>
+          <option value="Himachal Pradesh">Himachal Pradesh</option>
+          <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+          <option value="Jharkhand">Jharkhand</option>
+          <option value="Karnataka">Karnataka</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Madya Pradesh">Madya Pradesh</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Manipur">Manipur</option>
+          <option value="Meghalaya">Meghalaya</option>
+          <option value="Mizoram">Mizoram</option>
+          <option value="Nagaland">Nagaland</option>
+          <option value="Orissa">Orissa</option>
+          <option value="Punjab">Punjab</option>
+          <option value="Rajasthan">Rajasthan</option>
+          <option value="Sikkim">Sikkim</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Tripura">Tripura</option>
+          <option value="Uttaranchal">Uttaranchal</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+          <option value="West Bengal">West Bengal</option>
+          <option disabled style="background-color:#aaa; color:#fff">UNION Territories</option>
+          <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+          <option value="Chandigarh">Chandigarh</option>
+          <option value="Dadar and Nagar Haveli">Dadar and Nagar Haveli</option>
+          <option value="Daman and Diu">Daman and Diu</option>
+          <option value="Delhi">Delhi</option>
+          <option value="Lakshadeep">Lakshadeep</option>
+          <option value="Pondicherry">Pondicherry</option>  
+                            
+        </select>
+        <div class="error" id="stateError">Please select a state.</div>
+      </div>
+
+      <!-- District Dropdown -->
+      <div class="form-group col-md-4">
+        <label for="inputDistrict">District</label>
+        <select class="form-control" id="inputDistrict" name="inputDistrict" required>
+          <option value="">-- select one --</option>
+        </select>
+        <div class="error" id="districtError">Please select a district.</div>
+      </div>
+
+      <!-- Village/Town -->
+      <label for="village_town">Village/Town</label>
+      <input type="text" id="village_town" name="village_town" placeholder="Enter your village/town" required>
+      <div class="error" id="villageError">Village/town name is required.</div>
+
+      <!-- Pin Code -->
+      <label for="pinCode">Pin Code</label>
+      <input type="text" id="pinCode" name="pinCode" placeholder="Enter your pin code" required>
+      <div class="error" id="pinCodeError">Pin code must be 6 digits.</div>
+
+      <!-- Profile Picture Upload -->
+      <label>Profile Picture</label>
+      <div class="file-upload">
+        <label class="file-upload-label" for="profilePicture">
+          Upload Profile Picture
+          <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+        </label>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="terms">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">I agree to the terms and conditions.</label>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit">Register as Farmer</button>
+      <!-- New Bottom Links Section -->
+      <div style="text-align: center; margin-top: 20px;">
+        <p>Already registered? <a href="Login.html">Login here</a></p>
+        <p><a href="index.html">Back to Home</a></p>
+    </div>
+    
+    </form>
+  </div>
+
+  <script>
+
+        function showPassword(id) {
+            document.getElementById(id).type = "text";
+        }
+        function hidePassword(id) {
+            document.getElementById(id).type = "password";
+        }
+        
+    
+    document.addEventListener("DOMContentLoaded", function () {
+      const stateSelect = document.getElementById("inputState");
+      const districtSelect = document.getElementById("inputDistrict");
+      
+      const districts = {
+        "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Kadapa", "Krishna", "Kurnool", "Prakasam", "Nellore", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari"],
+        "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "Itanagar"],
+        "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Dhubri", "Dibrugarh", "Goalpara", "Jorhat"],
+        "Bihar": ["Araria", "Arwal", "Aurangabad", "Bhagalpur", "Bhojpur", "Darbhanga", "Gaya", "Muzaffarpur", "Patna"],
+        "Chhattisgarh": ["Balod", "Baloda Bazar", "Bilaspur", "Dhamtari", "Durg", "Janjgir Champa", "Korba", "Raipur", "Surguja"],
+        "Goa": ["North Goa", "South Goa"],
+        "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Bhavnagar", "Gandhinagar", "Kutch", "Rajkot", "Surat", "Vadodara"],
+        "Haryana": ["Ambala", "Bhiwani", "Faridabad", "Gurugram", "Hisar", "Jhajjar", "Karnal", "Panipat", "Sonipat"],
+        "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kullu", "Mandi", "Shimla", "Solan", "Una"],
+        "Jammu and Kashmir": ["Anantnag", "Baramulla", "Doda", "Jammu", "Kathua", "Poonch", "Pulwama", "Rajouri", "Udhampur"],
+        "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Giridih", "Hazaribagh", "Jamshedpur", "Ranchi"],
+        "Karnataka": ["Bangalore", "Belgaum", "Bellary", "Bidar", "Chikmagalur", "Dharwad", "Gulbarga", "Mandya", "Mysore"],
+        "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kollam", "Kottayam", "Kozhikode", "Palakkad", "Thrissur"],
+        "Madhya Pradesh": ["Bhopal", "Gwalior", "Indore", "Jabalpur", "Rewa", "Sagar", "Satna", "Ujjain"],
+        "Maharashtra": ["Ahmednagar", "Aurangabad", "Mumbai", "Nagpur", "Nashik", "Pune", "Solapur", "Thane"],
+        "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal", "Senapati", "Thoubal", "Ukhrul"],
+        "Meghalaya": ["East Garo Hills", "East Khasi Hills", "Jaintia Hills", "Ri Bhoi", "West Garo Hills"],
+        "Mizoram": ["Aizawl", "Champhai", "Kolasib", "Lawngtlai", "Lunglei", "Serchhip"],
+        "Nagaland": ["Dimapur", "Kohima", "Mokokchung", "Phek", "Tuensang", "Wokha", "Zunheboto"],
+        "Odisha": ["Angul", "Balangir", "Balasore", "Cuttack", "Ganjam", "Kendujhar", "Koraput", "Puri"],
+        "Punjab": ["Amritsar", "Bathinda", "Firozpur", "Jalandhar", "Ludhiana", "Patiala", "Sangrur"],
+        "Rajasthan": ["Ajmer", "Bikaner", "Jaipur", "Jaisalmer", "Jodhpur", "Kota", "Udaipur"],
+        "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Salem", "Tiruchirappalli", "Tirunelveli", "Vellore"],
+        "Telangana": ["Adilabad", "Hyderabad", "Karimnagar", "Khammam", "Mahabubnagar", "Nalgonda", "Warangal"],
+        "Tripura": ["Dhalai", "Gomati", "Khowai", "South Tripura", "West Tripura"],
+        "Uttar Pradesh": ["Agra", "Allahabad", "Kanpur", "Lucknow", "Meerut", "Varanasi"],
+        "Uttarakhand": ["Almora", "Dehradun", "Haridwar", "Nainital", "Pithoragarh", "Rudraprayag"],
+        "West Bengal": ["Bankura", "Bardhaman", "Darjeeling", "Howrah", "Kolkata", "Malda", "Murshidabad"],
+        "Andaman and Nicobar Islands": ["Nicobar", "North Middle Andaman", "South Andaman"],
+        "Chandigarh": ["Chandigarh"],
+        "Dadra and Nagar Haveli": ["Dadra and Nagar Haveli"],
+        "Daman and Diu": ["Daman", "Diu"],
+        "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "South Delhi", "West Delhi"],
+        "Lakshadweep": ["Lakshadweep"],
+        "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"]
+        };
+
+      stateSelect.addEventListener("change", function () {
+        const selectedState = stateSelect.value;
+        districtSelect.innerHTML = '<option value="">-- select one --</option>';
+        if (districts[selectedState]) {
+          districts[selectedState].forEach(district => {
+            let option = document.createElement("option");
+            option.value = district;
+            option.textContent = district;
+            districtSelect.appendChild(option);
+          });
+        }
+      });
+    });
+
+    // Form Validation and Submission
+    const form = document.getElementById('registrationForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent default form submission
+
+      // Reset error states
+      document.querySelectorAll('.error').forEach(err => err.style.display = 'none');
+      document.querySelectorAll('input, select').forEach(input => input.classList.remove('input-error'));
+
+      // Get form values
+      const fullName = document.getElementById('fullName').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const state = document.getElementById('inputState').value;
+      const district = document.getElementById('inputDistrict').value;
+      const village_town = document.getElementById('village_town').value.trim();
+      const pinCode = document.getElementById('pinCode').value.trim();
+
+      let isValid = true;
+
+      // Validation checks
+      if (fullName.length < 3) {
+        showError('fullName', 'fullNameError');
+        isValid = false;
+      }
+      if (!/^\d{10}$/.test(phoneNumber)) {
+        showError('phoneNumber', 'phoneNumberError');
+        isValid = false;
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('email', 'emailError');
+        isValid = false;
+      }
+      if (password.length < 6) {
+        showError('password', 'passwordError');
+        isValid = false;
+      }
+      if (password !== confirmPassword) {
+        showError('confirmPassword', 'confirmPasswordError');
+        isValid = false;
+      }
+      if (state === 'SelectState') {
+        showError('inputState', 'stateError');
+        isValid = false;
+      }
+      if (!district) {
+        showError('inputDistrict', 'districtError');
+        isValid = false;
+      }
+      if (!village_town) {
+        showError('village_town', 'villageError');
+        isValid = false;
+      }
+      if (!/^\d{6}$/.test(pinCode)) {
+        showError('pinCode', 'pinCodeError');
+        isValid = false;
+      }
+
+      if (isValid) {
+        const formData = new FormData(form);
+        try {
+          const response = await fetch('/register/', {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.json();
+          if (response.ok) {
+            // Show custom success alert
+            const successAlert = document.getElementById('successAlert');
+            successAlert.style.display = 'block';
+            // Hide alert and redirect after 2 seconds
+            setTimeout(() => {
+              successAlert.style.display = 'none';
+              window.location.href = 'Login.html';
+            }, 2000);
+            form.reset(); // Clear form
+          } else {
+            if (result.error.includes('already registered') || result.error.includes('Duplicate entry')) {
+                alert(result.error);
+                form.reset(); // Reset form on duplicate entry
+              } else {
+                alert(result.error);
+              }
+          }
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          alert('An error occurred. Please try again.');
+        }
+      }
+    });
+
+    // Helper function to show errors
+    function showError(inputId, errorId) {
+      document.getElementById(inputId).classList.add('input-error');
+      document.getElementById(errorId).style.display = 'block';
+    }
+  </script>
+</body>
+</html>
