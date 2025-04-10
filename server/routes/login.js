@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../config/db');
 
-// Login Endpoint
 router.post('/', (req, res) => {
   console.log('Received POST /login request');
   console.log('Raw headers:', req.headers);
@@ -34,7 +33,7 @@ router.post('/', (req, res) => {
       }
 
       const user = users[0];
-      console.log('User found:', user);
+      console.log('User found from DB:', user); // Log full user object
 
       bcrypt.compare(password, user.password, (err, passwordMatch) => {
         if (err) {
@@ -51,9 +50,10 @@ router.post('/', (req, res) => {
           id: user.id,
           fullName: user.full_name,
           phoneNumber: user.phone_number,
-          email: user.email
+          email: user.email,
+          profilePicture: user.profile_picture
         };
-        console.log('Session created:', req.session.user);
+        console.log('Session created:', req.session.user); // Log session data
 
         console.log('Login successful for user:', user.full_name);
         res.status(200).json({ message: 'Login successful!' });

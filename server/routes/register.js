@@ -9,7 +9,7 @@ const path = require('path');
 // File Upload Setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads'); // Absolute path to /home/rgukt/project/kisaanconnect/uploads
+    const uploadDir = path.join(__dirname, '../../uploads/profile'); // Absolute path to /home/rgukt/project/kisaanconnect/uploads
     // Ensure the directory exists
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -34,7 +34,7 @@ router.post('/', upload.single('profilePicture'), async (req, res) => {
     fullName, phoneNumber, email, password, inputState, inputDistrict, village_town, pinCode
   } = req.body;
   const profilePicture = req.file ? req.file.filename : null;
-  const filePath = req.file ? path.join(__dirname, '../../uploads', req.file.filename) : null;
+  const filePath = req.file ? path.join(__dirname, '../../uploads/profile', req.file.filename) : null;
 
   console.log('Parsed form data:', {
     fullName, phoneNumber, email, password, inputState, inputDistrict, village_town, pinCode, profilePicture
