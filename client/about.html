@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 950px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .carousel-inner img {
+      border-radius: 12px;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .carousel-caption {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 10px 20px;
+    }
+
+    .carousel-caption h5, .carousel-caption p {
+      color: #fff;
+      margin: 0;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .grid-item {
+      background: #fefefe;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #27ae60;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      padding: 8px 0;
+      font-size: 16px;
+      color: #555;
+    }
+
+    li::before {
+      content: "✔";
+      color: #27ae60;
+      font-weight: bold;
+      padding-right: 8px;
+    }
+
+    @media (min-width: 768px) {
+      .grid-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .carousel-caption {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 12px;
+        padding: 15px 25px;
+        max-width: 80%;
+        margin: auto;
+        backdrop-filter: blur(5px);
+      }
+      
+      .carousel-caption h5 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #fff;
+      }
+      
+      .carousel-caption p {
+        color: #ddd;
+        font-style: italic;
+      }
+
+      
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>About Kisaan Connect</h1>
+
+    <!-- Auto-Scrolling Bootstrap 5 Carousel -->
+    <div id="kisaanCarousel" class="carousel slide carousel-fade mb-5" data-bs-ride="carousel" data-bs-interval="2850">
+        <div class="carousel-inner">
+      
+          <div class="carousel-item active">
+            <img src="https://plus.unsplash.com/premium_photo-1661964177687-57387c2cbd14?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8amFwYW58ZW58MHx8MHx8fDA%3D" class="d-block w-100" alt="Farming Field">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>“The ultimate goal of farming is not the growing of crops, but the cultivation of human beings.”</h5>
+              <p>— Masanobu Fukuoka</p>
+            </div>
+          </div>
+      
+          <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1552083375-1447ce886485?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bmF0dXJlJTIwd2FsbHBhcGVyfGVufDB8fDB8fHww" class="d-block w-100" alt="Farmer Ploughing">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>“Agriculture is the most healthful, most useful and most noble employment of man.”</h5>
+              <p>— George Washington</p>
+            </div>
+          </div>
+      
+          <div class="carousel-item">
+            <img src="https://plus.unsplash.com/premium_photo-1673410154246-4002e211a6fb?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8d2F0ZXJmYWxsJTIwd2FsbHBhcGVyfGVufDB8fDB8fHww" class="d-block w-100" alt="Kisan">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>“Farming looks mighty easy when your plow is a pencil.”</h5>
+              <p>— Dwight D. Eisenhower</p>
+            </div>
+          </div>
+      
+          <div class="carousel-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Idyllic_landscape_with_a_waterfall_%28Unsplash%29.jpg/1200px-Idyllic_landscape_with_a_waterfall_%28Unsplash%29.jpg" class="d-block w-100" alt="Sunset Farm">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>“The farmer is the only man in our economy who buys everything at retail, sells everything at wholesale, and pays the freight both ways.”</h5>
+              <p>— John F. Kennedy</p>
+            </div>
+          </div>
+      
+        </div>
+      
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#kisaanCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#kisaanCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+
+
+        <div class="grid-container">
+            <div class="grid-item">
+              <h2>Our Vision</h2>
+              <ul>
+                <li>Empower farmers with direct market access.</li>
+                <li>Eliminate middlemen to ensure fair pricing.</li>
+                <li>Bridge the gap between farmers and consumers.</li>
+              </ul>
+            </div>
+      
+            <div class="grid-item">
+              <h2>Features</h2>
+              <ul>
+                <li>Real-time crop price updates.</li>
+                <li>Seamless buying and selling of crops.</li>
+                <li>User-friendly dashboard for farmers.</li>
+                <li>Secure and fast transactions.</li>
+              </ul>
+            </div>
+      
+            <div class="grid-item">
+              <h2>Benefits</h2>
+              <ul>
+                <li>Increased profits for farmers.</li>
+                <li>Lower prices for consumers.</li>
+                <li>Fresh and organic produce availability.</li>
+              </ul>
+            </div>
+      
+            <div class="grid-item">
+              <h2>How It Works?</h2>
+              <ul>
+                <li>Farmers list their crops with pricing.</li>
+                <li>Buyers place orders directly from farmers.</li>
+                <li>Payment and logistics are handled securely.</li>
+              </ul>
+            </div>
+
+      </div>
+      
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

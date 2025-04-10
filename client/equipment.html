@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Kisaan Connect - Equipment Rental</title>
+    <style>
+        /* Core Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
+                        #f5f5f5;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            gap: 30px; /* Increased spacing */
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .equipment-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns for medium screens */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .equipment-grid {
+                grid-template-columns: 1fr; /* Single column for small screens */
+            }
+        }
+
+        .equipment-item {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .equipment-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .equipment-image {
+            height: 250px; /* Increased image height */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .equipment-content {
+            padding: 20px;
+        }
+
+        .equipment-name {
+            font-size: 1.4em;
+            color: #25c717;
+            margin-bottom: 10px;
+        }
+
+        .equipment-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .cost {
+            color: #25c717;
+            font-size: 1.2em;
+        }
+
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .seller-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .seller-name {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .availability {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .equipment-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .rent-button {
+            background: #25c717;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1.1em;
+        }
+
+        .rent-button:hover {
+            background: #20a515;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 15% auto;
+            padding: 40px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .equipment-form-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .equipment-form {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+            url('https://img.freepik.com/free-photo/yellow-industrial-bulldozer-construction-site-generative-ai_188544-15761.jpg') no-repeat center center/cover;
+            padding: 20px;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin: 5px;
+        }
+        
+        .form-group label {
+            text-align: left;
+        }
+        
+        .equipment-form input,
+        .equipment-form select {
+            width: 60%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #25c717;
+            border-radius: 5px;
+        }
+        
+        .equipment-form button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .equipment-form button:hover {
+            background: #218838;
+        }
+        
+        /* Add Equipment Button */
+        #addEquipmentButton {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            font-size: 18px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+        
+        #addEquipmentButton:hover {
+            background-color: #218838;
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        
+    </style>
+</head>
+<body>
+    <!-- Equipment Grid -->
+    <div class="equipment-grid">
+        <!-- Equipment Item 1 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1637269820542-fcee090f8fbe?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Tractor</div>
+                <div class="equipment-details">
+                    <div class="cost">₹1500/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Green Farm Solutions</div>
+                            <div class="availability">Available: 5 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    High-power tractor for farming operations. Comes with various attachments.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 2 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1614977645968-6db1d7798ac7?q=80&w=1373&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Harvester</div>
+                <div class="equipment-details">
+                    <div class="cost">₹2200/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">AgriTech Rentals</div>
+                            <div class="availability">Available: 3 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Modern combine harvester for efficient crop harvesting.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 3 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://plus.unsplash.com/premium_photo-1661922800416-c0b49b9bb77f?q=80&w=1531&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Plow</div>
+                <div class="equipment-details">
+                    <div class="cost">₹800/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Farm Equip Co.</div>
+                            <div class="availability">Available: 8 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Heavy-duty plow for soil preparation and field cultivation.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 4 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://plus.unsplash.com/premium_photo-1661845609789-635c5e35c4ba?q=80&w=1548&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Sprinkler System</div>
+                <div class="equipment-details">
+                    <div class="cost">₹500/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Irrigation Pro</div>
+                            <div class="availability">Available: 12 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Automated irrigation system for efficient water distribution.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 5 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://plus.unsplash.com/premium_photo-1661811860830-ba25d94af541?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Cultivator</div>
+                <div class="equipment-details">
+                    <div class="cost">₹950/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Tillage Solutions</div>
+                            <div class="availability">Available: 6 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Rotary tiller for soil cultivation and weed control.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 6 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1706862609885-7771b001daa2?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Seed Drill</div>
+                <div class="equipment-details">
+                    <div class="cost">₹1200/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Precision Agri</div>
+                            <div class="availability">Available: 4 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Precision seed planting equipment for uniform crop growth.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 7 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://plus.unsplash.com/premium_photo-1661964075728-914c8ede7b85?q=80&w=1492&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Fertilizer Spreader</div>
+                <div class="equipment-details">
+                    <div class="cost">₹750/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Crop Care Rentals</div>
+                            <div class="availability">Available: 7 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Broadcast spreader for even fertilizer distribution.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 8 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1696371269814-ae41fc67cf03?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Water Pump</div>
+                <div class="equipment-details">
+                    <div class="cost">₹600/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Aqua Farm Solutions</div>
+                            <div class="availability">Available: 10 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    High-capacity pump for irrigation and water transfer.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 9 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1633413257200-cc38024117ef?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Greenhouse Kit</div>
+                <div class="equipment-details">
+                    <div class="cost">₹3000/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Greenhouse Experts</div>
+                            <div class="availability">Available: 2 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Complete greenhouse setup for controlled environment farming.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+
+        <!-- Equipment Item 10 -->
+        <div class="equipment-item">
+            <div class="equipment-image" style="background-image: url('https://images.unsplash.com/photo-1715886852332-efe3cfce496b?q=80&w=1476&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"></div>
+            <div class="equipment-content">
+                <div class="equipment-name">Mulcher</div>
+                <div class="equipment-details">
+                    <div class="cost">₹1800/day</div>
+                    <div class="seller-info">
+                        <div class="seller-avatar"></div>
+                        <div>
+                            <div class="seller-name">Land Prep Pros</div>
+                            <div class="availability">Available: 4 units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="equipment-description">
+                    Heavy-duty mulcher for vegetation management and land clearing.
+                </div>
+                <button class="rent-button" onclick="showModal()">Rent Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>Request Received!</h2>
+            <p>Your rental request has been successfully submitted. We'll notify you soon.</p>
+            <button onclick="hideModal()" class="rent-button">OK</button>
+        </div>
+    </div>
+
+    <div class="equipment-grid">
+        <!-- Equipment will be added here dynamically -->
+    </div>
+    
+    <!-- Equipment Submission Form (Hidden Initially) -->
+    <div class="equipment-form-container" id="equipmentFormContainer" onclick="closeEquipmentForm(event)">
+        <div class="equipment-form" onclick="event.stopPropagation()">
+            <h2>Rent Your Equipment <span class="icon">🛠️</span></h2>
+    
+            <div class="form-group">
+                <label for="equipmentName"><b>Equipment Name:</b></label>
+                <input type="text" id="equipmentName" placeholder="Enter Equipment Name" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="equipmentImage"><b>Equipment Image:</b></label>
+                <input type="file" id="equipmentImage" accept="image/*" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="rentalRate"><b>Rental Rate:</b></label>
+                <input type="number" id="rentalRate" placeholder="Rate (per day/hour)" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="rentalDuration"><b>Available Duration:</b></label>
+                <input type="text" id="rentalDuration" placeholder="e.g., 2 days, 1 week" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="ownerName"><b>Owner Name:</b></label>
+                <input type="text" id="ownerName" placeholder="Enter Owner Name" required>
+            </div>
+    
+            <div class="form-group">
+                <label for="ownerLocation"><b>Location:</b></label>
+                <input type="text" id="ownerLocation" placeholder="Enter Location" required>
+            </div>
+    
+            <button onclick="addEquipment()">Add Equipment</button>
+        </div>
+    </div>
+    
+    <!-- Add Equipment Button -->
+    <button id="addEquipmentButton" onclick="openEquipmentForm()">+ Add Equipment</button>
+    
+    <script>
+        function openEquipmentForm() {
+            let formContainer = document.getElementById('equipmentFormContainer');
+            let addButton = document.getElementById('addEquipmentButton');
+    
+            formContainer.style.display = 'flex';
+            addButton.style.visibility = 'hidden';
+        }
+    
+        function closeEquipmentForm(event) {
+            let formContainer = document.getElementById('equipmentFormContainer');
+            let addButton = document.getElementById('addEquipmentButton');
+    
+            if (event.target.id === "equipmentFormContainer") {
+                formContainer.style.display = 'none';
+                addButton.style.visibility = 'visible';
+            }
+        }
+    
+        function addEquipment() {
+            const name = document.getElementById('equipmentName').value;
+            const imageInput = document.getElementById('equipmentImage');
+            const rate = document.getElementById('rentalRate').value;
+            const duration = document.getElementById('rentalDuration').value;
+            const owner = document.getElementById('ownerName').value;
+            const location = document.getElementById('ownerLocation').value;
+    
+            if (!name || !imageInput.files.length || !rate || !duration || !owner || !location) {
+                alert("Please fill all fields!");
+                return;
+            }
+    
+            // Add your dynamic UI update or backend POST logic here
+            alert("Equipment added successfully!");
+        }
+
+        function showModal() {
+            document.getElementById('successModal').style.display = 'block';
+        }
+
+        function hideModal() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

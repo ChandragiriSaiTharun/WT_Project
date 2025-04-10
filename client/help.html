@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help & Support - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f1f8e9;
+      color: #1b5e20;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding-top: 30px;
+    }
+    .card-custom {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .btn-custom {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+    }
+    .btn-custom:hover {
+      background-color: #1b5e20;
+    }
+    .response-box {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="text-success">Help & Support - Kisaan Connect</h1>
+      <p class="lead">If you're a farmer and need help, reach out using the form below or check our FAQ!</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-custom p-4 h-100">
+          <h2 class="h5 text-success">Submit a Query</h2>
+          <p>Describe your issue, and our support team will respond quickly.</p>
+          <input type="text" id="farmerName" class="form-control mb-2" placeholder="Your Name">
+          <input type="text" id="cropType" class="form-control mb-2" placeholder="Crop Type">
+          <textarea id="queryMsg" rows="4" class="form-control mb-2" placeholder="Describe your issue..."></textarea>
+          <button class="btn btn-custom w-100" onclick="submitQuery()">Submit</button>
+          <div id="response" class="response-box"></div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-custom p-4 h-100">
+          <h2 class="h5 text-success">Contact Us</h2>
+          <p><strong>Email:</strong> support@kisaanconnect.in</p>
+          <p><strong>Phone:</strong> +91-9876543210</p>
+          <p><strong>Office Hours:</strong> 9 AM - 5 PM</p>
+        </div>
+      </div>
+
+      <div class="col-md-12 col-lg-4">
+        <div class="card card-custom p-4 h-100">
+          <h2 class="h5 text-success">FAQs</h2>
+          <p><strong>Q:</strong> How can I track my crop price?<br>
+          <strong>A:</strong> Login and visit the Dashboard > Crop Price section.</p>
+
+          <p><strong>Q:</strong> How long does support take to respond?<br>
+          <strong>A:</strong> Usually within 24 hours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function submitQuery() {
+      const name = document.getElementById("farmerName").value;
+      const crop = document.getElementById("cropType").value;
+      const message = document.getElementById("queryMsg").value;
+      const responseBox = document.getElementById("response");
+
+      if (!name || !crop || !message) {
+        responseBox.innerText = "Please fill all fields.";
+        return;
+      }
+
+      fetch("https://api.kisaanconnect.in/help", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, crop, message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        responseBox.innerText = "Your query has been submitted successfully!";
+      })
+      .catch(err => {
+        console.error(err);
+        responseBox.innerText = "Something went wrong. Please try again later.";
+      });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
