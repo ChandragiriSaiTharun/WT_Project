@@ -12,7 +12,7 @@
 
 ## 🚀 Live Demo
 
-🌐 [kisaanconnect.vercel.app](https://kisaanconnect.vercel.app)  
+🌐 [kisaanconnect.vercel.app](https://kisaan-connect-farm.onrender.com)  
 🎥 [YouTube Video Demo](https://www.youtube.com/watch?v=your-demo-link)
 
 ---
