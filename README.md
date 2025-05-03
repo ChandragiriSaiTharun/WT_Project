@@ -24,7 +24,7 @@
 | 💻 Frontend | HTML, CSS, **Bootstrap**, jQuery           |
 | 🧠 Backend  | Node.js, **Express.js**                    |
 | 🛢 Database  | MySQL                                      |
-| ☁️ Hosting  | Vercel (Frontend) + Render/Local (Backend) |
+| ☁️ Hosting  | Render/Local                               |
 
 ---
 
