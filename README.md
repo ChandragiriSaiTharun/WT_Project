@@ -35,7 +35,4 @@
 - 📥 **Database Integration** using MySQL for persistent records.
 
 
-> **Organizer**  
-> [LinkedIn](https://linkedin.com/in/prabhas) | [GitHub](https://github.com/your-username)
-
 ---
