@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const bcrypt = require('bcrypt');
-const db = require('../config/db');
+const Farmer = require('../models/Farmer');
 const fs = require('fs');
 const path = require('path');
 
@@ -46,15 +46,20 @@ router.post('/', upload.single('profilePicture'), async (req, res) => {
   }
 
   try {
-    const checkQuery = `
-      SELECT * FROM farmers WHERE phone_number = ? OR (email IS NOT NULL AND email = ?)
-    `;
-    console.log('Executing duplicate check query with:', phoneNumber, email);
-    const [existing] = await db.promise().query(checkQuery, [phoneNumber, email || '']);
-    console.log('Duplicate check result:', existing);
+    console.log('Checking for duplicate phone number or email:', phoneNumber, email);
+    
+    // Check for existing farmer with same phone number or email
+    const existingFarmer = await Farmer.findOne({
+      $or: [
+        { phoneNumber: phoneNumber },
+        { email: email || null }
+      ]
+    });
+    
+    console.log('Duplicate check result:', existingFarmer);
 
-    if (existing.length > 0) {
-      if (existing[0].phone_number === phoneNumber) {
+    if (existingFarmer) {
+      if (existingFarmer.phoneNumber === phoneNumber) {
         console.log('Duplicate phone number found');
         if (filePath && fs.existsSync(filePath)) {
           fs.unlink(filePath, (err) => {
@@ -66,7 +71,7 @@ router.post('/', upload.single('profilePicture'), async (req, res) => {
         }
         return res.status(400).json({ error: 'Phone number already registered.Please Login to your Account' });
       }
-      if (existing[0].email === email) {
+      if (existingFarmer.email === email) {
         console.log('Duplicate email found');
         if (filePath && fs.existsSync(filePath)) {
           fs.unlink(filePath, (err) => {
@@ -85,17 +90,25 @@ router.post('/', upload.single('profilePicture'), async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     console.log('Password hashed successfully');
 
-    const insertQuery = `
-      INSERT INTO farmers (full_name, phone_number, email, password, state, district, village_town, pin_code, profile_picture)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    console.log('Executing insert query with:', [
-      fullName, phoneNumber, email || null, hashedPassword, inputState, inputDistrict, village_town, pinCode, profilePicture
-    ]);
-    const [result] = await db.promise().query(insertQuery, [
-      fullName, phoneNumber, email || null, hashedPassword, inputState, inputDistrict, village_town, pinCode, profilePicture
-    ]);
-    console.log('Insert result:', result);
+    // Create new farmer document
+    const newFarmer = new Farmer({
+      fullName,
+      phoneNumber,
+      email: email || null,
+      password: hashedPassword,
+      state: inputState,
+      district: inputDistrict,
+      villageTown: village_town,
+      pinCode,
+      profilePicture
+    });
+    
+    console.log('Creating new farmer with data:', {
+      fullName, phoneNumber, email: email || null, inputState, inputDistrict, village_town, pinCode, profilePicture
+    });
+    
+    const savedFarmer = await newFarmer.save();
+    console.log('Farmer saved successfully:', savedFarmer._id);
 
     console.log('Farmer registered successfully');
     res.status(200).json({ message: 'Farmer registered successfully!' });
@@ -109,7 +122,7 @@ router.post('/', upload.single('profilePicture'), async (req, res) => {
     } else {
       console.log('File not found at:', filePath);
     }
-    if (error.code === 'ER_DUP_ENTRY') {
+    if (error.code === 11000) { // MongoDB duplicate key error
       console.log('Duplicate entry error detected');
       return res.status(400).json({ error: 'Duplicate entry detected' });
     }

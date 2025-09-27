@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const db = require('../config/db');
+const Farmer = require('../models/Farmer');
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   console.log('Received POST /login request');
   console.log('Raw headers:', req.headers);
   console.log('Raw body:', req.body);
@@ -18,48 +18,44 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Email/phone and password are required' });
   }
 
-  db.query(
-    'SELECT * FROM farmers WHERE email = ? OR phone_number = ?',
-    [emailPhone, emailPhone],
-    (err, users) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error' });
-      }
+  try {
+    // Find user by email or phone number
+    const user = await Farmer.findOne({
+      $or: [
+        { email: emailPhone },
+        { phoneNumber: emailPhone }
+      ]
+    });
 
-      if (users.length === 0) {
-        console.log('No user found');
-        return res.status(401).json({ error: 'Invalid email/phone or password' });
-      }
-
-      const user = users[0];
-      console.log('User found from DB:', user); // Log full user object
-
-      bcrypt.compare(password, user.password, (err, passwordMatch) => {
-        if (err) {
-          console.error('Password comparison error:', err);
-          return res.status(500).json({ error: 'Server error' });
-        }
-
-        if (!passwordMatch) {
-          console.log('Password mismatch');
-          return res.status(401).json({ error: 'Invalid email/phone or password' });
-        }
-
-        req.session.user = {
-          id: user.id,
-          fullName: user.full_name,
-          phoneNumber: user.phone_number,
-          email: user.email,
-          profilePicture: user.profile_picture
-        };
-        console.log('Session created:', req.session.user); // Log session data
-
-        console.log('Login successful for user:', user.full_name);
-        res.status(200).json({ message: 'Login successful!' });
-      });
+    if (!user) {
+      console.log('No user found');
+      return res.status(401).json({ error: 'Invalid email/phone or password' });
     }
-  );
+
+    console.log('User found from DB:', user); // Log full user object
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    
+    if (!passwordMatch) {
+      console.log('Password mismatch');
+      return res.status(401).json({ error: 'Invalid email/phone or password' });
+    }
+
+    req.session.user = {
+      id: user._id,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      profilePicture: user.profilePicture
+    };
+    console.log('Session created:', req.session.user); // Log session data
+
+    console.log('Login successful for user:', user.fullName);
+    res.status(200).json({ message: 'Login successful!' });
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ error: 'Database error' });
+  }
 });
 
 module.exports = router;

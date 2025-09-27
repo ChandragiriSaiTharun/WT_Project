@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Help & Support - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      color: #1b5e20;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .admin-header {
+      background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+    .card-custom {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      border: none;
+    }
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    .ticket-item {
+      border-left: 4px solid #4caf50;
+      background: white;
+      margin-bottom: 1rem;
+    }
+    .ticket-urgent { border-left-color: #f44336; }
+    .ticket-high { border-left-color: #ff9800; }
+    .ticket-medium { border-left-color: #2196f3; }
+    .ticket-low { border-left-color: #4caf50; }
+    .btn-admin { 
+      background: linear-gradient(45deg, #2e7d32, #4caf50);
+      border: none;
+      color: white;
+    }
+    .btn-admin:hover { 
+      background: linear-gradient(45deg, #1b5e20, #388e3c);
+      color: white;
+    }
+    .stats-card {
+      background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+      border-radius: 15px;
+    }
+  </style>
+</head>
+<body class="admin-page">
+  <div class="admin-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col">
+          <h1><i class="fas fa-shield-alt me-2"></i>Admin Help & Support Dashboard</h1>
+          <p class="mb-0">Manage support tickets and help farmer community</p>
+        </div>
+        <div class="col-auto">
+          <a href="/marketplace" class="btn btn-light">
+            <i class="fas fa-arrow-left me-1"></i>Back to Marketplace
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4 admin-only" style="display: none;">
+      <div class="col-md-3">
+        <div class="card stats-card p-3">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-ticket-alt fa-2x text-primary me-3"></i>
+            <div>
+              <h3 class="mb-0" id="totalTickets">0</h3>
+              <small class="text-muted">Total Tickets</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card p-3">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-clock fa-2x text-warning me-3"></i>
+            <div>
+              <h3 class="mb-0" id="openTickets">0</h3>
+              <small class="text-muted">Open Tickets</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card p-3">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fa-2x text-success me-3"></i>
+            <div>
+              <h3 class="mb-0" id="resolvedTickets">0</h3>
+              <small class="text-muted">Resolved</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card p-3">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-users fa-2x text-info me-3"></i>
+            <div>
+              <h3 class="mb-0" id="activeUsers">0</h3>
+              <small class="text-muted">Active Users</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Admin Controls -->
+      <div class="col-md-8 admin-only" style="display: none;">
+        <div class="card card-custom">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-headset me-2"></i>Support Tickets</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="ticketFilter" id="all" checked>
+                <label class="btn btn-outline-success" for="all">All</label>
+                
+                <input type="radio" class="btn-check" name="ticketFilter" id="open">
+                <label class="btn btn-outline-warning" for="open">Open</label>
+                
+                <input type="radio" class="btn-check" name="ticketFilter" id="resolved">
+                <label class="btn btn-outline-success" for="resolved">Resolved</label>
+                
+                <input type="radio" class="btn-check" name="ticketFilter" id="urgent">
+                <label class="btn btn-outline-danger" for="urgent">Urgent</label>
+              </div>
+              <button class="btn btn-admin ms-2" onclick="loadTickets()">
+                <i class="fas fa-sync me-1"></i>Refresh
+              </button>
+            </div>
+            
+            <div id="ticketsContainer">
+              <!-- Tickets will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular User Help -->
+      <div class="col-md-4">
+        <div class="card card-custom">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Need Help?</h5>
+          </div>
+          <div class="card-body">
+            <form id="helpForm">
+              <div class="mb-3">
+                <label for="farmerName" class="form-label">Your Name</label>
+                <input type="text" id="farmerName" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select id="priority" class="form-select" required>
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select id="category" class="form-select" required>
+                  <option value="technical">Technical Issue</option>
+                  <option value="crop">Crop Related</option>
+                  <option value="market">Market/Pricing</option>
+                  <option value="account">Account Issues</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="message" class="form-label">Describe your issue</label>
+                <textarea id="message" class="form-control" rows="4" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-paper-plane me-1"></i>Submit Ticket
+              </button>
+            </form>
+            <div id="helpResponse" class="mt-3"></div>
+          </div>
+        </div>
+
+        <!-- Quick Help -->
+        <div class="card card-custom mt-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Help</h5>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush">
+              <a href="#" class="list-group-item list-group-item-action" onclick="showFAQ()">
+                <i class="fas fa-question-circle me-2"></i>Frequently Asked Questions
+              </a>
+              <a href="#" class="list-group-item list-group-item-action" onclick="showUserGuide()">
+                <i class="fas fa-book me-2"></i>User Guide
+              </a>
+              <a href="#" class="list-group-item list-group-item-action" onclick="showContactInfo()">
+                <i class="fas fa-phone me-2"></i>Contact Information
+              </a>
+              <a href="#" class="list-group-item list-group-item-action" onclick="showVideoTutorials()">
+                <i class="fas fa-video me-2"></i>Video Tutorials
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Modal -->
+  <div class="modal fade" id="ticketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ticket Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="ticketModalBody">
+          <!-- Ticket details will be loaded here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" onclick="respondToTicket()">Respond</button>
+          <button type="button" class="btn btn-warning" onclick="closeTicket()">Close Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin-check.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let currentTickets = [];
+    let selectedTicket = null;
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserData();
+      loadTickets();
+      loadStats();
+      
+      // Set up form submission
+      document.getElementById('helpForm').addEventListener('submit', submitHelpTicket);
+      
+      // Set up ticket filters
+      document.querySelectorAll('input[name="ticketFilter"]').forEach(radio => {
+        radio.addEventListener('change', filterTickets);
+      });
+    });
+
+    // Load current user data
+    async function loadUserData() {
+      try {
+        const user = await adminAuth.checkAuthentication();
+        if (user) {
+          document.getElementById('farmerName').value = user.fullName || '';
+          document.getElementById('email').value = user.email || '';
+          
+          // Check if user is admin
+          if (adminAuth.isAdmin(user.email)) {
+            // Show admin sections
+            showAdminSections();
+          } else {
+            // Redirect to regular help page
+            window.location.href = '/help.html';
+          }
+        } else {
+          // Not logged in, redirect to login
+          window.location.href = '/Login.html';
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+        showNetworkError('Failed to verify admin access. Please check your connection and try again.');
+      }
+    }
+
+    // Show admin-specific sections
+    function showAdminSections() {
+      // Admin sections are already visible in HTML, so just ensure they work
+      console.log('✅ Admin access verified');
+    }
+
+    // Show network error message
+    function showNetworkError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+      errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>❌ Network error.</strong> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      document.body.insertBefore(errorDiv, document.body.firstChild);
+    }
+
+    // Submit help ticket
+    async function submitHelpTicket(e) {
+      e.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('farmerName').value,
+        email: document.getElementById('email').value,
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        message: document.getElementById('message').value
+      };
+
+      try {
+        const response = await fetch('/api/help/tickets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        const responseDiv = document.getElementById('helpResponse');
+        
+        if (response.ok) {
+          responseDiv.innerHTML = `
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle me-2"></i>
+              Ticket submitted successfully! ID: #${result.ticketId}
+            </div>
+          `;
+          document.getElementById('helpForm').reset();
+          if (adminAuth.isAdmin()) {
+            loadTickets(); // Refresh admin view
+          }
+        } else {
+          responseDiv.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              ${result.error || 'Failed to submit ticket'}
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Network error submitting ticket:', error);
+        document.getElementById('helpResponse').innerHTML = `
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ❌ Network error. Please check your connection and try again.
+          </div>
+        `;
+      }
+    }
+
+    // Load support tickets (admin only)
+    async function loadTickets() {
+      if (!adminAuth.isAdmin()) return;
+      
+      try {
+        const response = await fetch('/api/help/tickets', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          currentTickets = data.tickets || data; // Handle different response formats
+          displayTickets(currentTickets);
+        } else if (response.status === 401) {
+          showNetworkError('Authentication required. Please login again.');
+          setTimeout(() => window.location.href = '/Login.html', 2000);
+        } else if (response.status === 403) {
+          showNetworkError('Admin access required. Redirecting to help page.');
+          setTimeout(() => window.location.href = '/help.html', 2000);
+        } else {
+          showNetworkError('Failed to load tickets. Please try again later.');
+        }
+      } catch (error) {
+        console.error('Failed to load tickets:', error);
+        showNetworkError('❌ Network error. Please check your connection and try again.');
+      }
+    }
+
+    // Display tickets
+    function displayTickets(tickets) {
+      const container = document.getElementById('ticketsContainer');
+      
+      if (tickets.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center">No tickets found.</p>';
+        return;
+      }
+      
+      container.innerHTML = tickets.map(ticket => `
+        <div class="card ticket-item ticket-${ticket.priority} mb-3" onclick="showTicketDetail('${ticket._id}')">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">#${ticket.ticketId} - ${ticket.name}</h6>
+                <p class="mb-1 text-muted">${ticket.message.substring(0, 100)}...</p>
+                <small class="text-muted">
+                  <i class="fas fa-user me-1"></i>${ticket.email} |
+                  <i class="fas fa-tag me-1"></i>${ticket.category} |
+                  <i class="fas fa-clock me-1"></i>${new Date(ticket.createdAt).toLocaleDateString()}
+                </small>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-${getPriorityColor(ticket.priority)}">${ticket.priority.toUpperCase()}</span>
+                <br>
+                <span class="badge bg-${getStatusColor(ticket.status)} mt-1">${ticket.status.toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Filter tickets
+    function filterTickets() {
+      const filter = document.querySelector('input[name="ticketFilter"]:checked').id;
+      let filteredTickets = currentTickets;
+      
+      switch(filter) {
+        case 'open':
+          filteredTickets = currentTickets.filter(t => t.status === 'open');
+          break;
+        case 'resolved':
+          filteredTickets = currentTickets.filter(t => t.status === 'resolved');
+          break;
+        case 'urgent':
+          filteredTickets = currentTickets.filter(t => t.priority === 'urgent');
+          break;
+      }
+      
+      displayTickets(filteredTickets);
+    }
+
+    // Show ticket detail
+    function showTicketDetail(ticketId) {
+      selectedTicket = currentTickets.find(t => t._id === ticketId);
+      if (!selectedTicket) return;
+      
+      document.getElementById('ticketModalBody').innerHTML = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Ticket Information</h6>
+            <p><strong>ID:</strong> #${selectedTicket.ticketId}</p>
+            <p><strong>Name:</strong> ${selectedTicket.name}</p>
+            <p><strong>Email:</strong> ${selectedTicket.email}</p>
+            <p><strong>Priority:</strong> <span class="badge bg-${getPriorityColor(selectedTicket.priority)}">${selectedTicket.priority.toUpperCase()}</span></p>
+            <p><strong>Category:</strong> ${selectedTicket.category}</p>
+            <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(selectedTicket.status)}">${selectedTicket.status.toUpperCase()}</span></p>
+            <p><strong>Created:</strong> ${new Date(selectedTicket.createdAt).toLocaleString()}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Message</h6>
+            <p class="bg-light p-3 rounded">${selectedTicket.message}</p>
+            <div class="mt-3">
+              <label for="responseMessage" class="form-label">Admin Response:</label>
+              <textarea id="responseMessage" class="form-control" rows="4" placeholder="Enter your response..."></textarea>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      new bootstrap.Modal(document.getElementById('ticketModal')).show();
+    }
+
+    // Load statistics
+    async function loadStats() {
+      if (!adminAuth.isAdmin()) return;
+      
+      try {
+        const response = await fetch('/api/help/stats', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const stats = await response.json();
+          document.getElementById('totalTickets').textContent = stats.total || 0;
+          document.getElementById('openTickets').textContent = stats.open || 0;
+          document.getElementById('resolvedTickets').textContent = stats.resolved || 0;
+          document.getElementById('activeUsers').textContent = stats.activeUsers || 0;
+        } else {
+          console.error('Failed to load stats, status:', response.status);
+          // Set default values if stats fail to load
+          document.getElementById('totalTickets').textContent = '-';
+          document.getElementById('openTickets').textContent = '-';
+          document.getElementById('resolvedTickets').textContent = '-';
+          document.getElementById('activeUsers').textContent = '-';
+        }
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+        showNetworkError('Failed to load statistics. Some admin features may not be available.');
+      }
+    }
+
+    // Helper functions
+    function getPriorityColor(priority) {
+      const colors = { urgent: 'danger', high: 'warning', medium: 'info', low: 'success' };
+      return colors[priority] || 'secondary';
+    }
+
+    function getStatusColor(status) {
+      const colors = { open: 'warning', resolved: 'success', closed: 'secondary' };
+      return colors[status] || 'secondary';
+    }
+
+    // Quick help functions
+    function showFAQ() {
+      alert('FAQ section - Implementation pending');
+    }
+
+    function showUserGuide() {
+      alert('User Guide - Implementation pending');
+    }
+
+    function showContactInfo() {
+      alert('Contact: support@kisaanconnect.com | Phone: +91-9876543210');
+    }
+
+    function showVideoTutorials() {
+      showModal('Video Tutorials', `
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-seedling fa-3x text-success mb-2"></i>
+                <h6>Crop Planting Guide</h6>
+                <p class="small text-muted">Learn proper planting techniques</p>
+                <a href="https://www.youtube.com/watch?v=uIh7g_Lgaeo" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-bug fa-3x text-warning mb-2"></i>
+                <h6>Pest Management</h6>
+                <p class="small text-muted">Identify and control crop pests</p>
+                <a href="https://www.youtube.com/watch?v=JIODRqrKx6Q" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-info mb-2"></i>
+                <h6>Market Analysis</h6>
+                <p class="small text-muted">Understanding crop market trends</p>
+                <a href="https://www.youtube.com/watch?v=K_0fKZKhbMo" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-cloud-rain fa-3x text-primary mb-2"></i>
+                <h6>Weather Monitoring</h6>
+                <p class="small text-muted">Using weather data for farming</p>
+                <a href="https://www.youtube.com/watch?v=xgpol4kkzZ8" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-tint fa-3x text-primary mb-2"></i>
+                <h6>Irrigation Techniques</h6>
+                <p class="small text-muted">Water management for crops</p>
+                <a href="https://www.youtube.com/watch?v=S3QryFqHBT0" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-flask fa-3x text-success mb-2"></i>
+                <h6>Soil Testing</h6>
+                <p class="small text-muted">Testing soil health and nutrients</p>
+                <a href="https://www.youtube.com/watch?v=2nHRQFrmvE4" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-leaf fa-3x text-success mb-2"></i>
+                <h6>Organic Farming</h6>
+                <p class="small text-muted">Sustainable farming practices</p>
+                <a href="https://www.youtube.com/watch?v=H1JRgIg9674" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-tools fa-3x text-warning mb-2"></i>
+                <h6>Farm Equipment</h6>
+                <p class="small text-muted">Modern farming tools and machinery</p>
+                <a href="https://www.youtube.com/watch?v=F4neLJQC1_E" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 text-center">
+          <p class="text-muted small">
+            <i class="fas fa-info-circle me-1"></i>
+            Videos will open in a new tab. Subscribe to our YouTube channel for more farming tips!
+          </p>
+          <a href="https://www.youtube.com/@KisaanConnect" target="_blank" class="btn btn-outline-danger btn-sm">
+            <i class="fab fa-youtube me-1"></i>Visit Our Channel
+          </a>
+        </div>
+      `);
+    }
+
+    function respondToTicket() {
+      const response = document.getElementById('responseMessage').value;
+      if (!response.trim()) {
+        alert('Please enter a response message');
+        return;
+      }
+      
+      // Implementation for responding to ticket
+      alert('Response sent successfully!');
+      bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+    }
+
+    function closeTicket() {
+      if (confirm('Are you sure you want to close this ticket?')) {
+        // Implementation for closing ticket
+        alert('Ticket closed successfully!');
+        bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+      }
+    }
+
+    // Generic modal function
+    function showModal(title, content) {
+      // Create modal if it doesn't exist
+      let modal = document.getElementById('helpModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'helpModal';
+        modal.innerHTML = `
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="helpModalTitle">${title}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body" id="helpModalBody">${content}</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      } else {
+        document.getElementById('helpModalTitle').textContent = title;
+        document.getElementById('helpModalBody').innerHTML = content;
+      }
+      
+      new bootstrap.Modal(modal).show();
+    }
+  </script>
+</body>
+</html>

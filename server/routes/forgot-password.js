@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db');
+const Farmer = require('../models/Farmer');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -28,21 +28,21 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const [users] = await db.promise().query('SELECT * FROM farmers WHERE email = ?', [email]);
-    console.log('Database query result:', users);
-    if (users.length === 0) {
+    const user = await Farmer.findOne({ email });
+    console.log('Database query result:', user);
+    if (!user) {
       console.log('No user found for email:', email);
       return res.status(404).json({ error: 'No account found with this email' });
     }
 
-    const user = users[0];
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000;
 
-    await db.promise().query(
-      'UPDATE farmers SET reset_token = ?, reset_token_expiry = ? WHERE email = ?',
-      [resetToken, resetTokenExpiry, email]
-    );
+    // Update user with reset token
+    await Farmer.findByIdAndUpdate(user._id, {
+      resetToken,
+      resetTokenExpiry
+    });
     console.log('Reset token stored for:', email);
 
     const resetUrl = `http://localhost:3000/reset-password.html?token=${resetToken}`;
@@ -89,24 +89,25 @@ router.post('/reset', async (req, res) => {
   
     try {
       console.log('Querying database with token:', token);
-      const [users] = await db.promise().query(
-        'SELECT * FROM farmers WHERE reset_token = ? AND reset_token_expiry > ?',
-        [token, Date.now()]
-      );
-      console.log('Query result:', users);
-      if (users.length === 0) {
+      const user = await Farmer.findOne({
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() }
+      });
+      console.log('Query result:', user);
+      if (!user) {
         console.log('No user found for token');
         return res.status(400).json({ error: 'Invalid or expired reset token' });
       }
   
-      const user = users[0];
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       console.log('Hashed new password');
   
-      await db.promise().query(
-        'UPDATE farmers SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
-        [hashedPassword, user.id]
-      );
+      // Update password and clear reset token
+      await Farmer.findByIdAndUpdate(user._id, {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
+      });
       console.log('Password reset for user:', user.email);
   
       res.status(200).json({ message: 'Password reset successfully!' });

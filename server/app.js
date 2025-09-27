@@ -2,11 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const connectDB = require('./config/db');
 const registerRoutes = require('./routes/register');
 const loginRoutes = require('./routes/login');
 const forgotPasswordRoutes = require('./routes/forgot-password');
 const cropRoutes = require('./routes/crops');
+const helpRoutes = require('./routes/help');
 const app = express();
+
+// Connect to MongoDB
+connectDB();
 
 // Middleware
 app.use(express.json());
@@ -31,6 +36,7 @@ app.use('/register', registerRoutes);
 app.use('/login', loginRoutes);
 app.use('/forgot-password', forgotPasswordRoutes);
 app.use('/crops', cropRoutes);
+app.use('/api/help', helpRoutes);
 
 // Serve Landing Page (index.html) at Root
 app.get('/', (req, res) => {
@@ -41,6 +47,16 @@ app.get('/', (req, res) => {
 // Serve Marketplace (HomePage_DetailsFilling.html)
 app.get('/marketplace', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'HomePage_DetailsFilling.html'));
+});
+
+// Serve Email Test Page
+app.get('/email-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'email-test.html'));
+});
+
+// Serve Admin Test Page
+app.get('/admin-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'admin-test.html'));
 });
 
 app.get('/about', (req, res) => {
@@ -78,9 +94,23 @@ app.get('/logout', (req, res) => {
 // Serve User Data
 app.get('/user', (req, res) => {
   if (req.session.user) {
-    res.json(req.session.user);
+    // Add admin flag for specific email
+    const userData = {
+      ...req.session.user,
+      isAdmin: req.session.user.email === 'thanushreddy934@gmail.com'
+    };
+    res.json(userData);
   } else {
     res.status(401).json({ error: 'Not authenticated' });
+  }
+});
+
+// Check if user is admin
+app.get('/api/user/admin-check', (req, res) => {
+  if (req.session.user && req.session.user.email === 'thanushreddy934@gmail.com') {
+    res.json({ isAdmin: true, email: req.session.user.email });
+  } else {
+    res.json({ isAdmin: false });
   }
 });
 

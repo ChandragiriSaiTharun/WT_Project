@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const db = require('../config/db');
+const Crop = require('../models/Crop');
 
 // File Upload Setup for Crop Images
 const storage = multer.diskStorage({
@@ -48,16 +48,21 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
   }
 
   try {
-    const insertQuery = `
-      INSERT INTO crops (name, image, price, quantity, unit, seller, location)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    const [result] = await db.promise().query(insertQuery, [
-      cropName, image, cropPrice, cropQuantity, cropUnit, sellerName, location
-    ]);
-    console.log('Crop added successfully:', result);
+    // Create new crop document
+    const newCrop = new Crop({
+      name: cropName,
+      image,
+      price: cropPrice,
+      quantity: cropQuantity,
+      unit: cropUnit,
+      seller: sellerName,
+      location
+    });
+    
+    const savedCrop = await newCrop.save();
+    console.log('Crop added successfully:', savedCrop._id);
 
-    res.status(200).json({ message: 'Crop added successfully!', cropId: result.insertId });
+    res.status(200).json({ message: 'Crop added successfully!', cropId: savedCrop._id });
   } catch (error) {
     console.error('Error adding crop:', error);
     if (filePath && fs.existsSync(filePath)) {
@@ -72,17 +77,24 @@ router.get('/', async (req, res) => {
   console.log('Received GET /crops request');
 
   try {
-    const selectQuery = `
-      SELECT id, name, image, price, quantity, unit, seller, location, added_date
-      FROM crops
-      ORDER BY added_date DESC
-    `;
-    const [crops] = await db.promise().query(selectQuery);
+    // Fetch all crops, sorted by newest first
+    const crops = await Crop.find()
+      .sort({ addedDate: -1 })
+      .lean(); // Use lean() for better performance when we don't need mongoose document methods
+    
     console.log('Fetched crops:', crops);
 
-    // Add full image URL to each crop
+    // Add full image URL to each crop and convert _id to id for compatibility
     const cropsWithImageUrl = crops.map(crop => ({
-      ...crop,
+      id: crop._id,
+      name: crop.name,
+      image: crop.image,
+      price: crop.price,
+      quantity: crop.quantity,
+      unit: crop.unit,
+      seller: crop.seller,
+      location: crop.location,
+      added_date: crop.addedDate,
       imageUrl: crop.image ? `/crop/${crop.image}` : null
     }));
 

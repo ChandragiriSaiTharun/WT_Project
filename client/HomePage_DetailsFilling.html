@@ -617,7 +617,7 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
         <a href="/equipment"><i class="material-icons">build</i> Equipment Rental</a>  
         <a href="#"><i class="material-icons">local_offer</i> Discounts</a>  
         <a href="#"><i class="material-icons">chat</i> My Chats</a>  
-        <a href="/help"><i class="material-icons">help</i> Help & Support</a>
+        <a href="#" onclick="navigateToHelp()"><i class="material-icons">help</i> Help & Support</a>
       </nav>
     </div>
     <div class="logo">
@@ -914,6 +914,34 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
         });
       }
     });
+
+    // Admin help navigation function
+    async function navigateToHelp() {
+      try {
+        const response = await fetch('/api/user/admin-check', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.isAdmin) {
+            window.location.href = '/admin-help.html';
+          } else {
+            window.location.href = '/help.html';
+          }
+        } else {
+          // If not logged in or error, go to regular help
+          window.location.href = '/help.html';
+        }
+      } catch (error) {
+        console.error('Admin check failed:', error);
+        // Fallback to regular help page
+        window.location.href = '/help.html';
+      }
+    }
   </script>
+  
+  <!-- Admin Redirect Script -->
+  <script src="admin-redirect.js"></script>
 </body>
 </html>
