@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <title>Kisaan Connect - Marketplace</title>
   <style>
     /* Main body styles */
@@ -127,6 +128,68 @@ header .logo .icon {
 
 header .logo .connect {
   color: #007bff;
+}
+
+/* Enhanced Nav Brand Styling */
+.nav-brand {
+  color: #2e7d32;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(46, 125, 50, 0.1);
+}
+
+.nav-brand:hover {
+  color: #1b5e20;
+  text-shadow: 2px 2px 4px rgba(46, 125, 50, 0.2);
+  transform: translateY(-1px);
+}
+
+.nav-brand .logo-icon {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+  color: #4caf50;
+  animation: leafSway 3s ease-in-out infinite;
+}
+
+.nav-brand .brand-text {
+  background: linear-gradient(45deg, #2e7d32, #4caf50);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.nav-brand:hover .logo-icon {
+  color: #66bb6a;
+  transform: rotate(5deg) scale(1.1);
+}
+
+@keyframes leafSway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+/* Dark mode adjustments for nav-brand */
+body.dark-mode .nav-brand {
+  color: #4caf50;
+  text-shadow: 1px 1px 2px rgba(76, 175, 80, 0.1);
+}
+
+body.dark-mode .nav-brand:hover {
+  color: #66bb6a;
+  text-shadow: 2px 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+body.dark-mode .nav-brand .brand-text {
+  background: linear-gradient(45deg, #4caf50, #66bb6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 header nav a {
@@ -644,9 +707,10 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
       </nav>
     </div>
     <div class="logo">
-      <span class="icon">🌾</span>
-      <span>Kisaan</span>
-      <span class="connect">Connect</span>
+      <a href="/" class="nav-brand">
+        <i class="fas fa-leaf logo-icon"></i>
+        <span class="brand-text">Kisaan Connect</span>
+      </a>
     </div>
     <nav id="nav">
       <div class="auth-buttons" id="authButtons">

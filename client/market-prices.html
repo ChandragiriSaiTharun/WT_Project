@@ -125,13 +125,45 @@
 
     .nav-brand {
       color: #2e7d32;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s ease;
+      text-shadow: 1px 1px 2px rgba(46, 125, 50, 0.1);
     }
 
     .nav-brand:hover {
       color: #1b5e20;
+      text-shadow: 2px 2px 4px rgba(46, 125, 50, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .nav-brand .logo-icon {
+      font-size: 2rem;
+      margin-right: 0.5rem;
+      color: #4caf50;
+      animation: leafSway 3s ease-in-out infinite;
+    }
+
+    .nav-brand .brand-text {
+      background: linear-gradient(45deg, #2e7d32, #4caf50);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-brand:hover .logo-icon {
+      color: #66bb6a;
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    @keyframes leafSway {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
     }
 
     @media (max-width: 768px) {
@@ -160,8 +192,9 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-md-6">
-          <a href="/" class="nav-brand">
-            <i class="fas fa-leaf me-2"></i>Kisaan Connect
+          <a href="/marketplace" class="nav-brand">
+            <i class="fas fa-leaf logo-icon"></i>
+            <span class="brand-text">Kisaan Connect</span>
           </a>
         </div>
         <div class="col-md-6 text-end">
