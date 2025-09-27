@@ -59,6 +59,44 @@ app.get('/db-test', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'db-test.html'));
 });
 
+// Serve Crops Test Page
+app.get('/crops-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'crops-test.html'));
+});
+
+// Test endpoint to check crops in database
+app.get('/api/test/crops', async (req, res) => {
+  try {
+    const Crop = require('./models/Crop');
+    const crops = await Crop.find({}).limit(20).sort({ addedDate: -1 });
+    const count = await Crop.countDocuments();
+    
+    res.json({
+      message: 'Crops database test successful',
+      totalCrops: count,
+      crops: crops.map(crop => ({
+        id: crop._id,
+        name: crop.name,
+        image: crop.image,
+        price: crop.price,
+        quantity: crop.quantity,
+        unit: crop.unit,
+        seller: crop.seller,
+        location: crop.location,
+        addedDate: crop.addedDate,
+        imageUrl: crop.image ? `/crop/${crop.image}` : null,
+        createdAt: crop.createdAt
+      }))
+    });
+  } catch (error) {
+    console.error('Crops test error:', error);
+    res.status(500).json({ 
+      error: 'Crops test failed', 
+      details: error.message 
+    });
+  }
+});
+
 // Serve Admin Test Page
 app.get('/admin-test', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'admin-test.html'));
