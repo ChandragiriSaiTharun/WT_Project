@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Market Prices - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: white;
+      padding: 3rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .price-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    
+    .price-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .price-up {
+      border-left: 4px solid #28a745;
+    }
+    
+    .price-down {
+      border-left: 4px solid #dc3545;
+    }
+    
+    .price-stable {
+      border-left: 4px solid #6c757d;
+    }
+    
+    .category-filter {
+      background: white;
+      border-radius: 25px;
+      padding: 0.5rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .category-btn {
+      border-radius: 20px;
+      margin: 0 0.25rem;
+      transition: all 0.3s ease;
+      border: none;
+      padding: 0.5rem 1rem;
+    }
+    
+    .category-btn.active {
+      background: linear-gradient(45deg, #4caf50, #2e7d32);
+      color: white;
+    }
+    
+    .category-btn:not(.active) {
+      background: transparent;
+      color: #666;
+    }
+    
+    .category-btn:not(.active):hover {
+      background: #f0f0f0;
+    }
+    
+    .price-trend-up {
+      color: #28a745;
+    }
+    
+    .price-trend-down {
+      color: #dc3545;
+    }
+    
+    .price-trend-stable {
+      color: #6c757d;
+    }
+    
+    .loading-spinner {
+      display: none;
+    }
+    
+    .loading-spinner.show {
+      display: flex;
+    }
+    
+    .category-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .price-change {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+
+    .navigation-bar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-brand {
+      color: #2e7d32;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .nav-brand:hover {
+      color: #1b5e20;
+    }
+
+    @media (max-width: 768px) {
+      .category-filter {
+        padding: 1rem;
+      }
+      
+      .category-btn {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .hero-section {
+        padding: 2rem 0;
+      }
+      
+      .hero-section h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div class="navigation-bar">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <a href="/" class="nav-brand">
+            <i class="fas fa-leaf me-2"></i>Kisaan Connect
+          </a>
+        </div>
+        <div class="col-md-6 text-end">
+          <a href="/marketplace" class="btn btn-outline-success me-2">
+            <i class="fas fa-home me-1"></i>Home
+          </a>
+          <a href="/schemes" class="btn btn-outline-success me-2">
+            <i class="fas fa-gift me-1"></i>Schemes
+          </a>
+          <a href="/weather" class="btn btn-outline-success">
+            <i class="fas fa-cloud-sun me-1"></i>Weather
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="display-4 mb-3">
+            <i class="fas fa-chart-line me-3"></i>Market Prices
+          </h1>
+          <p class="lead mb-0">Real-time agricultural commodity prices from major markets across India</p>
+          <div class="mt-3">
+            <small class="opacity-75">
+              <i class="fas fa-clock me-1"></i>Last updated: <span id="lastUpdated">Loading...</span>
+            </small>
+          </div>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-light btn-lg" onclick="refreshPrices()" id="refreshBtn">
+            <i class="fas fa-sync-alt me-2" id="refreshIcon"></i>Refresh Prices
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" class="form-control" id="searchInput" placeholder="Search crops, fruits, vegetables..." style="border-radius: 25px 0 0 25px;">
+          <button class="btn btn-success" type="button" onclick="searchPrices()" style="border-radius: 0 25px 25px 0;">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <select class="form-select" id="sortSelect" onchange="sortPrices()" style="border-radius: 25px;">
+          <option value="name">Sort by Name</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="change-high">Highest Change</option>
+          <option value="change-low">Lowest Change</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filter d-flex justify-content-center flex-wrap">
+      <button class="category-btn active" data-category="all">
+        <i class="fas fa-th-large me-1"></i>All
+      </button>
+      <button class="category-btn" data-category="grains">
+        <i class="fas fa-seedling me-1"></i>Grains
+      </button>
+      <button class="category-btn" data-category="vegetables">
+        <i class="fas fa-carrot me-1"></i>Vegetables
+      </button>
+      <button class="category-btn" data-category="fruits">
+        <i class="fas fa-apple-alt me-1"></i>Fruits
+      </button>
+      <button class="category-btn" data-category="pulses">
+        <i class="fas fa-circle me-1"></i>Pulses
+      </button>
+      <button class="category-btn" data-category="spices">
+        <i class="fas fa-pepper-hot me-1"></i>Spices
+      </button>
+      <button class="category-btn" data-category="oilseeds">
+        <i class="fas fa-sun me-1"></i>Oilseeds
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner justify-content-center align-items-center" style="min-height: 200px;">
+      <div class="text-center">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="mt-3">
+          <h5>Loading market prices...</h5>
+          <p class="text-muted">Fetching latest data from agricultural markets</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Market Prices Grid -->
+    <div id="pricesContainer" class="row">
+      <!-- Prices will be loaded here dynamically -->
+    </div>
+
+    <!-- No Data Message -->
+    <div id="noDataMessage" class="no-data" style="display: none;">
+      <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+      <h4>No prices available</h4>
+      <p>Prices for this category are currently not available. Please try again later or contact support.</p>
+      <button class="btn btn-success" onclick="loadPrices()">
+        <i class="fas fa-retry me-1"></i>Try Again
+      </button>
+    </div>
+  </div>
+
+  <!-- Price Detail Modal -->
+  <div class="modal fade" id="priceDetailModal" tabindex="-1" aria-labelledby="priceDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="modalTitle">
+            <i class="fas fa-chart-bar me-2"></i>Price Details
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6><i class="fas fa-info-circle me-2"></i>Current Information</h6>
+                <div id="modalPriceInfo">
+                  <!-- Price info will be loaded here -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6><i class="fas fa-chart-line me-2"></i>Price Trend (Last 7 days)</h6>
+                <canvas id="priceChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-4">
+            <div class="col-12">
+              <h6><i class="fas fa-lightbulb me-2"></i>Market Insights</h6>
+              <div id="marketInsights" class="alert alert-info">
+                <!-- Market insights will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Close
+          </button>
+          <button type="button" class="btn btn-success" onclick="addToWatchlist()">
+            <i class="fas fa-bookmark me-1"></i>Add to Watchlist
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let allPrices = [];
+    let filteredPrices = [];
+    let currentCategory = 'all';
+    let priceChart = null;
+    let currentSort = 'name';
+
+    // Load prices when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPrices();
+      setupCategoryFilters();
+      setupSearchFilter();
+      updateLastUpdated();
+    });
+
+    // Setup category filter buttons
+    function setupCategoryFilters() {
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Remove active class from all buttons
+          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+          
+          // Add active class to clicked button
+          this.classList.add('active');
+          
+          // Filter prices
+          currentCategory = this.dataset.category;
+          filterPrices();
+        });
+      });
+    }
+
+    // Setup search functionality
+    function setupSearchFilter() {
+      document.getElementById('searchInput').addEventListener('input', function() {
+        filterPrices();
+      });
+
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchPrices();
+        }
+      });
+    }
+
+    // Load all prices from API
+    async function loadPrices() {
+      showLoading(true);
+      
+      try {
+        const response = await fetch('/api/market-prices');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          allPrices = data.data;
+          filteredPrices = [...allPrices];
+          filterPrices();
+          updateLastUpdated();
+        } else {
+          throw new Error(data.error || 'Failed to load market prices');
+        }
+      } catch (error) {
+        console.error('Error loading prices:', error);
+        showError('Unable to load market prices. Please check your connection and try again.');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Filter prices by category and search
+    function filterPrices() {
+      let filtered = [...allPrices];
+      
+      // Filter by category
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(price => price.category === currentCategory);
+      }
+      
+      // Filter by search term
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      if (searchTerm) {
+        filtered = filtered.filter(price => 
+          price.name.toLowerCase().includes(searchTerm) || 
+          price.category.toLowerCase().includes(searchTerm) ||
+          price.market.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      filteredPrices = filtered;
+      sortPrices();
+    }
+
+    // Sort prices based on selected criteria
+    function sortPrices() {
+      const sortBy = document.getElementById('sortSelect').value;
+      
+      switch(sortBy) {
+        case 'name':
+          filteredPrices.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'price-low':
+          filteredPrices.sort((a, b) => a.currentPrice - b.currentPrice);
+          break;
+        case 'price-high':
+          filteredPrices.sort((a, b) => b.currentPrice - a.currentPrice);
+          break;
+        case 'change-high':
+          filteredPrices.sort((a, b) => (b.changePercentage || 0) - (a.changePercentage || 0));
+          break;
+        case 'change-low':
+          filteredPrices.sort((a, b) => (a.changePercentage || 0) - (b.changePercentage || 0));
+          break;
+      }
+      
+      displayPrices(filteredPrices);
+    }
+
+    // Display prices in grid
+    function displayPrices(prices) {
+      const container = document.getElementById('pricesContainer');
+      const noDataMessage = document.getElementById('noDataMessage');
+      
+      if (prices.length === 0) {
+        container.innerHTML = '';
+        noDataMessage.style.display = 'block';
+        return;
+      }
+      
+      noDataMessage.style.display = 'none';
+      
+      const pricesHTML = prices.map(price => {
+        const trendIcon = getTrendIcon(price.trend);
+        const trendClass = `price-trend-${price.trend}`;
+        const cardClass = `price-${price.trend}`;
+        const changeText = price.trend === 'stable' ? 'No change' : `${price.changePercentage || 0}%`;
+        
+        return `
+          <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <div class="card price-card ${cardClass}" onclick="showPriceDetail('${price._id}')">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h5 class="card-title mb-1">${price.name}</h5>
+                    <small class="text-muted text-capitalize">${price.category}</small>
+                  </div>
+                  <div class="category-icon ${trendClass}">
+                    ${getCategoryIcon(price.category)}
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-6">
+                    <h3 class="text-success mb-0">₹${price.currentPrice}</h3>
+                    <small class="text-muted">${price.unit || 'per kg'}</small>
+                  </div>
+                  <div class="col-6 text-end">
+                    <div class="price-change ${trendClass}">
+                      ${trendIcon} ${changeText}
+                    </div>
+                    <small class="text-muted">vs yesterday</small>
+                  </div>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">
+                    <i class="fas fa-map-marker-alt me-1"></i>${price.market || 'Market Info'}
+                  </small>
+                  <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>${formatDate(price.lastUpdated)}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = pricesHTML;
+    }
+
+    // Show price details in modal
+    async function showPriceDetail(priceId) {
+      try {
+        const response = await fetch(`/api/market-prices/${priceId}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          const price = data.data;
+          
+          // Update modal title
+          document.getElementById('modalTitle').innerHTML = `
+            <i class="fas fa-chart-bar me-2"></i>${price.name} - Price Details
+          `;
+          
+          // Update price info
+          const priceInfo = document.getElementById('modalPriceInfo');
+          const trendIcon = getTrendIcon(price.trend);
+          const trendClass = `price-trend-${price.trend}`;
+          
+          priceInfo.innerHTML = `
+            <div class="card bg-light">
+              <div class="card-body">
+                <h4 class="text-success mb-2">₹${price.currentPrice} <span class="fs-6 text-muted">${price.unit || 'per kg'}</span></h4>
+                <p class="mb-2">
+                  <strong>Previous Price:</strong> ₹${price.previousPrice} ${price.unit || 'per kg'}
+                </p>
+                <p class="mb-2">
+                  <strong>Change:</strong> 
+                  <span class="${trendClass}">
+                    ${trendIcon} ${price.changePercentage || 0}%
+                  </span>
+                </p>
+                <p class="mb-2">
+                  <strong>Market:</strong> ${price.market || 'Market Information'}
+                </p>
+                <p class="mb-2">
+                  <strong>Category:</strong> <span class="text-capitalize">${price.category}</span>
+                </p>
+                <p class="mb-0">
+                  <strong>Last Updated:</strong> ${formatDateTime(price.lastUpdated)}
+                </p>
+              </div>
+            </div>
+          `;
+          
+          // Update market insights
+          const insights = generateMarketInsights(price);
+          document.getElementById('marketInsights').innerHTML = insights;
+          
+          // Create price chart
+          createPriceChart(price);
+          
+          // Show modal
+          const modal = new bootstrap.Modal(document.getElementById('priceDetailModal'));
+          modal.show();
+        } else {
+          throw new Error(data.error || 'Failed to load price details');
+        }
+      } catch (error) {
+        console.error('Error loading price details:', error);
+        alert('Failed to load price details. Please try again.');
+      }
+    }
+
+    // Generate market insights
+    function generateMarketInsights(price) {
+      const change = price.changePercentage || 0;
+      let insights = '';
+      
+      if (change > 5) {
+        insights = `<i class="fas fa-arrow-up text-success me-2"></i>
+          <strong>Bullish Trend:</strong> ${price.name} prices are showing strong upward momentum (+${change}%). 
+          This could be due to high demand or supply constraints. Consider selling if you're a producer.`;
+      } else if (change < -5) {
+        insights = `<i class="fas fa-arrow-down text-danger me-2"></i>
+          <strong>Bearish Trend:</strong> ${price.name} prices have declined significantly (${change}%). 
+          This might indicate oversupply or reduced demand. Good buying opportunity for traders.`;
+      } else if (change > 0) {
+        insights = `<i class="fas fa-arrow-up text-warning me-2"></i>
+          <strong>Moderate Growth:</strong> ${price.name} prices are showing steady growth (+${change}%). 
+          Market conditions appear stable with slight upward pressure.`;
+      } else if (change < 0) {
+        insights = `<i class="fas fa-arrow-down text-warning me-2"></i>
+          <strong>Slight Decline:</strong> ${price.name} prices have dropped marginally (${change}%). 
+          This could be temporary market correction.`;
+      } else {
+        insights = `<i class="fas fa-minus text-info me-2"></i>
+          <strong>Stable Market:</strong> ${price.name} prices remain unchanged. 
+          Market is showing stability with balanced supply and demand.`;
+      }
+      
+      return insights;
+    }
+
+    // Create price chart
+    function createPriceChart(price) {
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      
+      // Destroy existing chart if it exists
+      if (priceChart) {
+        priceChart.destroy();
+      }
+      
+      // Generate sample 7-day data based on current and previous prices
+      const labels = [];
+      const data = [];
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        if (i === 0) {
+          data.push(price.currentPrice);
+        } else if (i === 1) {
+          data.push(price.previousPrice);
+        } else {
+          // Generate realistic price variations
+          const basePrice = price.previousPrice;
+          const variation = (Math.random() - 0.5) * (basePrice * 0.1); // ±10% variation
+          data.push(Math.max(0, basePrice + variation));
+        }
+      }
+      
+      const borderColor = price.trend === 'up' ? '#28a745' : 
+                         price.trend === 'down' ? '#dc3545' : '#6c757d';
+      const backgroundColor = price.trend === 'up' ? 'rgba(40, 167, 69, 0.1)' : 
+                             price.trend === 'down' ? 'rgba(220, 53, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)';
+      
+      priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `${price.name} Price (₹/${price.unit || 'kg'})`,
+            data: data,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: borderColor,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: `Price (₹/${price.unit || 'kg'})`
+              },
+              ticks: {
+                callback: function(value) {
+                  return '₹' + value.toFixed(2);
+                }
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    }
+
+    // Helper functions
+    function getTrendIcon(trend) {
+      switch(trend) {
+        case 'up': return '<i class="fas fa-arrow-up"></i>';
+        case 'down': return '<i class="fas fa-arrow-down"></i>';
+        default: return '<i class="fas fa-minus"></i>';
+      }
+    }
+
+    function getCategoryIcon(category) {
+      const icons = {
+        grains: '<i class="fas fa-seedling"></i>',
+        vegetables: '<i class="fas fa-carrot"></i>',
+        fruits: '<i class="fas fa-apple-alt"></i>',
+        pulses: '<i class="fas fa-circle"></i>',
+        spices: '<i class="fas fa-pepper-hot"></i>',
+        oilseeds: '<i class="fas fa-sun"></i>'
+      };
+      return icons[category] || '<i class="fas fa-leaf"></i>';
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleDateString();
+    }
+
+    function formatDateTime(dateString) {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleString();
+    }
+
+    function updateLastUpdated() {
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent = now.toLocaleString();
+    }
+
+    function showLoading(show) {
+      const spinner = document.querySelector('.loading-spinner');
+      if (show) {
+        spinner.classList.add('show');
+      } else {
+        spinner.classList.remove('show');
+      }
+    }
+
+    function showError(message) {
+      const container = document.getElementById('pricesContainer');
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="alert alert-danger d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div>
+              <strong>Error:</strong> ${message}
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-danger" onclick="loadPrices()">
+                  <i class="fas fa-retry me-1"></i>Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Event handlers
+    function searchPrices() {
+      filterPrices();
+    }
+
+    function refreshPrices() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      const refreshIcon = document.getElementById('refreshIcon');
+      
+      // Add loading state
+      refreshBtn.disabled = true;
+      refreshIcon.classList.add('fa-spin');
+      
+      loadPrices().then(() => {
+        // Remove loading state after a delay for better UX
+        setTimeout(() => {
+          refreshBtn.disabled = false;
+          refreshIcon.classList.remove('fa-spin');
+        }, 1000);
+      });
+    }
+
+    function addToWatchlist() {
+      // Placeholder for watchlist functionality
+      alert('Watchlist feature coming soon! You will be able to track your favorite crops and get price alerts.');
+    }
+
+    // Auto-refresh prices every 5 minutes
+    setInterval(function() {
+      loadPrices();
+    }, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

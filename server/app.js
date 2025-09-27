@@ -8,6 +8,7 @@ const loginRoutes = require('./routes/login');
 const forgotPasswordRoutes = require('./routes/forgot-password');
 const cropRoutes = require('./routes/crops');
 const helpRoutes = require('./routes/help');
+const marketPricesRoutes = require('./routes/market-prices');
 const app = express();
 
 // Connect to MongoDB
@@ -37,6 +38,7 @@ app.use('/login', loginRoutes);
 app.use('/forgot-password', forgotPasswordRoutes);
 app.use('/crops', cropRoutes);
 app.use('/api/help', helpRoutes);
+app.use('/api/market-prices', marketPricesRoutes);
 
 // Serve Landing Page (index.html) at Root
 app.get('/', (req, res) => {
@@ -57,6 +59,16 @@ app.get('/email-test', (req, res) => {
 // Serve Database Test Page
 app.get('/db-test', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'db-test.html'));
+});
+
+// Serve Market Prices Page
+app.get('/market-prices', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'market-prices.html'));
+});
+
+// Serve Market Prices Page
+app.get('/market-prices', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'market-prices.html'));
 });
 
 // Serve Crops Test Page
@@ -284,6 +296,229 @@ app.put('/help/:id', async (req, res) => {
     });
   }
 });
+
+// Market Prices API Endpoints
+app.get('/api/market-prices', (req, res) => {
+  try {
+    // Sample market price data - in production, this would come from a real market data API
+    const marketPrices = [
+      {
+        id: 1,
+        name: "Tomato",
+        category: "vegetable",
+        icon: "🍅",
+        currentPrice: Math.floor(Math.random() * 20) + 35, // Dynamic pricing
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 10,
+        location: "Delhi",
+        market: "Azadpur Mandi",
+        quality: "Grade A",
+        history: generatePriceHistory(40, 7),
+        avgPrice: 42,
+        lastUpdated: new Date()
+      },
+      {
+        id: 2,
+        name: "Onion",
+        category: "vegetable",
+        icon: "🧅",
+        currentPrice: Math.floor(Math.random() * 15) + 20,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 8,
+        location: "Mumbai",
+        market: "Vashi Market",
+        quality: "Grade B",
+        history: generatePriceHistory(28, 7),
+        avgPrice: 29,
+        lastUpdated: new Date()
+      },
+      {
+        id: 3,
+        name: "Apple",
+        category: "fruit",
+        icon: "🍎",
+        currentPrice: Math.floor(Math.random() * 40) + 160,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 6,
+        location: "Bangalore",
+        market: "KR Market",
+        quality: "Premium",
+        history: generatePriceHistory(180, 7),
+        avgPrice: 179,
+        lastUpdated: new Date()
+      },
+      {
+        id: 4,
+        name: "Banana",
+        category: "fruit",
+        icon: "🍌",
+        currentPrice: Math.floor(Math.random() * 20) + 55,
+        unit: "per dozen",
+        change: (Math.random() - 0.5) * 4,
+        location: "Chennai",
+        market: "Koyambedu Market",
+        quality: "Grade A",
+        history: generatePriceHistory(65, 7),
+        avgPrice: 65,
+        lastUpdated: new Date()
+      },
+      {
+        id: 5,
+        name: "Rice",
+        category: "grain",
+        icon: "🌾",
+        currentPrice: Math.floor(Math.random() * 10) + 50,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 5,
+        location: "Hyderabad",
+        market: "Begum Bazaar",
+        quality: "Basmati",
+        history: generatePriceHistory(55, 7),
+        avgPrice: 54,
+        lastUpdated: new Date()
+      },
+      {
+        id: 6,
+        name: "Wheat",
+        category: "grain",
+        icon: "🌾",
+        currentPrice: Math.floor(Math.random() * 8) + 28,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 3,
+        location: "Delhi",
+        market: "Azadpur Mandi",
+        quality: "Grade A",
+        history: generatePriceHistory(32, 7),
+        avgPrice: 32.5,
+        lastUpdated: new Date()
+      },
+      {
+        id: 7,
+        name: "Turmeric",
+        category: "spice",
+        icon: "🟡",
+        currentPrice: Math.floor(Math.random() * 30) + 110,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 12,
+        location: "Bangalore",
+        market: "Spice Market",
+        quality: "Premium",
+        history: generatePriceHistory(120, 7),
+        avgPrice: 116,
+        lastUpdated: new Date()
+      },
+      {
+        id: 8,
+        name: "Chili",
+        category: "spice",
+        icon: "🌶️",
+        currentPrice: Math.floor(Math.random() * 20) + 75,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 8,
+        location: "Mumbai",
+        market: "Crawford Market",
+        quality: "Grade B",
+        history: generatePriceHistory(85, 7),
+        avgPrice: 87,
+        lastUpdated: new Date()
+      },
+      {
+        id: 9,
+        name: "Potato",
+        category: "vegetable",
+        icon: "🥔",
+        currentPrice: Math.floor(Math.random() * 10) + 20,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 4,
+        location: "Kolkata",
+        market: "Sealdah Market",
+        quality: "Grade A",
+        history: generatePriceHistory(25, 7),
+        avgPrice: 24.5,
+        lastUpdated: new Date()
+      },
+      {
+        id: 10,
+        name: "Mango",
+        category: "fruit",
+        icon: "🥭",
+        currentPrice: Math.floor(Math.random() * 40) + 130,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 15,
+        location: "Hyderabad",
+        market: "Fruit Market",
+        quality: "Alphonso",
+        history: generatePriceHistory(150, 7),
+        avgPrice: 143,
+        lastUpdated: new Date()
+      },
+      // Additional items
+      {
+        id: 11,
+        name: "Carrot",
+        category: "vegetable",
+        icon: "🥕",
+        currentPrice: Math.floor(Math.random() * 15) + 25,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 6,
+        location: "Delhi",
+        market: "Azadpur Mandi",
+        quality: "Grade A",
+        history: generatePriceHistory(30, 7),
+        avgPrice: 32,
+        lastUpdated: new Date()
+      },
+      {
+        id: 12,
+        name: "Orange",
+        category: "fruit",
+        icon: "🍊",
+        currentPrice: Math.floor(Math.random() * 30) + 70,
+        unit: "per kg",
+        change: (Math.random() - 0.5) * 8,
+        location: "Mumbai",
+        market: "Crawford Market",
+        quality: "Premium",
+        history: generatePriceHistory(85, 7),
+        avgPrice: 88,
+        lastUpdated: new Date()
+      }
+    ];
+
+    // Calculate change percentages
+    marketPrices.forEach(item => {
+      item.change = parseFloat(((item.currentPrice - item.avgPrice) / item.avgPrice * 100).toFixed(1));
+    });
+
+    res.json({
+      success: true,
+      data: marketPrices,
+      lastUpdated: new Date(),
+      message: 'Market prices retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching market prices:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch market prices'
+    });
+  }
+});
+
+// Helper function to generate price history
+function generatePriceHistory(basePrice, days) {
+  const history = [];
+  let price = basePrice;
+  
+  for (let i = 0; i < days; i++) {
+    // Add some randomness to simulate price fluctuations
+    const change = (Math.random() - 0.5) * 6; // ±3% change
+    price = Math.max(basePrice * 0.8, Math.min(basePrice * 1.2, price + change));
+    history.push(Math.floor(price));
+  }
+  
+  return history;
+}
 
 // Get all farmers (admin only)
 app.get('/api/farmers', async (req, res) => {
