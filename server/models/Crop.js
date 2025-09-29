@@ -30,6 +30,11 @@ const cropSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  sellerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farmer',
+    required: true
+  },
   location: {
     type: String,
     required: true,

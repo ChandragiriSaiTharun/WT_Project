@@ -9,7 +9,20 @@ const forgotPasswordRoutes = require('./routes/forgot-password');
 const cropRoutes = require('./routes/crops');
 const helpRoutes = require('./routes/help');
 const marketPricesRoutes = require('./routes/market-prices');
+const chatRoutes = require('./routes/chats');
+const http = require('http');
+const socketIo = require('socket.io');
+const Chat = require('./models/Chat');
+const Message = require('./models/Message');
+
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Connect to MongoDB
 connectDB();
@@ -39,6 +52,7 @@ app.use('/forgot-password', forgotPasswordRoutes);
 app.use('/crops', cropRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/market-prices', marketPricesRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Serve Landing Page (index.html) at Root
 app.get('/', (req, res) => {
@@ -66,9 +80,14 @@ app.get('/market-prices', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'market-prices.html'));
 });
 
-// Serve Market Prices Page
-app.get('/market-prices', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client', 'market-prices.html'));
+// Serve Chats Page
+app.get('/chats', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'chats.html'));
+});
+
+// Serve Chat Test Page
+app.get('/chat-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'chat-test.html'));
 });
 
 // Serve Crops Test Page
@@ -693,8 +712,167 @@ app.get('/api/dashboard/stats', async (req, res) => {
   }
 });
 
+// Socket.IO for real-time chat
+const connectedUsers = new Map(); // Store user socket connections
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Join user to their personal room
+  socket.on('join-user', (userId) => {
+    socket.userId = userId;
+    socket.join(`user_${userId}`);
+    connectedUsers.set(userId, socket.id);
+    console.log(`User ${userId} joined their room`);
+  });
+
+  // Join a chat room
+  socket.on('join-chat', (chatId) => {
+    socket.join(`chat_${chatId}`);
+    console.log(`Socket ${socket.id} joined chat ${chatId}`);
+  });
+
+  // Leave a chat room
+  socket.on('leave-chat', (chatId) => {
+    socket.leave(`chat_${chatId}`);
+    console.log(`Socket ${socket.id} left chat ${chatId}`);
+  });
+
+  // Handle new message
+  socket.on('send-message', async (data) => {
+    try {
+      const { chatId, content, messageType = 'text' } = data;
+      
+      if (!socket.userId) {
+        socket.emit('error', { message: 'User not authenticated' });
+        return;
+      }
+
+      // Verify user is participant in this chat
+      const chat = await Chat.findById(chatId);
+      if (!chat || !chat.participants.includes(socket.userId)) {
+        socket.emit('error', { message: 'Access denied' });
+        return;
+      }
+
+      // Create message
+      const message = new Message({
+        chatId,
+        sender: socket.userId,
+        content: content.trim(),
+        messageType
+      });
+
+      await message.save();
+      await message.populate('sender', 'fullName profilePicture');
+
+      // Update chat's last message and unread counts
+      const otherParticipantId = chat.participants.find(id => !id.equals(socket.userId));
+      
+      await Chat.findByIdAndUpdate(chatId, {
+        $set: {
+          'lastMessage.content': content.trim(),
+          'lastMessage.sender': socket.userId,
+          'lastMessage.timestamp': new Date()
+        }
+      });
+
+      // Update unread count for other participant
+      await Chat.findByIdAndUpdate(chatId, {
+        $inc: {
+          'unreadCount.$[elem].count': 1
+        }
+      }, {
+        arrayFilters: [{ 'elem.userId': otherParticipantId }]
+      });
+
+      const formattedMessage = {
+        messageId: message._id,
+        content: message.content,
+        sender: {
+          id: message.sender._id,
+          name: message.sender.fullName,
+          profilePicture: message.sender.profilePicture
+        },
+        messageType: message.messageType,
+        isOwn: message.sender._id.equals(socket.userId),
+        isRead: false,
+        timestamp: message.createdAt,
+        chatId: chatId
+      };
+
+      // Emit to all participants in the chat
+      io.to(`chat_${chatId}`).emit('new-message', formattedMessage);
+      
+      // Emit to other participant's personal room for notifications
+      io.to(`user_${otherParticipantId}`).emit('chat-notification', {
+        chatId,
+        message: formattedMessage,
+        from: {
+          id: message.sender._id,
+          name: message.sender.fullName
+        }
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      socket.emit('error', { message: 'Failed to send message' });
+    }
+  });
+
+  // Handle typing indicators
+  socket.on('typing-start', (data) => {
+    const { chatId, userName } = data;
+    socket.to(`chat_${chatId}`).emit('user-typing', { userName, userId: socket.userId });
+  });
+
+  socket.on('typing-stop', (data) => {
+    const { chatId } = data;
+    socket.to(`chat_${chatId}`).emit('user-stop-typing', { userId: socket.userId });
+  });
+
+  // Handle message read receipts
+  socket.on('mark-messages-read', async (data) => {
+    try {
+      const { chatId } = data;
+      
+      // Mark messages as read
+      await Message.updateMany(
+        { chatId, sender: { $ne: socket.userId }, isRead: false },
+        { 
+          $set: { isRead: true }, 
+          $push: { readBy: { userId: socket.userId } } 
+        }
+      );
+
+      // Update unread count
+      await Chat.findByIdAndUpdate(chatId, {
+        $set: {
+          'unreadCount.$[elem].count': 0
+        }
+      }, {
+        arrayFilters: [{ 'elem.userId': socket.userId }]
+      });
+
+      // Notify other participants
+      socket.to(`chat_${chatId}`).emit('messages-read', { userId: socket.userId, chatId });
+
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  });
+
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    if (socket.userId) {
+      connectedUsers.delete(socket.userId);
+    }
+  });
+});
+
 // Start Server
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

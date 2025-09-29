@@ -802,7 +802,7 @@ body.dark-mode .results-info {
         <a href="/schemes"><i class="material-icons">campaign</i> Government Schemes</a>
         <a href="/equipment"><i class="material-icons">build</i> Equipment Rental</a>  
         <!-- <a href="#"><i class="material-icons">local_offer</i> Discounts</a>   -->
-        <a href="#"><i class="material-icons">chat</i> My Chats</a>  
+        <a href="/chats"><i class="material-icons">chat</i> My Chats</a>  
         <a href="#" onclick="navigateToHelp()"><i class="material-icons">help</i> Help & Support</a>
       </nav>
     </div>
@@ -1070,6 +1070,99 @@ body.dark-mode .results-info {
       }
     }
 
+    // Start Chat with Seller
+    async function startChat(sellerId, cropId, sellerName, cropName) {
+      try {
+        // Check if user is logged in
+        console.log('🔐 Checking login status...');
+        const user = await checkLoginStatus();
+        console.log('👤 User status:', user);
+        
+        if (!user) {
+          alert('Please login to start a chat with the seller');
+          window.location.href = '/Login.html';
+          return;
+        }
+        
+        console.log('✅ User authenticated:', user.fullName);
+
+        // Check if trying to chat with self
+        if (sellerId === user._id) {
+          alert('You cannot chat with yourself');
+          return;
+        }
+
+        // Show loading state
+        const chatButtons = document.querySelectorAll('.chat-button');
+        chatButtons.forEach(btn => {
+          if (btn.onclick && btn.onclick.toString().includes(sellerId)) {
+            btn.innerHTML = '<i class="material-icons">hourglass_empty</i> Connecting...';
+            btn.disabled = true;
+          }
+        });
+
+        // Start or get existing chat
+        console.log('🚀 Starting chat with:', { sellerId, cropId, sellerName, cropName });
+        
+        const response = await fetch('/api/chats/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            participantId: sellerId,
+            cropId: cropId
+          })
+        });
+
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('❌ Server error:', errorData);
+          
+          if (response.status === 401) {
+            alert('Please login first to start a chat');
+            window.location.href = '/Login.html';
+            return;
+          }
+          
+          throw new Error(`Server error: ${response.status} - ${errorData}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store chat context in session storage for the chat page
+          sessionStorage.setItem('chatContext', JSON.stringify({
+            chatId: data.chat.chatId,
+            participantId: sellerId,
+            participantName: sellerName,
+            cropName: cropName,
+            openChat: true
+          }));
+
+          // Redirect to chats page
+          window.location.href = '/chats';
+        } else {
+          throw new Error(data.error || 'Failed to start chat');
+        }
+
+      } catch (error) {
+        console.error('❌ Error starting chat:', error);
+        alert(`Failed to start chat: ${error.message}. Please try again.`);
+        
+        // Reset button state
+        const chatButtons = document.querySelectorAll('.chat-button');
+        chatButtons.forEach(btn => {
+          if (btn.onclick && btn.onclick.toString().includes(sellerId)) {
+            btn.innerHTML = 'Chat';
+            btn.disabled = false;
+          }
+        });
+      }
+    }
+
     async function fetchCrops() {
       try {
         const response = await fetch('/crops');
@@ -1122,8 +1215,8 @@ body.dark-mode .results-info {
               <b>${crop.seller}</b> - ${crop.location}
             </div>
             <div class="button-group">
-              <button class="buy-button" onclick="checkLoginAndBuy(${crop.id})">Buy Now</button>
-              <button class="chat-button">Chat</button>
+              <button class="buy-button" onclick="checkLoginAndBuy('${crop.id}')">Buy Now</button>
+              <button class="chat-button" onclick="startChat('${crop.sellerId}', '${crop.id}', '${crop.seller}', '${crop.name}')">Chat</button>
             </div>
           </div>
         `;

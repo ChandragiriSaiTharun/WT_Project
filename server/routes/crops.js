@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Crop = require('../models/Crop');
+const Farmer = require('../models/Farmer');
 
 // File Upload Setup for Crop Images
 const storage = multer.diskStorage({
@@ -56,6 +57,7 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
       quantity: cropQuantity,
       unit: cropUnit,
       seller: sellerName,
+      sellerId: req.session.userId, // Add the user ID
       location
     });
     
@@ -130,6 +132,12 @@ router.get('/', async (req, res) => {
 
     console.log(`Fetched ${crops.length} crops out of ${total} total`);
 
+    // Get first farmer for fallback sellerId
+    let defaultSeller = null;
+    if (crops.some(crop => !crop.sellerId)) {
+      defaultSeller = await Farmer.findOne();
+    }
+
     // Add full image URL to each crop and convert _id to id for compatibility
     const cropsWithImageUrl = crops.map(crop => ({
       id: crop._id,
@@ -139,6 +147,7 @@ router.get('/', async (req, res) => {
       quantity: crop.quantity,
       unit: crop.unit,
       seller: crop.seller,
+      sellerId: crop.sellerId || (defaultSeller ? defaultSeller._id : null),
       location: crop.location,
       added_date: crop.addedDate,
       imageUrl: crop.image ? `/crop/${crop.image}` : null,
@@ -191,6 +200,7 @@ router.get('/:id', async (req, res) => {
       quantity: crop.quantity,
       unit: crop.unit,
       seller: crop.seller,
+      sellerId: crop.sellerId,
       location: crop.location,
       added_date: crop.addedDate,
       imageUrl: crop.image ? `/crop/${crop.image}` : null,
