@@ -688,6 +688,106 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
   background: #ffebee;
   border-color: #e57373;
 }
+
+/* Search and Filter Section Styles */
+.search-filter-section {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.search-filter-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .search-filter-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.search-group {
+  flex: 1;
+  min-width: 300px;
+}
+
+.sort-group {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input-group {
+  display: flex;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.search-input-group input {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: white;
+}
+
+body.dark-mode .search-input-group input {
+  background: #2c2c2c;
+  color: #e0e0e0;
+}
+
+.search-input-group button {
+  padding: 12px 20px;
+  border: none;
+  background: #28a745;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-input-group button:hover {
+  background: #218838;
+}
+
+.sort-select {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  outline: none;
+  cursor: pointer;
+}
+
+body.dark-mode .sort-select {
+  background: #2c2c2c;
+  color: #e0e0e0;
+}
+
+.sort-select:focus {
+  box-shadow: 0 2px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* Results info */
+.results-info {
+  text-align: center;
+  margin: 10px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+body.dark-mode .results-info {
+  color: #bbb;
+}
   </style>
 </head>
 <body>
@@ -701,7 +801,7 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
         <a href="/weather"><i class="material-icons">wb_sunny</i> Weather Updates</a>
         <a href="/schemes"><i class="material-icons">campaign</i> Government Schemes</a>
         <a href="/equipment"><i class="material-icons">build</i> Equipment Rental</a>  
-        <a href="#"><i class="material-icons">local_offer</i> Discounts</a>  
+        <!-- <a href="#"><i class="material-icons">local_offer</i> Discounts</a>   -->
         <a href="#"><i class="material-icons">chat</i> My Chats</a>  
         <a href="#" onclick="navigateToHelp()"><i class="material-icons">help</i> Help & Support</a>
       </nav>
@@ -734,6 +834,36 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
     <br><br><br>
     <h1>Fresh Crop Marketplace</h1>
     <p>Sell and Buy Directly from Farmers</p>
+  </div>
+
+  <!-- Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-filter-container">
+      <div class="search-group">
+        <div class="search-input-group">
+          <input type="text" id="searchInput" placeholder="Search crops by name, seller, or location...">
+          <button type="button" onclick="searchCrops()">
+            <i class="material-icons">search</i>
+          </button>
+        </div>
+      </div>
+      <div class="sort-group">
+        <select class="sort-select" id="sortSelect" onchange="sortCrops()">
+          <option value="default">Sort by...</option>
+          <option value="name-asc">Name: A to Z</option>
+          <option value="name-desc">Name: Z to A</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="location-asc">Location: A to Z</option>
+          <option value="location-desc">Location: Z to A</option>
+          <option value="quantity-high">Quantity: High to Low</option>
+          <option value="quantity-low">Quantity: Low to High</option>
+        </select>
+      </div>
+    </div>
+    <div class="results-info" id="resultsInfo">
+      <!-- Results count will be displayed here -->
+    </div>
   </div>
 
   <!-- Crop Listings Grid -->
@@ -787,6 +917,11 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
   <button id="addCropButton" onclick="checkLoginAndOpenForm()">+ Add Crop</button>
 
   <script>
+    // Global variables for search and sort functionality
+    let allCrops = [];
+    let filteredCrops = [];
+    let currentSort = 'default';
+
     // Check Login Status and Update Navbar
     async function checkLoginStatus() {
       try {
@@ -906,6 +1041,14 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
           alert('Crop added successfully!');
           document.getElementById('cropFormContainer').style.display = 'none';
           document.getElementById('addCropButton').style.visibility = 'visible';
+          // Clear form
+          document.getElementById('cropName').value = '';
+          document.getElementById('cropImage').value = '';
+          document.getElementById('cropPrice').value = '';
+          document.getElementById('cropQuantity').value = '';
+          document.getElementById('sellerName').value = '';
+          document.getElementById('sellerLocation').value = '';
+          document.getElementById('cropUnit').value = 'unit';
           fetchCrops(); // Refresh crop listings
         } else {
           alert(result.error || 'Failed to add crop');
@@ -933,52 +1076,182 @@ body.dark-mode .crop-form input, body.dark-mode .crop-form select {
         const data = await response.json();
     
         if (response.ok) {
-          const cropGrid = document.getElementById('cropGrid');
-          cropGrid.innerHTML = ''; // Clear existing crops
-          
           // Handle the correct response structure
           const crops = data.crops || [];
-    
+          allCrops = crops;
+          filteredCrops = [...allCrops];
+          
           if (crops.length === 0) {
-            cropGrid.innerHTML = '<div class="no-crops-message">No crops available at the moment. <a href="#" onclick="showCropForm()">Add your crops!</a></div>';
+            displayNoCrops();
             return;
           }
-    
-          crops.forEach(crop => {
-            const card = document.createElement('div');
-            card.className = 'crop-card';
-            card.innerHTML = `
-              <img src="${crop.imageUrl || '/path/to/default-image.jpg'}" class="crop-image" alt="${crop.name}">
-              <div class="crop-details">
-                <h3>${crop.name}</h3>
-                <div class="price-tag">₹${crop.price}/${crop.unit}</div>
-                <div class="quantity-available">Available: ${crop.quantity} ${crop.unit}</div>
-                <div class="seller-info">
-                  <b>${crop.seller}</b> - ${crop.location}
-                </div>
-                <div class="button-group">
-                  <button class="buy-button" onclick="checkLoginAndBuy(${crop.id})">Buy Now</button>
-                  <button class="chat-button">Chat</button>
-                </div>
-              </div>
-            `;
-            cropGrid.appendChild(card);
-          });
+          
+          displayCrops(filteredCrops);
         } else {
           console.error('Failed to fetch crops:', data.error || 'Unknown error');
-          const cropGrid = document.getElementById('cropGrid');
-          cropGrid.innerHTML = '<div class="error-message">Failed to load crops. Please try again later.</div>';
+          displayError('Failed to load crops. Please try again later.');
         }
       } catch (error) {
         console.error('Error fetching crops:', error);
-        const cropGrid = document.getElementById('cropGrid');
-        cropGrid.innerHTML = '<div class="error-message">Network error. Please check your connection.</div>';
+        displayError('Network error. Please check your connection.');
+      }
+    }
+
+    // Display crops function
+    function displayCrops(crops) {
+      const cropGrid = document.getElementById('cropGrid');
+      cropGrid.innerHTML = ''; // Clear existing crops
+      
+      if (crops.length === 0) {
+        displayNoResults();
+        return;
+      }
+
+      updateResultsInfo(crops.length);
+      
+      crops.forEach(crop => {
+        const card = document.createElement('div');
+        card.className = 'crop-card';
+        card.innerHTML = `
+          <img src="${crop.imageUrl || '/path/to/default-image.jpg'}" class="crop-image" alt="${crop.name}">
+          <div class="crop-details">
+            <h3>${crop.name}</h3>
+            <div class="price-tag">₹${crop.price}/${crop.unit}</div>
+            <div class="quantity-available">Available: ${crop.quantity} ${crop.unit}</div>
+            <div class="seller-info">
+              <b>${crop.seller}</b> - ${crop.location}
+            </div>
+            <div class="button-group">
+              <button class="buy-button" onclick="checkLoginAndBuy(${crop.id})">Buy Now</button>
+              <button class="chat-button">Chat</button>
+            </div>
+          </div>
+        `;
+        cropGrid.appendChild(card);
+      });
+    }
+
+    // Display no crops message
+    function displayNoCrops() {
+      const cropGrid = document.getElementById('cropGrid');
+      cropGrid.innerHTML = '<div class="no-crops-message">No crops available at the moment. <a href="#" onclick="checkLoginAndOpenForm()">Add your crops!</a></div>';
+      updateResultsInfo(0);
+    }
+
+    // Display no results message
+    function displayNoResults() {
+      const cropGrid = document.getElementById('cropGrid');
+      cropGrid.innerHTML = '<div class="no-crops-message">No crops match your search criteria. <a href="#" onclick="clearSearch()">Clear search</a> to see all crops.</div>';
+      updateResultsInfo(0);
+    }
+
+    // Display error message
+    function displayError(message) {
+      const cropGrid = document.getElementById('cropGrid');
+      cropGrid.innerHTML = `<div class="error-message">${message}</div>`;
+      updateResultsInfo(0);
+    }
+
+    // Update results info
+    function updateResultsInfo(count) {
+      const resultsInfo = document.getElementById('resultsInfo');
+      if (count === 0) {
+        resultsInfo.textContent = '';
+      } else if (count === 1) {
+        resultsInfo.textContent = '1 crop found';
+      } else {
+        resultsInfo.textContent = `${count} crops found`;
       }
     }
     
+    // Search functionality
+    function searchCrops() {
+      applyFilters();
+    }
+
+    // Sort functionality
+    function sortCrops() {
+      const sortBy = document.getElementById('sortSelect').value;
+      currentSort = sortBy;
+      applyFilters();
+    }
+
+    // Apply both search and sort filters
+    function applyFilters() {
+      let filtered = [...allCrops];
+      
+      // Apply search filter
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (searchTerm) {
+        filtered = filtered.filter(crop => 
+          crop.name.toLowerCase().includes(searchTerm) || 
+          crop.seller.toLowerCase().includes(searchTerm) ||
+          crop.location.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Apply sort
+      const sortBy = document.getElementById('sortSelect').value;
+      switch(sortBy) {
+        case 'name-asc':
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'name-desc':
+          filtered.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'price-low':
+          filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+          break;
+        case 'price-high':
+          filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+          break;
+        case 'location-asc':
+          filtered.sort((a, b) => a.location.localeCompare(b.location));
+          break;
+        case 'location-desc':
+          filtered.sort((a, b) => b.location.localeCompare(a.location));
+          break;
+        case 'quantity-high':
+          filtered.sort((a, b) => parseFloat(b.quantity) - parseFloat(a.quantity));
+          break;
+        case 'quantity-low':
+          filtered.sort((a, b) => parseFloat(a.quantity) - parseFloat(b.quantity));
+          break;
+        default:
+          // No sorting for 'default'
+          break;
+      }
+      
+      filteredCrops = filtered;
+      displayCrops(filteredCrops);
+    }
+
+    // Clear search function
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('sortSelect').value = 'default';
+      currentSort = 'default';
+      applyFilters();
+    }
+
+    // Setup search input listener
+    function setupSearchListener() {
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', function() {
+        applyFilters();
+      });
+      
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          searchCrops();
+        }
+      });
+    }
+
     // Call fetchCrops when the page loads
     document.addEventListener('DOMContentLoaded', () => {
       fetchCrops();
+      setupSearchListener();
       // Existing DOMContentLoaded code...
     });
 
