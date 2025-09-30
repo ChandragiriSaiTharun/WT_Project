@@ -7,11 +7,20 @@ const Crop = require('../models/Crop');
 
 // Middleware to check if user is authenticated
 function requireAuth(req, res, next) {
+  console.log('🔐 Auth check - Session:', {
+    hasSession: !!req.session,
+    hasUser: !!req.session.user,
+    userId: req.session.user ? req.session.user.id : 'none'
+  });
+  
   if (!req.session.user || !req.session.user.id) {
+    console.log('❌ Authentication failed - no valid session');
     return res.status(401).json({ error: 'Authentication required' });
   }
+  
   // Store userId for compatibility with existing chat code
   req.session.userId = req.session.user.id;
+  console.log('✅ User authenticated:', req.session.userId);
   next();
 }
 
@@ -134,21 +143,77 @@ router.get('/:chatId/messages', requireAuth, async (req, res) => {
   try {
     const { chatId } = req.params;
     const { page = 1, limit = 50 } = req.query;
+    
+    console.log('📥 Loading messages for chat:', chatId, 'by user:', req.session.userId);
+    console.log('📋 Session user object:', req.session.user);
 
     // Verify user is part of this chat
     const chat = await Chat.findById(chatId);
+    console.log('💬 Chat found:', chat ? 'Yes' : 'No');
+    console.log('👥 Chat participants:', chat ? chat.participants : 'N/A');
+    console.log('🔑 Current user ID:', req.session.userId);
+    
     if (!chat || !chat.participants.includes(req.session.userId)) {
+      console.log('❌ Access denied for chat:', chatId);
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const messages = await Message.getChatMessages(chatId, parseInt(page), parseInt(limit));
+    // Get messages and format for frontend
+    console.log('🔍 Querying messages for chatId:', chatId);
+    const rawMessages = await Message.find({ chatId })
+      .populate('sender', 'fullName profilePicture')
+      .sort({ createdAt: 1 }) // Ascending order for proper display
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+    
+    console.log('📨 Found messages:', rawMessages.length);
+    console.log('📋 Sample message:', rawMessages[0] ? {
+      id: rawMessages[0]._id,
+      content: rawMessages[0].content,
+      sender: rawMessages[0].sender ? rawMessages[0].sender.fullName : 'No sender',
+      createdAt: rawMessages[0].createdAt
+    } : 'No messages');
+
+    // Format messages with isOwn field
+    const messages = rawMessages.map(message => {
+      // Handle case where sender might not be populated
+      const sender = message.sender || { _id: message.sender, fullName: 'Unknown User', profilePicture: null };
+      
+      return {
+        _id: message._id,
+        content: message.content,
+        type: message.type || 'text',
+        timestamp: message.createdAt,
+        sender: {
+          id: sender._id,
+          name: sender.fullName || 'Unknown User',
+          profilePicture: sender.profilePicture
+        },
+        isOwn: sender._id.equals(req.session.userId),
+        isRead: message.readBy ? message.readBy.some(read => read.userId.equals(req.session.userId)) : false
+      };
+    });
     
     // Mark messages as read for current user
-    await Message.markMessagesAsRead(chatId, req.session.userId);
+    await Message.updateMany(
+      { 
+        chatId,
+        'readBy.userId': { $ne: req.session.userId }
+      },
+      { 
+        $push: { 
+          readBy: { 
+            userId: req.session.userId, 
+            readAt: new Date() 
+          } 
+        } 
+      }
+    );
 
+    console.log('✅ Returning formatted messages:', messages.length);
     res.json({ success: true, messages });
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    console.error('❌ Error fetching messages:', error);
     res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
@@ -210,19 +275,92 @@ router.post('/:chatId/messages', requireAuth, async (req, res) => {
 // Debug endpoint to check database data
 router.get('/debug', async (req, res) => {
   try {
-    const farmers = await Farmer.find().select('fullName email').limit(5);
+    const farmers = await Farmer.find().select('fullName email phoneNumber').limit(5);
     const crops = await Crop.find().select('name seller sellerId').limit(5);
-    const chats = await Chat.find().limit(5);
+    const chats = await Chat.find().populate('participants', 'fullName').limit(5);
+    const messages = await Message.find().populate('sender', 'fullName').limit(10);
     
     res.json({
       farmersCount: await Farmer.countDocuments(),
       cropsCount: await Crop.countDocuments(),
       chatsCount: await Chat.countDocuments(),
+      messagesCount: await Message.countDocuments(),
       sampleFarmers: farmers,
       sampleCrops: crops,
-      sampleChats: chats
+      sampleChats: chats,
+      sampleMessages: messages
     });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Test endpoint to create sample messages (for debugging)
+router.post('/debug/create-test-messages', async (req, res) => {
+  try {
+    // Find first two users
+    const farmers = await Farmer.find().limit(2);
+    if (farmers.length < 2) {
+      return res.status(400).json({ error: 'Need at least 2 users' });
+    }
+
+    const [user1, user2] = farmers;
+
+    // Create or find chat
+    let chat = await Chat.findOne({
+      participants: { $all: [user1._id, user2._id] }
+    });
+
+    if (!chat) {
+      chat = new Chat({
+        participants: [user1._id, user2._id]
+      });
+      await chat.save();
+    }
+
+    // Clear existing messages
+    await Message.deleteMany({ chatId: chat._id });
+
+    // Create test messages
+    const testMessages = [
+      { sender: user1._id, content: 'Hello! How are you?' },
+      { sender: user2._id, content: 'Hi! I am doing well, thanks!' },
+      { sender: user1._id, content: 'Great to hear that!' },
+      { sender: user2._id, content: 'How can I help you today?' },
+      { sender: user1._id, content: 'I need some information about your crops' }
+    ];
+
+    const createdMessages = [];
+    for (const msgData of testMessages) {
+      const message = new Message({
+        chatId: chat._id,
+        sender: msgData.sender,
+        content: msgData.content,
+        type: 'text'
+      });
+      await message.save();
+      createdMessages.push(message);
+    }
+
+    // Update chat last message
+    const lastMessage = createdMessages[createdMessages.length - 1];
+    chat.lastMessage = {
+      content: lastMessage.content,
+      sender: lastMessage.sender,
+      timestamp: lastMessage.createdAt
+    };
+    await chat.save();
+
+    res.json({
+      success: true,
+      chatId: chat._id,
+      messagesCreated: createdMessages.length,
+      participants: [user1.fullName, user2.fullName],
+      message: 'Test messages created successfully!'
+    });
+
+  } catch (error) {
+    console.error('Error creating test messages:', error);
     res.status(500).json({ error: error.message });
   }
 });

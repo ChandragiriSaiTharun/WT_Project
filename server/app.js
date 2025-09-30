@@ -153,6 +153,108 @@ app.get('/help', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'help.html'));
 });
 
+// Serve Admin Help Page
+app.get('/admin-help', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'admin-help.html'));
+});
+
+// Serve Admin Test Page
+app.get('/admin-test', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-test.html'));
+});
+
+// Serve Test Help Submit Page
+app.get('/test-help-submit', (req, res) => {
+  res.sendFile(path.join(__dirname, '../test-help-submit.html'));
+});
+
+// Serve Admin Registration Page
+app.get('/admin-register', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-register.html'));
+});
+
+// Serve Admin Diagnostics Page
+app.get('/admin-diagnostics', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-diagnostics.html'));
+});
+
+// Temporary test route to check tickets (remove in production)
+app.get('/test-tickets', async (req, res) => {
+  try {
+    const Ticket = require('./models/Ticket');
+    const tickets = await Ticket.find({}).sort({ createdAt: -1 }).limit(10);
+    res.json({
+      success: true,
+      count: tickets.length,
+      tickets: tickets
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Temporary test route to create sample tickets (remove in production)
+app.get('/create-test-tickets', async (req, res) => {
+  try {
+    const Ticket = require('./models/Ticket');
+    
+    // Create some sample tickets
+    const sampleTickets = [
+      {
+        ticketId: 'KC-' + Date.now() + '-001',
+        name: 'Ravi Kumar',
+        email: 'ravi.kumar@example.com',
+        phone: '9876543210',
+        category: 'crop_disease',
+        priority: 'high',
+        message: 'My tomato plants are wilting and leaves are turning brown. Need urgent help!',
+        cropType: 'Tomato',
+        status: 'open'
+      },
+      {
+        ticketId: 'KC-' + Date.now() + '-002',
+        name: 'Priya Sharma',
+        email: 'priya.sharma@example.com',
+        phone: '8765432109',
+        category: 'market_price',
+        priority: 'medium',
+        message: 'Need current market rates for onions. When is the best time to sell?',
+        cropType: 'Onion',
+        status: 'in_progress'
+      },
+      {
+        ticketId: 'KC-' + Date.now() + '-003',
+        name: 'Suresh Patel',
+        email: 'suresh.patel@example.com',
+        phone: '7654321098',
+        category: 'equipment',
+        priority: 'low',
+        message: 'Tractor making unusual noise during startup. Need maintenance tips.',
+        cropType: 'Multiple',
+        status: 'resolved'
+      }
+    ];
+    
+    const createdTickets = await Ticket.insertMany(sampleTickets);
+    
+    res.json({
+      success: true,
+      message: 'Sample tickets created successfully',
+      count: createdTickets.length,
+      tickets: createdTickets
+    });
+  } catch (error) {
+    console.error('Error creating test tickets:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Logout Endpoint
 app.get('/logout', (req, res) => {
   req.session.destroy((err) => {
@@ -220,7 +322,23 @@ app.get('/api/test/farmers', async (req, res) => {
 });
 
 // Admin Help Queries Endpoints
-app.get('/help', async (req, res) => {
+app.get('/api/admin/help-queries', async (req, res) => {
+  // Temporary: Allow testing without auth (remove in production)
+  console.log('🔍 Admin help queries request received');
+  console.log('Session:', req.session);
+  
+  // Check admin access (temporarily commented for testing)
+  /*
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+  
+  const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
+  if (!adminEmails.includes(req.session.user.email)) {
+    return res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+  */
+  
   try {
     const Ticket = require('./models/Ticket');
     const tickets = await Ticket.find({}).sort({ createdAt: -1 });
@@ -253,7 +371,23 @@ app.get('/help', async (req, res) => {
   }
 });
 
-app.put('/help/:id', async (req, res) => {
+app.put('/api/admin/help-queries/:id', async (req, res) => {
+  // Temporary: Allow testing without auth (remove in production)
+  console.log('🔍 Admin help query update request received');
+  console.log('Session:', req.session);
+  
+  // Check admin access (temporarily commented for testing)
+  /*
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, error: 'Authentication required' });
+  }
+  
+  const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
+  if (!adminEmails.includes(req.session.user.email)) {
+    return res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+  */
+  
   try {
     const Ticket = require('./models/Ticket');
     const { id } = req.params;
@@ -760,7 +894,7 @@ io.on('connection', (socket) => {
         chatId,
         sender: socket.userId,
         content: content.trim(),
-        messageType
+        type: messageType
       });
 
       await message.save();
