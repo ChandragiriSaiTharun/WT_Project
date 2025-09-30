@@ -10,6 +10,7 @@ const cropRoutes = require('./routes/crops');
 const helpRoutes = require('./routes/help');
 const marketPricesRoutes = require('./routes/market-prices');
 const chatRoutes = require('./routes/chats');
+const ecommerceRoutes = require('./routes/ecommerce');
 const http = require('http');
 const socketIo = require('socket.io');
 const Chat = require('./models/Chat');
@@ -53,6 +54,7 @@ app.use('/crops', cropRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/market-prices', marketPricesRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/ecommerce', ecommerceRoutes);
 
 // Serve Landing Page (index.html) at Root
 app.get('/', (req, res) => {
@@ -63,6 +65,16 @@ app.get('/', (req, res) => {
 // Serve Marketplace (HomePage_DetailsFilling.html)
 app.get('/marketplace', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'HomePage_DetailsFilling.html'));
+});
+
+// Serve Buy Now Page
+app.get('/buy-now', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'buy-now.html'));
+});
+
+// Serve Order Success Page
+app.get('/order-success', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client', 'order-success.html'));
 });
 
 // Serve Email Test Page

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .success-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 30px;
+    }
+    
+    /* Animated Success Icon */
+    .success-animation {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+    }
+    
+    .success-circle {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #28a745;
+      border-radius: 50%;
+      position: absolute;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      animation: scaleIn 0.8s ease-out forwards;
+      transform: scale(0);
+    }
+    
+    .success-tick {
+      width: 60px;
+      height: 30px;
+      border-left: 6px solid white;
+      border-bottom: 6px solid white;
+      transform: rotate(-45deg);
+      position: absolute;
+      top: 35px;
+      left: 25px;
+      animation: drawTick 0.6s ease-out 0.4s forwards;
+      opacity: 0;
+    }
+    
+    @keyframes scaleIn {
+      0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.1) rotate(180deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes drawTick {
+      0% {
+        opacity: 0;
+        transform: rotate(-45deg) scale(0);
+      }
+      50% {
+        opacity: 1;
+        transform: rotate(-45deg) scale(1.2);
+      }
+      100% {
+        opacity: 1;
+        transform: rotate(-45deg) scale(1);
+      }
+    }
+    
+    /* Floating particles animation */
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #28a745;
+      animation: confetti-fall 3s linear infinite;
+    }
+    
+    .confetti:nth-child(1) { left: 10%; animation-delay: 0s; background: #28a745; }
+    .confetti:nth-child(2) { left: 20%; animation-delay: 0.2s; background: #20c997; }
+    .confetti:nth-child(3) { left: 30%; animation-delay: 0.4s; background: #ffc107; }
+    .confetti:nth-child(4) { left: 40%; animation-delay: 0.6s; background: #28a745; }
+    .confetti:nth-child(5) { left: 50%; animation-delay: 0.8s; background: #20c997; }
+    .confetti:nth-child(6) { left: 60%; animation-delay: 1s; background: #ffc107; }
+    .confetti:nth-child(7) { left: 70%; animation-delay: 1.2s; background: #28a745; }
+    .confetti:nth-child(8) { left: 80%; animation-delay: 1.4s; background: #20c997; }
+    .confetti:nth-child(9) { left: 90%; animation-delay: 1.6s; background: #ffc107; }
+    
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    
+    .success-message {
+      animation: fadeInUp 1s ease-out 1s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .order-details {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      animation: slideInUp 1s ease-out 1.2s forwards;
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    
+    @keyframes slideInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .btn-custom {
+      border-radius: 25px;
+      padding: 10px 30px;
+      font-weight: 500;
+      text-decoration: none;
+      animation: bounceIn 1s ease-out 1.4s forwards;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    .estimated-delivery {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    /* Pulsing glow effect */
+    .success-glow {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(40, 167, 69, 0.3), transparent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Confetti Animation -->
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    <div class="confetti"></div>
+    
+    <div class="success-container text-center">
+      <!-- Animated Success Icon -->
+      <div class="success-animation">
+        <div class="success-glow"></div>
+        <div class="success-circle"></div>
+        <div class="success-tick"></div>
+      </div>
+      
+      <!-- Success Message -->
+      <div class="success-message">
+        <h1 class="text-success mb-3">🎉 Order Placed Successfully! 🎉</h1>
+        <p class="text-muted mb-4 fs-5">Thank you for your purchase. Your order has been confirmed and will be delivered to your doorstep.</p>
+      </div>
+      
+      <!-- Order Details -->
+      <div class="order-details">
+        <div id="orderInfo">
+          <!-- Order details will be loaded here -->
+          <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <a href="/marketplace" class="btn btn-success btn-custom w-100 mb-3">
+            <i class="fas fa-home me-2"></i>Continue Shopping
+          </a>
+          <button onclick="viewMyOrders()" class="btn btn-outline-success btn-custom w-100">
+            <i class="fas fa-list me-2"></i>View My Orders
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders Modal -->
+  <div class="modal fade" id="ordersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius: 15px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+          <h5 class="modal-title">
+            <i class="fas fa-box me-2"></i>My Orders
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="orders-loading" class="text-center py-4">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Loading orders...</span>
+            </div>
+          </div>
+          <div id="orders-container">
+            <!-- Orders will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Get order ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+    const isTemp = urlParams.get('temp') === 'true';
+
+    // Load order details
+    document.addEventListener('DOMContentLoaded', function() {
+      if (orderId) {
+        if (isTemp) {
+          console.log('Loading temporary order:', orderId);
+          displayTemporaryOrder(orderId);
+        } else {
+          console.log('Loading order from server:', orderId);
+          showLoadingState();
+          loadOrderDetails(orderId);
+        }
+      } else {
+        showError();
+      }
+    });
+
+    function showLoadingState() {
+      // You can add a loading spinner here if needed
+      console.log('Showing loading state...');
+    }
+
+    async function loadOrderDetails(orderId) {
+      try {
+        console.log('Fetching order from server:', orderId);
+        
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 5000)
+        );
+        
+        const fetchPromise = fetch(`/api/ecommerce/orders/${orderId}`, {
+          credentials: 'include'
+        });
+        
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Server order found:', data.order);
+          displayOrderDetails(data.order);
+          // Store order locally for My Orders
+          storeOrderLocally(data.order);
+        } else {
+          console.log('Server responded with error:', response.status);
+          throw new Error('Order not found on server');
+        }
+      } catch (error) {
+        console.error('Error loading order from server:', error);
+        console.log('Falling back to temporary order display');
+        // If server fails, show temporary order
+        displayTemporaryOrder(orderId);
+      }
+    }
+
+    function displayTemporaryOrder(orderId) {
+      const quantity = parseInt(localStorage.getItem('lastOrderQuantity')) || 1;
+      const amount = localStorage.getItem('lastOrderAmount') || '999';
+      const cropName = localStorage.getItem('lastOrderCrop') || 'Fresh Produce';
+      
+      const tempOrder = {
+        orderId: orderId,
+        orderStatus: 'pending',
+        status: 'pending', // For compatibility with My Orders display
+        totalAmount: parseFloat(amount),
+        createdAt: new Date().toISOString(),
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        paymentMethod: 'cod',
+        items: [{
+          cropName: cropName,
+          quantity: quantity,
+          unit: 'kg',
+          pricePerUnit: parseFloat(amount) / quantity,
+          totalPrice: parseFloat(amount)
+        }]
+      };
+      
+      console.log('Created temporary order:', tempOrder);
+      displayOrderDetails(tempOrder);
+      storeOrderLocally(tempOrder);
+    }
+
+    function storeOrderLocally(order) {
+      try {
+        console.log('Storing order locally:', order);
+        let localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+        console.log('Existing local orders:', localOrders);
+        
+        // Check if order already exists
+        const existingIndex = localOrders.findIndex(o => o.orderId === order.orderId);
+        if (existingIndex >= 0) {
+          localOrders[existingIndex] = order;
+          console.log('Updated existing order at index:', existingIndex);
+        } else {
+          localOrders.unshift(order); // Add to beginning
+          console.log('Added new order to beginning');
+        }
+        
+        // Keep only last 20 orders
+        localOrders = localOrders.slice(0, 20);
+        localStorage.setItem('userOrders', JSON.stringify(localOrders));
+        console.log('Orders stored successfully:', localOrders.length, 'total orders');
+      } catch (error) {
+        console.error('Error storing order locally:', error);
+      }
+    }
+
+    function displayOrderDetails(order) {
+      const estimatedDeliveryDate = new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const paymentMethods = {
+        'cod': 'Cash on Delivery',
+        'upi': 'UPI Payment',
+        'card': 'Credit/Debit Card',
+        'netbanking': 'Net Banking'
+      };
+
+      const orderHtml = `
+        <div class="row text-start">
+          <div class="col-md-6">
+            <h6 class="text-success mb-3">Order Details</h6>
+            <p><strong>Order ID:</strong> ${order.orderId}</p>
+            <p><strong>Total Amount:</strong> ₹${order.totalAmount.toFixed(2)}</p>
+            <p><strong>Payment Method:</strong> ${paymentMethods[order.paymentMethod]}</p>
+            <p><strong>Order Status:</strong> 
+              <span class="badge bg-warning">${order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}</span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-success mb-3">Shipping Address</h6>
+            <div class="text-muted">
+              <strong>${order.shippingAddress.fullName}</strong><br>
+              ${order.shippingAddress.addressLine1}<br>
+              ${order.shippingAddress.addressLine2 ? order.shippingAddress.addressLine2 + '<br>' : ''}
+              ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}<br>
+              <small>Phone: ${order.shippingAddress.phoneNumber}</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="estimated-delivery text-center">
+          <h6 class="mb-2">
+            <i class="fas fa-truck me-2"></i>Estimated Delivery
+          </h6>
+          <h5 class="mb-0">${estimatedDeliveryDate}</h5>
+        </div>
+        
+        <div class="mt-4">
+          <h6 class="text-success mb-3">Order Items</h6>
+          <div class="row">
+            ${order.items.map(item => `
+              <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center p-3 bg-light rounded">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">${item.cropName}</h6>
+                    <p class="text-muted mb-1">Quantity: ${item.quantity} ${item.unit}</p>
+                    <p class="text-success mb-0">₹${item.totalPrice.toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('orderInfo').innerHTML = orderHtml;
+    }
+
+    function showError() {
+      document.getElementById('orderInfo').innerHTML = `
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Order not found or invalid order ID.
+        </div>
+      `;
+    }
+
+    // View my orders
+    async function viewMyOrders() {
+      const modal = new bootstrap.Modal(document.getElementById('ordersModal'));
+      modal.show();
+      
+      // Show loading
+      document.getElementById('orders-loading').style.display = 'block';
+      document.getElementById('orders-container').innerHTML = '';
+      
+      try {
+        const response = await fetch('/api/ecommerce/orders', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          displayOrders(data.orders || []);
+        } else {
+          throw new Error('Failed to load orders');
+        }
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        document.getElementById('orders-container').innerHTML = `
+          <div class="text-center text-muted py-4">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+            <p>Failed to load orders</p>
+          </div>
+        `;
+      } finally {
+        document.getElementById('orders-loading').style.display = 'none';
+      }
+    }
+
+    // Display orders
+    function displayOrders(orders) {
+      const container = document.getElementById('orders-container');
+      
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-muted py-4">
+            <i class="fas fa-box fa-3x mb-3"></i>
+            <p>No orders found</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = orders.map(order => `
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="mb-1">Order #${order.orderId || order._id.substring(0, 8)}</h6>
+                <small class="text-muted">${new Date(order.createdAt).toLocaleDateString()}</small>
+              </div>
+              <span class="badge bg-${getStatusColor(order.status || order.orderStatus)}">${order.status || order.orderStatus}</span>
+            </div>
+            
+            <div class="mb-3">
+              ${order.items.map(item => `
+                <div class="d-flex align-items-center mb-2">
+                  <img src="${item.cropId?.image || '/uploads/crop/default.jpg'}" 
+                       class="rounded" style="width: 50px; height: 50px; object-fit: cover;" 
+                       onerror="this.src='/uploads/crop/default.jpg'">
+                  <div class="ms-3">
+                    <h6 class="mb-0">${item.cropName || 'Product'}</h6>
+                    <small class="text-muted">Qty: ${item.quantity} ${item.unit} × ₹${item.pricePerUnit}</small>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>Total: ₹${order.totalAmount}</strong>
+              <small class="text-muted">${order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod.toUpperCase()}</small>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Get status color
+    function getStatusColor(status) {
+      if (!status) return 'secondary';
+      switch (status.toLowerCase()) {
+        case 'pending': 
+        case 'placed': return 'warning';
+        case 'confirmed': return 'info';
+        case 'shipped': return 'primary';
+        case 'delivered': return 'success';
+        case 'cancelled': return 'danger';
+        default: return 'secondary';
+      }
+    }
+  </script>
+</body>
+</html>

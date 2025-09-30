@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -44,9 +45,10 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 5%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px 5%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
   position: fixed;
   width: 100%;
   left: 50%;
@@ -54,9 +56,107 @@ header {
   top: 0;
   z-index: 1000;
   box-sizing: border-box;
+  height: 70px;
 }
 body.dark-mode header {
-  background: rgba(31, 31, 31, 0.9);
+  background: rgba(31, 31, 31, 0.95);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Header Layout Components */
+header .menu-icon {
+  display: block;
+  font-size: 28px;
+  color: #28a745;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1001;
+}
+
+header .menu-icon:hover {
+  background-color: rgba(40, 167, 69, 0.1);
+  transform: scale(1.1);
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #28a745;
+  flex: 1;
+  margin-left: 15px;
+}
+
+header #nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+header .auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Professional Cart Icon */
+.cart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+  cursor: pointer;
+}
+
+.cart-icon-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(135deg, #20c997, #28a745);
+}
+
+.cart-icon-wrapper a {
+  color: white !important;
+  text-decoration: none !important;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
 header nav {
@@ -75,39 +175,70 @@ header .auth-buttons {
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   header {
-    padding: 15px 5%;
-    width: 90%;
+    padding: 10px 3%;
+    height: 60px;
   }
-  header nav {
-    gap: 10px;
-    font-size: 14px;
+  
+  header .menu-icon {
+    display: block;
+    font-size: 24px;
   }
-  header .auth-buttons button {
-    padding: 8px 15px;
-    font-size: 14px;
+  
+  header .logo {
+    font-size: 20px;
+    margin-left: 10px;
+  }
+  
+  header #nav {
+    gap: 12px;
+  }
+  
+  .cart-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .cart-icon-wrapper a {
+    font-size: 16px;
+  }
+  
+  .cart-count {
+    top: -3px;
+    right: -3px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 769px) {
+  header .menu-icon {
+    display: block;
   }
 }
 
 @media (max-width: 480px) {
   header {
-    flex-wrap: wrap;
+    padding: 8px 2%;
+    height: 55px;
+  }
+  
+  header .logo {
+    font-size: 18px;
+    flex: 1;
+  }
+  
+  header #nav {
     gap: 10px;
   }
-  header .logo {
-    order: 1;
-    width: 100%;
-    justify-content: center;
+  
+  .cart-icon-wrapper {
+    width: 36px;
+    height: 36px;
   }
-  header nav {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-  }
-  header .auth-buttons {
-    order: 2;
-    width: 100%;
-    justify-content: center;
-    margin-left: 0;
+  
+  .cart-icon-wrapper a {
+    font-size: 14px;
   }
 }
 
@@ -270,70 +401,107 @@ header .auth-buttons button span {
   z-index: 1;
 }
 
-/* Menu Icon */
-.menu-icon {
-  font-size: 55px;
-  cursor: pointer;
-  position: fixed;
-  top: 5px;
-  left: 30px;
-  color: #25c717;
-  transition: transform 0.3s;
-  z-index: 1000;
-}
-
-.menu-icon:hover {
-  transform: scale(2.1);
-}
-
-/* Sidebar Styling */
+/* Professional Sidebar */
 .sidebar {
   position: fixed;
-  background-color: #333;
-  top: 83px;
-  left: -320px;
-  width: 315px;
-  height: calc(100vh - 60px);
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-  transition: left 0.42s ease-in-out;
+  background: linear-gradient(180deg, #2c2c2c 0%, #1a1a1a 100%);
+  top: 70px;
+  left: -350px;
+  width: 320px;
+  height: calc(100vh - 70px);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(40, 167, 69, 0.2);
 }
 body.dark-mode .sidebar {
-  background-color: #1a1a1a;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+  border-right: 1px solid rgba(40, 167, 69, 0.3);
 }
 
 .sidebar.active {
   left: 0;
 }
 
-/* Sidebar Menu (From Attached File) */
+/* Sidebar Menu */
 .menu {
   display: flex;
   flex-direction: column;
-  padding: 5px; /* Reduced padding from attached file */
-  align-items: flex-start; /* Left-aligned as per your previous request */
-  gap: 5px; /* Added gap to control spacing from attached file */
-  background-color: #333; /* From attached file */
-}
-body.dark-mode .menu {
-  background-color: #1a1a1a; /* Consistent with sidebar dark mode */
+  padding: 20px 15px;
+  align-items: stretch;
+  gap: 8px;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .menu a {
   text-decoration: none;
-  font-size: 18px;
-  color: white;
-  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #e0e0e0;
+  padding: 15px 20px;
   display: flex;
   align-items: center;
-  transition: background 0.3s, padding-left 0.3s;
-  border-radius: 25px;
-  margin: 5px 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  margin: 2px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.menu a:hover::before {
+  left: 0;
+}
+
+.menu a:hover {
+  color: white;
+  transform: translateX(8px);
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
 
 .menu a i {
   margin-right: 15px;
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.menu a:hover i {
+  transform: scale(1.2);
+}
+
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.show {
+  opacity: 1;
 }
 
 .menu a:hover {
@@ -478,6 +646,227 @@ body.dark-mode .vibrating-text {
   text-shadow: 0 0 10px rgba(40, 167, 69, 0.8); /* Enhanced glow on hover */
 }
 
+/* Professional Buy Now Modal - Flipkart Style */
+.modal-xl {
+  max-width: 1140px;
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #28a745, #20c997) !important;
+}
+
+.product-image-container {
+  position: relative;
+}
+
+.main-image-wrapper {
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+}
+
+.main-product-image {
+  max-height: 400px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.main-product-image:hover {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.product-details {
+  padding: 10px;
+}
+
+.product-title {
+  font-size: 28px;
+  line-height: 1.3;
+}
+
+.product-description {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.price-section {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 15px;
+}
+
+.current-price {
+  font-size: 32px !important;
+  color: #28a745 !important;
+}
+
+.price-unit {
+  font-size: 18px;
+}
+
+.seller-info-card .card {
+  transition: all 0.3s ease;
+}
+
+.seller-info-card .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.quantity-selection-card .card {
+  transition: all 0.3s ease;
+}
+
+.quantity-selection-card .card:hover {
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+}
+
+.quantity-controls {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.quantity-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.quantity-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.quantity-input {
+  width: 100px !important;
+  height: 45px;
+  font-size: 18px;
+  border: 2px solid #28a745;
+  border-radius: 10px !important;
+  background: #f8f9fa;
+}
+
+.quantity-input:focus {
+  border-color: #20c997;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  background: white;
+}
+
+.unit-label {
+  font-size: 16px;
+  background: #e9ecef;
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+.total-amount-card .card {
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+  border: none;
+}
+
+.action-buttons .btn {
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.action-buttons .btn-outline-success:hover {
+  background: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.action-buttons .btn-success:hover {
+  background: #20c997;
+  border-color: #20c997;
+}
+
+/* Modal Backdrop Enhancement */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+/* Badge Enhancements */
+.bg-success-subtle {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+/* Responsive Adjustments for Modal */
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 95%;
+    margin: 10px;
+  }
+  
+  .product-title {
+    font-size: 24px;
+  }
+  
+  .current-price {
+    font-size: 28px !important;
+  }
+  
+  .main-product-image {
+    max-height: 250px;
+  }
+  
+  .action-buttons .btn {
+    height: 45px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 5px;
+  }
+  
+  .product-title {
+    font-size: 20px;
+  }
+  
+  .current-price {
+    font-size: 24px !important;
+  }
+  
+  .quantity-controls {
+    max-width: 250px;
+  }
+  
+  .quantity-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .quantity-input {
+    width: 80px !important;
+    height: 40px;
+    font-size: 16px;
+  }
+}
+
 /* Crop Grid */
 .crop-grid {
   display: grid;
@@ -495,18 +884,232 @@ body.dark-mode .vibrating-text {
 
 .crop-card {
   background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  border-radius: 15px;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
   position: relative;
 }
 body.dark-mode .crop-card {
   background: #2c2c2c;
+  border: 1px solid #404040;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 .crop-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: #28a745;
+}
+
+.crop-card .card-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+/* Wishlist Button */
+.wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.wishlist-btn i {
+  font-size: 18px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.wishlist-btn:hover i {
+  color: #e74c3c;
+}
+
+.wishlist-btn.active i {
+  color: #e74c3c;
+  font-weight: 900;
+}
+
+.wishlist-btn.active {
+  background: rgba(231, 76, 60, 0.1);
+  border: 2px solid #e74c3c;
+}
+
+.crop-card .card-content {
+  padding: 20px;
+}
+
+.crop-card .crop-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+body.dark-mode .crop-card .crop-name {
+  color: #e0e0e0;
+}
+
+.crop-card .crop-price {
+  font-size: 24px;
+  font-weight: 800;
+  color: #28a745;
+  margin-bottom: 4px;
+}
+
+.crop-card .price-unit {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .crop-card .price-unit {
+  color: #999;
+}
+
+.crop-card .availability-info {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.crop-card .seller-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+body.dark-mode .crop-card .seller-info {
+  border-color: #404040;
+}
+
+.crop-card .seller-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.crop-card .seller-details {
+  flex: 1;
+}
+
+.crop-card .seller-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+body.dark-mode .crop-card .seller-name {
+  color: #e0e0e0;
+}
+
+.crop-card .seller-location {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+body.dark-mode .crop-card .seller-location {
+  color: #999;
+}
+
+.crop-card .action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.crop-card .btn-buy,
+.crop-card .btn-chat {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.crop-card .btn-buy {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.crop-card .btn-buy:hover {
+  background: linear-gradient(135deg, #20c997, #17a2b8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.crop-card .btn-chat {
+  background: #f8f9fa;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.crop-card .btn-chat:hover {
+  background: #28a745;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+body.dark-mode .crop-card .btn-chat {
+  background: #404040;
+  color: #20c997;
+  border-color: #20c997;
+}
+
+body.dark-mode .crop-card .btn-chat:hover {
+  background: #20c997;
+  color: #2c2c2c;
 }
 
 .crop-image {
@@ -788,6 +1391,569 @@ body.dark-mode .sort-select {
 body.dark-mode .results-info {
   color: #bbb;
 }
+
+/* Flipkart-Style Buy Now Modal */
+.flipkart-modal {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.flipkart-header {
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assured-badge {
+  background: linear-gradient(to right, #ffd700, #ffed4e);
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.flipkart-body {
+  background: #fff;
+  min-height: 500px;
+}
+
+/* Product Images Section */
+.product-images-section {
+  background: #fafafa;
+  border-right: 1px solid #f0f0f0;
+  padding: 24px;
+}
+
+.image-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-image-wrapper {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.main-product-image {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.main-product-image:hover {
+  transform: scale(1.05);
+}
+
+.image-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+.discount-badge {
+  background: #ff6b6b;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.image-action-buttons {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.btn-wishlist-large,
+.btn-share {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-wishlist-large:hover,
+.btn-share:hover {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+.thumbnail-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.thumbnail-item {
+  width: 60px;
+  height: 60px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.thumbnail-item.active {
+  border-color: #2874f0;
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Product Details Section */
+.product-details-section {
+  padding: 24px;
+}
+
+.breadcrumb-section {
+  margin-bottom: 8px;
+}
+
+.breadcrumb {
+  color: #878787;
+  font-size: 14px;
+}
+
+.product-title-section {
+  margin-bottom: 20px;
+}
+
+.product-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #212121;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.product-subtitle {
+  color: #878787;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.rating-section {
+  margin-bottom: 16px;
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-score {
+  background: #388e3c;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stars {
+  color: #ffc107;
+  font-size: 14px;
+  display: none;
+}
+
+.rating-count {
+  color: #878787;
+  font-size: 14px;
+}
+
+/* Price Section */
+.price-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.special-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price-symbol {
+  font-size: 16px;
+  color: #212121;
+}
+
+.price-value {
+  font-size: 28px;
+  font-weight: 500;
+  color: #212121;
+}
+
+.price-unit {
+  font-size: 16px;
+  color: #878787;
+}
+
+.original-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strikethrough {
+  color: #878787;
+  text-decoration: line-through;
+  font-size: 16px;
+}
+
+.discount-percent {
+  color: #388e3c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.price-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.benefit-item {
+  color: #878787;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+/* Seller Section */
+.seller-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.seller-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.seller-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.seller-label {
+  color: #878787;
+  font-size: 14px;
+}
+
+.seller-name {
+  color: #2874f0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.seller-rating {
+  background: #388e3c;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.seller-benefits {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.seller-benefit {
+  color: #878787;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.seller-location {
+  color: #878787;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* Purchase Section */
+.purchase-section {
+  margin-bottom: 24px;
+}
+
+.quantity-section,
+.delivery-section {
+  margin-bottom: 16px;
+}
+
+.section-label {
+  color: #212121;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-decrease,
+.qty-increase {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #c2c2c2;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qty-decrease:hover,
+.qty-increase:hover {
+  border-color: #2874f0;
+  color: #2874f0;
+}
+
+.qty-input {
+  width: 60px;
+  height: 32px;
+  border: 1px solid #c2c2c2;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.qty-unit {
+  color: #878787;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.delivery-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.delivery-pincode {
+  color: #2874f0;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.delivery-time {
+  color: #878787;
+  font-size: 12px;
+}
+
+/* Total Section */
+.total-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.total-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.total-label {
+  color: #212121;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.total-amount {
+  color: #212121;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.savings-info {
+  text-align: center;
+}
+
+.savings {
+  color: #388e3c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-buttons-section {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-add-to-cart,
+.btn-buy-now {
+  flex: 1;
+  height: 54px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-add-to-cart {
+  background: #ff9f00;
+  color: white;
+  border: 1px solid #ff9f00;
+}
+
+.btn-add-to-cart:hover {
+  background: #e68900;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 159, 0, 0.3);
+}
+
+.btn-buy-now {
+  background: #fb641b;
+  color: white;
+}
+
+.btn-buy-now:hover {
+  background: #e0571a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(251, 100, 27, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .flipkart-body .row {
+    flex-direction: column;
+  }
+  
+  .product-images-section {
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .action-buttons-section {
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 16px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal.show .modal-dialog {
+  animation: modalFadeIn 0.3s ease-out;
+}
   </style>
 </head>
 <body>
@@ -829,6 +1995,9 @@ body.dark-mode .results-info {
     </nav>
   </header>
 
+  <!-- Sidebar Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" style="display: none;"></div>
+
   <!-- Marketplace Header -->
   <div class="marketplace-header">
     <br><br><br>
@@ -869,6 +2038,11 @@ body.dark-mode .results-info {
   <!-- Crop Listings Grid -->
   <div class="crop-grid" id="cropGrid">
     <!-- Crops will be added here dynamically -->
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <!-- Toasts will be dynamically added here -->
   </div>
 
   <!-- Crop Submission Form -->
@@ -934,9 +2108,27 @@ body.dark-mode .results-info {
               <input type="checkbox" id="modeToggle">
               <span class="slider"></span>
             </label>
+            <div class="cart-icon-wrapper" title="Wishlist">
+              <a href="#" onclick="event.preventDefault(); viewWishlist(); return false;">
+                <i class="fas fa-heart"></i>
+                <span class="cart-count" id="wishlist-count">0</span>
+              </a>
+            </div>
+            <div class="cart-icon-wrapper" title="My Orders">
+              <a href="#" onclick="event.preventDefault(); viewMyOrders(); return false;">
+                <i class="fas fa-box"></i>
+              </a>
+            </div>
+            <div class="cart-icon-wrapper" title="Shopping Cart">
+              <a href="/checkout.html">
+                <i class="fas fa-shopping-cart"></i>
+              </a>
+            </div>
             <a href="/logout"><button class="login"><span>Logout</span></button></a>
             <i class="material-icons profile-icon" id="profileIcon">account_circle</i>
           `;
+          // Load initial cart count
+          updateCartCount();
           return user;
         } else {
           authButtons.innerHTML = `
@@ -971,15 +2163,46 @@ body.dark-mode .results-info {
     const menuIcon = document.getElementById('menuIcon');
     menuIcon.addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('sidebar').classList.toggle('active');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      
+      sidebar.classList.toggle('active');
+      
+      if (sidebar.classList.contains('active')) {
+        backdrop.style.display = 'block';
+        setTimeout(() => backdrop.classList.add('show'), 10);
+      } else {
+        backdrop.classList.remove('show');
+        setTimeout(() => backdrop.style.display = 'none', 300);
+      }
     });
+
+    // Close sidebar when clicking backdrop
+    document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      
+      sidebar.classList.remove('active');
+      backdrop.classList.remove('show');
+      setTimeout(() => backdrop.style.display = 'none', 300);
+    });
+
     document.addEventListener('click', (event) => {
       const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
       const farmerDetails = document.getElementById('farmerDetails');
-      if (sidebar.classList.contains('active') && !sidebar.contains(event.target) && event.target !== menuIcon) {
+      
+      if (sidebar.classList.contains('active') && 
+          !sidebar.contains(event.target) && 
+          !menuIcon.contains(event.target)) {
         sidebar.classList.remove('active');
+        backdrop.classList.remove('show');
+        setTimeout(() => backdrop.style.display = 'none', 300);
       }
-      if (farmerDetails.classList.contains('show') && !farmerDetails.contains(event.target) && !event.target.closest('.profile-icon')) {
+      
+      if (farmerDetails.classList.contains('show') && 
+          !farmerDetails.contains(event.target) && 
+          !event.target.closest('.profile-icon')) {
         farmerDetails.classList.remove('show');
       }
     });
@@ -1060,13 +2283,951 @@ body.dark-mode .results-info {
     }
 
     // Check Login for Buy Now
-    async function checkLoginAndBuy() {
+    async function checkLoginAndBuy(cropId) {
       const user = await checkLoginStatus();
       if (!user) {
         alert('Please login to buy crops');
         window.location.href = '/Login.html';
       } else {
-        alert('Proceeding to buy...'); // Replace with actual buy logic
+        buyNow(cropId);
+      }
+    }
+
+    // Show Buy Now Modal with quantity selection
+    function showBuyNowModal(cropId) {
+      // Find the crop data
+      const crop = window.cropsData.find(c => c.id === cropId);
+      if (!crop) {
+        alert('Crop not found');
+        return;
+      }
+
+      // Create modal HTML with Flipkart-style design
+      const modalHtml = `
+        <div class="modal fade" id="buyNowModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog modal-dialog-centered" style="max-width: 1000px;">
+            <div class="modal-content flipkart-modal">
+              
+              <!-- Modal Header -->
+              <div class="flipkart-header">
+                <div class="header-content">
+                  <div class="product-badge">
+                    <span class="assured-badge">
+                      <i class="fas fa-shield-alt me-1"></i>Assured
+                    </span>
+                  </div>
+                  <button type="button" class="modal-close-btn" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Modal Body -->
+              <div class="flipkart-body">
+                <div class="row g-0">
+                  
+                  <!-- Product Images Section -->
+                  <div class="col-md-5 product-images-section">
+                    <div class="image-container">
+                      <div class="main-image-wrapper">
+                        <img src="${crop.imageUrl || '/uploads/crop/default.jpg'}" 
+                             alt="${crop.name}" class="main-product-image" id="mainProductImage">
+                        
+                        <!-- Image Badges -->
+                        <div class="image-badges">
+                          <span class="discount-badge">₹${Math.round(crop.price * 0.2)} off</span>
+                        </div>
+                        
+                        <!-- Action Buttons on Image -->
+                        <div class="image-action-buttons">
+                          <button class="btn-wishlist-large" onclick="toggleWishlist('${cropId}')">
+                            <i class="far fa-heart"></i>
+                          </button>
+                          <button class="btn-share">
+                            <i class="fas fa-share-alt"></i>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <!-- Thumbnail Images -->
+                      <div class="thumbnail-container">
+                        <div class="thumbnail-item active">
+                          <img src="${crop.imageUrl || '/uploads/crop/default.jpg'}" alt="thumbnail">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Product Details Section -->
+                  <div class="col-md-7 product-details-section">
+                    <div class="product-info">
+                      
+                      <!-- Breadcrumb -->
+                      <div class="breadcrumb-section">
+                        <span class="breadcrumb">
+                          Agriculture > Fresh Crops > ${crop.name}
+                        </span>
+                      </div>
+                      
+                      <!-- Product Title and Rating -->
+                      <div class="product-title-section">
+                        <h1 class="product-title">${crop.name}</h1>
+                        <p class="product-subtitle">Fresh ${crop.name} - Premium Quality</p>
+                        
+                        <!-- Rating and Reviews -->
+                        <div class="rating-section">
+                          <div class="rating-container">
+                            <span class="rating-score">4.3</span>
+                            <div class="stars">
+                              <i class="fas fa-star"></i>
+                              <i class="fas fa-star"></i>
+                              <i class="fas fa-star"></i>
+                              <i class="fas fa-star"></i>
+                              <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="rating-count">1,234 ratings and 567 reviews</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Price Section -->
+                      <div class="price-section">
+                        <div class="price-row">
+                          <div class="special-price">
+                            <span class="price-symbol">₹</span>
+                            <span class="price-value">${crop.price}</span>
+                            <span class="price-unit">per ${crop.unit}</span>
+                          </div>
+                          <div class="original-price">
+                            <span class="strikethrough">₹${Math.round(crop.price * 1.25)}</span>
+                            <span class="discount-percent">20% off</span>
+                          </div>
+                        </div>
+                        <div class="price-benefits">
+                          <span class="benefit-item">
+                            <i class="fas fa-tag text-success me-1"></i>Bank Offer
+                          </span>
+                          <span class="benefit-item">
+                            <i class="fas fa-truck text-info me-1"></i>Free delivery
+                          </span>
+                          <span class="benefit-item">
+                            <i class="fas fa-undo text-warning me-1"></i>7-day return
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Seller Information -->
+                      <div class="seller-section">
+                        <div class="seller-info">
+                          <div class="seller-details">
+                            <div class="seller-header">
+                              <span class="seller-label">Seller</span>
+                              <span class="seller-name">${crop.seller}</span>
+                              <span class="seller-rating">4.2★</span>
+                            </div>
+                            <div class="seller-benefits">
+                              <span class="seller-benefit">
+                                <i class="fas fa-shipping-fast me-1"></i>Fast Delivery
+                              </span>
+                              <span class="seller-benefit">
+                                <i class="fas fa-medal me-1"></i>Top Rated
+                              </span>
+                            </div>
+                          </div>
+                          <div class="seller-location">
+                            <i class="fas fa-map-marker-alt me-1"></i>${crop.location}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Quantity and Delivery -->
+                      <div class="purchase-section">
+                        <!-- Quantity -->
+                        <div class="quantity-section">
+                          <label class="section-label">Quantity</label>
+                          <div class="quantity-controls">
+                            <button class="qty-decrease" onclick="changeQuantity(-1)">
+                              <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" id="buyQuantity" value="1" min="1" max="1000" 
+                                   class="qty-input" onchange="updateTotal()">
+                            <button class="qty-increase" onclick="changeQuantity(1)">
+                              <i class="fas fa-plus"></i>
+                            </button>
+                            <span class="qty-unit">${crop.unit}</span>
+                          </div>
+                        </div>
+
+                        <!-- Delivery Info -->
+                        <div class="delivery-section">
+                          <label class="section-label">
+                            <i class="fas fa-map-marker-alt me-2"></i>Delivery
+                          </label>
+                          <div class="delivery-info">
+                            <span class="delivery-pincode">Enter pincode for delivery info</span>
+                            <span class="delivery-time">Usually delivered in 2-3 days</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Total Amount -->
+                      <div class="total-section">
+                        <div class="total-container">
+                          <span class="total-label">Total Amount</span>
+                          <span class="total-amount" id="totalAmount">₹${crop.price}</span>
+                        </div>
+                        <div class="savings-info">
+                          <span class="savings">You save ₹${Math.round(crop.price * 0.2)} on this order</span>
+                        </div>
+                      </div>
+
+                      <!-- Action Buttons -->
+                      <div class="action-buttons-section">
+                        <button class="btn-add-to-cart" onclick="addToCart('${cropId}')">
+                          <i class="fas fa-shopping-cart me-2"></i>
+                          <span>ADD TO CART</span>
+                        </button>
+                        <button class="btn-buy-now" onclick="buyNow('${cropId}')">
+                          <i class="fas fa-bolt me-2"></i>
+                          <span>BUY NOW</span>
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Remove existing modal if any
+      const existingModal = document.getElementById('buyNowModal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Add modal to page
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('buyNowModal'));
+      modal.show();
+
+      // Store crop data for reference
+      window.currentCrop = crop;
+    }
+
+    // Change quantity in buy modal
+    function changeQuantity(change) {
+      const quantityInput = document.getElementById('buyQuantity');
+      const currentQuantity = parseInt(quantityInput.value);
+      const newQuantity = Math.max(1, currentQuantity + change);
+      quantityInput.value = newQuantity;
+      updateTotal();
+    }
+
+    // Update total amount
+    function updateTotal() {
+      const quantity = parseInt(document.getElementById('buyQuantity').value) || 1;
+      const price = window.currentCrop.price;
+      const total = quantity * price;
+      document.getElementById('totalAmount').textContent = `₹${total.toFixed(2)}`;
+    }
+
+    // Wishlist functionality
+    let wishlistItems = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+    // Toggle wishlist item
+    async function toggleWishlist(cropId) {
+      const wishlistBtn = document.querySelector(`#wishlist-${cropId}`).parentElement;
+      const heartIcon = document.querySelector(`#wishlist-${cropId}`);
+      
+      try {
+        if (wishlistItems.includes(cropId)) {
+          // Remove from wishlist
+          const response = await fetch(`/api/ecommerce/wishlist/remove/${cropId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            wishlistItems = wishlistItems.filter(id => id !== cropId);
+            heartIcon.className = 'far fa-heart';
+            wishlistBtn.classList.remove('active');
+            showToast('info', 'Wishlist', 'Removed from wishlist');
+            localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+            updateWishlistCount();
+          } else {
+            showToast('error', 'Error', 'Failed to remove from wishlist');
+          }
+        } else {
+          // Add to wishlist
+          const response = await fetch('/api/ecommerce/wishlist/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ cropId })
+          });
+          
+          if (response.ok) {
+            wishlistItems.push(cropId);
+            heartIcon.className = 'fas fa-heart';
+            wishlistBtn.classList.add('active');
+            showToast('success', 'Wishlist', 'Added to wishlist ❤️');
+            localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+            updateWishlistCount();
+          } else {
+            showToast('error', 'Error', 'Failed to add to wishlist');
+          }
+        }
+      } catch (error) {
+        console.error('Wishlist error:', error);
+        showToast('error', 'Error', 'Error updating wishlist');
+      }
+    }
+
+    // Load wishlist from server
+    async function loadWishlist() {
+      try {
+        const response = await fetch('/api/ecommerce/wishlist', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.wishlist && data.wishlist.items) {
+            wishlistItems = data.wishlist.items.map(item => item.cropId._id || item.cropId);
+            localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+            updateWishlistUI();
+            updateWishlistCount();
+          }
+        } else if (response.status === 401) {
+          // User not logged in, use localStorage
+          console.log('User not logged in, using localStorage for wishlist');
+          updateWishlistUI();
+          updateWishlistCount();
+        }
+      } catch (error) {
+        console.error('Error loading wishlist:', error);
+        // Fallback to localStorage if server request fails
+        updateWishlistUI();
+        updateWishlistCount();
+      }
+    }
+
+    // Update wishlist UI on page load
+    function updateWishlistUI() {
+      wishlistItems.forEach(cropId => {
+        const heartIcon = document.querySelector(`#wishlist-${cropId}`);
+        const wishlistBtn = document.querySelector(`#wishlist-${cropId}`)?.parentElement;
+        if (heartIcon && wishlistBtn) {
+          heartIcon.className = 'fas fa-heart';
+          wishlistBtn.classList.add('active');
+        }
+      });
+    }
+
+    // Load wishlist when page loads
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        loadWishlist();
+        updateWishlistCount();
+      }, 1000); // Wait for crops to load
+    });
+
+    // Update wishlist count in navbar
+    function updateWishlistCount() {
+      const wishlistCountElement = document.getElementById('wishlist-count');
+      if (wishlistCountElement) {
+        wishlistCountElement.textContent = wishlistItems.length;
+      }
+    }
+
+    // View wishlist function
+    function viewWishlist() {
+      // Use the static modal
+      const modal = new bootstrap.Modal(document.getElementById('staticWishlistModal'));
+      modal.show();
+      
+      // Load wishlist items
+      loadWishlistModal();
+    }
+
+    // Load wishlist items in modal
+    async function loadWishlistModal() {
+      try {
+        const response = await fetch('/api/ecommerce/wishlist', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const modalBody = document.getElementById('staticWishlistModalBody');
+          
+          if (data.wishlist.items.length === 0) {
+            modalBody.innerHTML = `
+              <div class="text-center py-4">
+                <i class="fas fa-heart-broken fa-3x text-muted mb-3"></i>
+                <h5>Your wishlist is empty</h5>
+                <p class="text-muted">Add some crops to your wishlist to see them here!</p>
+              </div>
+            `;
+            return;
+          }
+          
+          let itemsHtml = '<div class="row g-3">';
+          data.wishlist.items.forEach(item => {
+            const crop = item.cropId;
+            itemsHtml += `
+              <div class="col-md-6" id="wishlist-item-${crop._id}">
+                <div class="card h-100 shadow-sm">
+                  <div class="row g-0">
+                    <div class="col-4">
+                      <img src="${crop.imageUrl || '/uploads/crop/default.jpg'}" class="img-fluid h-100 object-fit-cover" style="border-radius: 8px 0 0 8px; min-height: 120px;">
+                    </div>
+                    <div class="col-8">
+                      <div class="card-body p-3">
+                        <h6 class="card-title fw-bold">${crop.name}</h6>
+                        <div class="d-flex align-items-center mb-2">
+                          <span class="text-success fw-bold h6 mb-0">₹${crop.price}</span>
+                          <span class="text-muted ms-1">/${crop.unit}</span>
+                        </div>
+                        <p class="text-muted small mb-2">
+                          <i class="fas fa-user me-1"></i>${crop.seller}
+                        </p>
+                        <p class="text-muted small mb-3">
+                          <i class="fas fa-map-marker-alt me-1"></i>${crop.location}
+                        </p>
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-success btn-sm flex-fill" onclick="buyFromWishlist('${crop._id}')">
+                            <i class="fas fa-shopping-cart me-1"></i>Buy Now
+                          </button>
+                          <button class="btn btn-outline-danger btn-sm" onclick="removeFromWishlistModal('${crop._id}')" title="Remove from wishlist">
+                            <i class="fas fa-heart-broken"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          itemsHtml += '</div>';
+          
+          // Add bulk actions
+          itemsHtml += `
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted">${data.wishlist.items.length} items in wishlist</span>
+                  <div>
+                    <button class="btn btn-outline-danger me-2" onclick="clearWishlist()">
+                      <i class="fas fa-trash me-1"></i>Clear All
+                    </button>
+                    <button class="btn btn-success" onclick="addAllToCart()">
+                      <i class="fas fa-cart-plus me-1"></i>Add All to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          modalBody.innerHTML = itemsHtml;
+        } else {
+          throw new Error('Failed to load wishlist');
+        }
+      } catch (error) {
+        console.error('Error loading wishlist:', error);
+        document.getElementById('staticWishlistModalBody').innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+            <h5>Error loading wishlist</h5>
+            <p class="text-muted">Please try again later.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Remove item from wishlist in modal
+    async function removeFromWishlistModal(cropId) {
+      try {
+        const response = await fetch(`/api/ecommerce/wishlist/remove/${cropId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          wishlistItems = wishlistItems.filter(id => id !== cropId);
+          localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+          updateWishlistCount();
+          updateWishlistUI();
+          
+          // Remove item from modal
+          const itemElement = document.getElementById(`wishlist-item-${cropId}`);
+          if (itemElement) {
+            itemElement.remove();
+          }
+          
+          // Check if wishlist is empty
+          if (wishlistItems.length === 0) {
+            loadWishlistModal(); // Reload to show empty state
+          }
+          
+          showToast('info', 'Wishlist', 'Removed from wishlist');
+        } else {
+          showToast('error', 'Error', 'Failed to remove from wishlist');
+        }
+      } catch (error) {
+        console.error('Error removing from wishlist:', error);
+        showToast('error', 'Error', 'Error removing from wishlist');
+      }
+    }
+
+    // Buy directly from wishlist
+    function buyFromWishlist(cropId) {
+      // Close wishlist modal first
+      const wishlistModal = bootstrap.Modal.getInstance(document.getElementById('staticWishlistModal'));
+      if (wishlistModal) {
+        wishlistModal.hide();
+      }
+      
+      // Trigger buy now functionality
+      checkLoginAndBuy(cropId);
+    }
+
+    // Clear entire wishlist
+    async function clearWishlist() {
+      if (!confirm('Are you sure you want to clear your entire wishlist?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/ecommerce/wishlist/clear', {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          wishlistItems = [];
+          localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+          updateWishlistCount();
+          updateWishlistUI();
+          loadWishlistModal(); // Reload modal
+          showToast('success', 'Wishlist', 'Wishlist cleared');
+        } else {
+          showToast('error', 'Error', 'Failed to clear wishlist');
+        }
+      } catch (error) {
+        console.error('Error clearing wishlist:', error);
+        showToast('error', 'Error', 'Error clearing wishlist');
+      }
+    }
+
+    // Add all wishlist items to cart
+    async function addAllToCart() {
+      if (wishlistItems.length === 0) {
+        showToast('info', 'Wishlist', 'Wishlist is empty');
+        return;
+      }
+      
+      let successCount = 0;
+      const totalItems = wishlistItems.length;
+      
+      for (const cropId of wishlistItems) {
+        try {
+          const response = await fetch('/api/ecommerce/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              cropId: cropId,
+              quantity: 1
+            })
+          });
+          
+          if (response.ok) {
+            successCount++;
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+        }
+      }
+      
+      if (successCount === totalItems) {
+        showToast('success', 'Cart', `All ${successCount} items added to cart!`);
+      } else if (successCount > 0) {
+        showToast('warning', 'Cart', `${successCount} of ${totalItems} items added to cart`);
+      } else {
+        showToast('error', 'Error', 'Failed to add items to cart');
+      }
+    }
+
+    // Add to cart
+    async function addToCart(cropId) {
+      const quantity = parseInt(document.getElementById('buyQuantity').value) || 1;
+      
+      try {
+        const response = await fetch('/api/ecommerce/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            cropId: cropId,
+            quantity: quantity
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Get crop name safely
+          const cropName = window.currentCrop ? window.currentCrop.name : 'Item';
+          
+          // Show professional toast notification
+          showToast('success', `${cropName} added to cart!`, 'Item successfully added to your shopping cart.');
+          
+          // Close modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('buyNowModal'));
+          if (modal) {
+            modal.hide();
+          }
+          
+          // Update cart count and summary
+          updateCartCount();
+        } else {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to add to cart');
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        showToast('error', 'Add to Cart Failed', error.message || 'Failed to add item to cart. Please try again.');
+      }
+    }
+
+    // Buy now - redirect to buy-now page
+    function buyNow(cropId) {
+      // Redirect to the separate buy-now page
+      window.location.href = `/buy-now?cropId=${cropId}`;
+    }
+
+    // View my orders
+    async function viewMyOrders() {
+      const modal = new bootstrap.Modal(document.getElementById('ordersModal'));
+      modal.show();
+      
+      // Show loading
+      document.getElementById('orders-loading').style.display = 'block';
+      document.getElementById('orders-container').innerHTML = '';
+      
+      try {
+        console.log('Loading orders from server...');
+        const response = await fetch('/api/ecommerce/orders', {
+          credentials: 'include'
+        });
+        
+        let serverOrders = [];
+        if (response.ok) {
+          const data = await response.json();
+          serverOrders = data.orders || [];
+          console.log('Server orders:', serverOrders);
+        } else {
+          console.log('Server orders failed:', response.status);
+        }
+        
+        // Get locally stored orders
+        const localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+        console.log('Local orders:', localOrders);
+        
+        // Merge server and local orders, prioritizing server orders
+        const allOrders = [...serverOrders];
+        localOrders.forEach(localOrder => {
+          const existsOnServer = serverOrders.find(serverOrder => 
+            serverOrder.orderId === localOrder.orderId
+          );
+          if (!existsOnServer) {
+            allOrders.push(localOrder);
+          }
+        });
+        
+        console.log('All orders merged:', allOrders);
+        
+        // Sort by creation date (newest first)
+        allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        displayOrders(allOrders);
+        
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        
+        // Fallback to local orders only
+        const localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+        console.log('Fallback to local orders:', localOrders);
+        if (localOrders.length > 0) {
+          displayOrders(localOrders);
+        } else {
+          document.getElementById('orders-container').innerHTML = `
+            <div class="text-center text-muted py-4">
+              <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+              <p>Failed to load orders</p>
+            </div>
+          `;
+        }
+      } finally {
+        document.getElementById('orders-loading').style.display = 'none';
+      }
+    }
+
+    // Display orders
+    function displayOrders(orders) {
+      const container = document.getElementById('orders-container');
+      
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="text-center text-muted py-4">
+            <i class="fas fa-box fa-3x mb-3"></i>
+            <p>No orders found</p>
+            <small>Your orders will appear here once you place them</small>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = orders.map(order => `
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h6 class="mb-1">Order #${order.orderId || order._id.substring(0, 8)}</h6>
+                <small class="text-muted">${new Date(order.createdAt).toLocaleDateString()}</small>
+              </div>
+              <span class="badge bg-${getOrderStatusColor(order.status || order.orderStatus)}">${order.status || order.orderStatus}</span>
+            </div>
+            
+            <div class="mb-3">
+              ${order.items.map(item => `
+                <div class="d-flex align-items-center mb-2">
+                  <img src="${item.cropId?.imageUrl || '/uploads/crop/default.jpg'}" 
+                       class="rounded" style="width: 50px; height: 50px; object-fit: cover;" 
+                       onerror="this.src='/uploads/crop/default.jpg'">
+                  <div class="ms-3">
+                    <h6 class="mb-0">${item.cropName || 'Product'}</h6>
+                    <small class="text-muted">Qty: ${item.quantity} ${item.unit} × ₹${item.pricePerUnit}</small>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>Total: ₹${order.totalAmount}</strong>
+              <small class="text-muted">${order.paymentMethod === 'cod' ? 'COD' : order.paymentMethod.toUpperCase()}</small>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Get order status color
+    function getOrderStatusColor(status) {
+      if (!status) return 'secondary';
+      switch (status.toLowerCase()) {
+        case 'pending': 
+        case 'placed': return 'warning';
+        case 'confirmed': return 'info';
+        case 'shipped': return 'primary';
+        case 'delivered': return 'success';
+        case 'cancelled': return 'danger';
+        default: return 'secondary';
+      }
+    }
+
+    // Update cart count
+    async function updateCartCount() {
+      try {
+        const response = await fetch('/api/ecommerce/cart', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const totalItems = data.cart.totalItems || 0;
+          
+          // Update cart count display
+          const cartBadge = document.querySelector('.cart-count');
+          if (cartBadge) {
+            cartBadge.textContent = totalItems;
+            if (totalItems > 0) {
+              cartBadge.style.display = 'flex';
+              cartBadge.style.animation = 'pulse 2s infinite';
+            } else {
+              cartBadge.style.display = 'none';
+            }
+          }
+          
+          // Update cart summary section
+          updateCartSummary(data.cart);
+        }
+      } catch (error) {
+        console.error('Error updating cart count:', error);
+        // Hide cart count on error
+        const cartBadge = document.querySelector('.cart-count');
+        if (cartBadge) {
+          cartBadge.style.display = 'none';
+        }
+        hideCartSummary();
+      }
+    }
+
+    // Update cart summary display
+    function updateCartSummary(cart) {
+      const cartSummarySection = document.getElementById('cartSummarySection');
+      const cartSummaryCount = document.getElementById('cartSummaryCount');
+      const cartSummaryItems = document.getElementById('cartSummaryItems');
+      const cartSummaryTotal = document.getElementById('cartSummaryTotal');
+      
+      if (!cart || !cart.items || cart.items.length === 0) {
+        hideCartSummary();
+        hideFloatingCart();
+        return;
+      }
+      
+      // Show cart summary section
+      cartSummarySection.style.display = 'block';
+      
+      // Update item count
+      const totalItems = cart.totalItems || 0;
+      cartSummaryCount.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
+      
+      // Update cart items display
+      cartSummaryItems.innerHTML = cart.items.map(item => `
+        <div class="cart-item-summary">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.cropId.name}</div>
+            <div class="cart-item-details">${item.quantity} ${item.cropId.unit} × ₹${item.cropId.price}</div>
+          </div>
+          <div class="cart-item-price">₹${(item.quantity * item.cropId.price).toFixed(2)}</div>
+        </div>
+      `).join('');
+      
+      // Update total
+      const total = cart.totalPrice || 0;
+      cartSummaryTotal.innerHTML = `<strong>Total: ₹${total.toFixed(2)}</strong>`;
+      
+      // Update floating cart widget
+      updateFloatingCart(totalItems, total);
+    }
+
+    // Update floating cart widget
+    function updateFloatingCart(totalItems, total) {
+      const floatingWidget = document.getElementById('floatingCartWidget');
+      const floatingCount = document.getElementById('floatingCartCount');
+      const floatingTotal = document.getElementById('floatingCartTotal');
+      
+      if (totalItems > 0) {
+        floatingWidget.style.display = 'block';
+        floatingCount.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
+        floatingTotal.textContent = `Total: ₹${total.toFixed(2)}`;
+        
+        // Auto-hide after 10 seconds (user can manually close it)
+        setTimeout(() => {
+          if (floatingWidget.style.display === 'block') {
+            floatingWidget.style.opacity = '0.7';
+          }
+        }, 10000);
+      } else {
+        hideFloatingCart();
+      }
+    }
+
+    // Hide floating cart
+    function hideFloatingCart() {
+      const floatingWidget = document.getElementById('floatingCartWidget');
+      floatingWidget.style.display = 'none';
+    }
+
+    // Professional Toast Notification System
+    function showToast(type, title, message) {
+      const toastContainer = document.querySelector('.toast-container');
+      const toastId = 'toast-' + Date.now();
+      
+      const iconMap = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      };
+      
+      const colorMap = {
+        success: 'success',
+        error: 'danger', 
+        warning: 'warning',
+        info: 'info'
+      };
+      
+      const toastHtml = `
+        <div id="${toastId}" class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header bg-${colorMap[type]} text-white">
+            <i class="${iconMap[type]} me-2"></i>
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            ${message}
+          </div>
+        </div>
+      `;
+      
+      toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+      
+      const toastElement = document.getElementById(toastId);
+      const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 4000
+      });
+      
+      toast.show();
+      
+      // Remove from DOM after hiding
+      toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+      });
+    }
+
+    // Hide cart summary
+    function hideCartSummary() {
+      const cartSummarySection = document.getElementById('cartSummarySection');
+      cartSummarySection.style.display = 'none';
+      hideFloatingCart();
+    }
+
+    // Clear cart confirmation
+    async function clearCartConfirm() {
+      if (confirm('Are you sure you want to clear your cart? This action cannot be undone.')) {
+        try {
+          const response = await fetch('/api/ecommerce/cart/clear', {
+            method: 'DELETE',
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            updateCartCount(); // Refresh cart display
+            showToast('success', 'Cart Cleared', 'All items have been removed from your cart.');
+          } else {
+            throw new Error('Failed to clear cart');
+          }
+        } catch (error) {
+          console.error('Error clearing cart:', error);
+          showToast('error', 'Error', 'Failed to clear cart. Please try again.');
+        }
       }
     }
 
@@ -1174,6 +3335,9 @@ body.dark-mode .results-info {
           allCrops = crops;
           filteredCrops = [...allCrops];
           
+          // Store crops data globally for modal access
+          window.cropsData = crops;
+          
           if (crops.length === 0) {
             displayNoCrops();
             return;
@@ -1205,18 +3369,42 @@ body.dark-mode .results-info {
       crops.forEach(crop => {
         const card = document.createElement('div');
         card.className = 'crop-card';
+        
+        // Get seller's first letter for avatar
+        const sellerInitial = crop.seller ? crop.seller.charAt(0).toUpperCase() : 'U';
+        
         card.innerHTML = `
-          <img src="${crop.imageUrl || '/path/to/default-image.jpg'}" class="crop-image" alt="${crop.name}">
-          <div class="crop-details">
-            <h3>${crop.name}</h3>
-            <div class="price-tag">₹${crop.price}/${crop.unit}</div>
-            <div class="quantity-available">Available: ${crop.quantity} ${crop.unit}</div>
-            <div class="seller-info">
-              <b>${crop.seller}</b> - ${crop.location}
+          <div class="card-image-container">
+            <img src="${crop.imageUrl || '/uploads/crop/default.jpg'}" class="crop-image card-image" alt="${crop.name}">
+            <div class="image-badge">Fresh</div>
+            <button class="wishlist-btn" onclick="toggleWishlist('${crop.id}')" title="Add to Wishlist">
+              <i class="far fa-heart" id="wishlist-${crop.id}"></i>
+            </button>
+          </div>
+          <div class="card-content">
+            <h3 class="crop-name">${crop.name}</h3>
+            <div class="crop-price">₹${crop.price}</div>
+            <div class="price-unit">per ${crop.unit}</div>
+            <div class="availability-info">
+              <i class="fas fa-check-circle me-1"></i>
+              Available: ${crop.quantity} ${crop.unit}
             </div>
-            <div class="button-group">
-              <button class="buy-button" onclick="checkLoginAndBuy('${crop.id}')">Buy Now</button>
-              <button class="chat-button" onclick="startChat('${crop.sellerId}', '${crop.id}', '${crop.seller}', '${crop.name}')">Chat</button>
+            <div class="seller-info">
+              <div class="seller-avatar">${sellerInitial}</div>
+              <div class="seller-details">
+                <p class="seller-name">${crop.seller}</p>
+                <p class="seller-location">
+                  <i class="fas fa-map-marker-alt me-1"></i>${crop.location}
+                </p>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-buy" onclick="checkLoginAndBuy('${crop.id}')">
+                <i class="fas fa-shopping-cart"></i>Buy Now
+              </button>
+              <button class="btn-chat" onclick="startChat('${crop.sellerId}', '${crop.id}', '${crop.seller}', '${crop.name}')">
+                <i class="fas fa-comments"></i>Chat
+              </button>
             </div>
           </div>
         `;
@@ -1405,6 +3593,54 @@ body.dark-mode .results-info {
       }
     }
   </script>
+
+  <!-- Static Wishlist Modal -->
+  <div class="modal fade" id="staticWishlistModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius: 15px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+          <h5 class="modal-title">
+            <i class="fas fa-heart me-2"></i>Your Wishlist
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="staticWishlistModalBody">
+          <div class="text-center">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders Modal -->
+  <div class="modal fade" id="ordersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="border-radius: 15px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #2c5530, #4a7c59); color: white;">
+          <h5 class="modal-title">
+            <i class="fas fa-box me-2"></i>My Orders
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="orders-loading" class="text-center py-4" style="display: none;">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Loading orders...</span>
+            </div>
+          </div>
+          <div id="orders-container">
+            <!-- Orders will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- Admin Redirect Script -->
   <script src="admin-redirect.js"></script>
