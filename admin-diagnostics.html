@@ -62,6 +62,9 @@
     <button onclick="testAdminAPI()">Test Admin Help API</button>
     <button onclick="testCreateTickets()">Create Test Tickets</button>
     <button onclick="testDirectAPI()">Direct API Test</button>
+    <button onclick="testAdminLogin()">Test Admin Login</button>
+    <button onclick="testResponseUpdate()">Test Response Update</button>
+    <button onclick="testSimpleResponse()">Test Simple Response (No Auth)</button>
     <button onclick="clearResults()">Clear Results</button>
   </div>
   
@@ -154,6 +157,112 @@
         }
       } catch (error) {
         log(`❌ Admin API Request Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function testAdminLogin() {
+      log('Testing admin login...');
+      
+      try {
+        const response = await fetch('/test-admin-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          log(`✅ Admin Login Success: ${JSON.stringify(data, null, 2)}`, 'success');
+        } else {
+          const errorText = await response.text();
+          log(`❌ Admin Login Error (${response.status}): ${errorText}`, 'error');
+        }
+      } catch (error) {
+        log(`❌ Admin Login Test Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function testResponseUpdate() {
+      log('Testing response update functionality...');
+      
+      try {
+        // First get the tickets to find one to update
+        const ticketsResponse = await fetch('/test-tickets');
+        const ticketsData = await ticketsResponse.json();
+        
+        if (!ticketsData.success || ticketsData.tickets.length === 0) {
+          log('❌ No tickets found to test response update', 'error');
+          return;
+        }
+        
+        const testTicket = ticketsData.tickets[0];
+        log(`Found test ticket: ${testTicket._id} - ${testTicket.ticketId}`);
+        
+        // Now test updating the response
+        const updateResponse = await fetch(`/api/admin/help-queries/${testTicket._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            response: 'This is a test response from the diagnostics tool. Your issue has been resolved!',
+            status: 'resolved'
+          }),
+          credentials: 'include'
+        });
+        
+        if (updateResponse.ok) {
+          const updateData = await updateResponse.json();
+          log(`✅ Response Update Success: ${JSON.stringify(updateData, null, 2)}`, 'success');
+        } else {
+          const errorText = await updateResponse.text();
+          log(`❌ Response Update Error (${updateResponse.status}): ${errorText}`, 'error');
+        }
+        
+      } catch (error) {
+        log(`❌ Response Update Test Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function testSimpleResponse() {
+      log('Testing simple response update (no auth)...');
+      
+      try {
+        // First get the tickets to find one to update
+        const ticketsResponse = await fetch('/test-tickets');
+        const ticketsData = await ticketsResponse.json();
+        
+        if (!ticketsData.success || ticketsData.tickets.length === 0) {
+          log('❌ No tickets found to test response update', 'error');
+          return;
+        }
+        
+        const testTicket = ticketsData.tickets[0];
+        log(`Found test ticket: ${testTicket._id} - ${testTicket.ticketId}`);
+        
+        // Now test updating the response using the test endpoint
+        const updateResponse = await fetch(`/test-response-update/${testTicket._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            response: 'This is a test response from the simple test endpoint. Your wheat crop issue seems to be related to fungal infection. Please apply the recommended fungicide and ensure proper drainage.'
+          })
+        });
+        
+        if (updateResponse.ok) {
+          const updateData = await updateResponse.json();
+          log(`✅ Simple Response Update Success: ${JSON.stringify(updateData, null, 2)}`, 'success');
+        } else {
+          const errorText = await updateResponse.text();
+          log(`❌ Simple Response Update Error (${updateResponse.status}): ${errorText}`, 'error');
+        }
+        
+      } catch (error) {
+        log(`❌ Simple Response Update Test Error: ${error.message}`, 'error');
       }
     }
 

@@ -323,21 +323,22 @@ app.get('/api/test/farmers', async (req, res) => {
 
 // Admin Help Queries Endpoints
 app.get('/api/admin/help-queries', async (req, res) => {
-  // Temporary: Allow testing without auth (remove in production)
   console.log('🔍 Admin help queries request received');
   console.log('Session:', req.session);
   
-  // Check admin access (temporarily commented for testing)
-  /*
+  // Check admin access
   if (!req.session.user) {
+    console.log('❌ No session user found');
     return res.status(401).json({ success: false, error: 'Authentication required' });
   }
   
   const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
   if (!adminEmails.includes(req.session.user.email)) {
+    console.log('❌ User not in admin list:', req.session.user.email);
     return res.status(403).json({ success: false, error: 'Admin access required' });
   }
-  */
+  
+  console.log('✅ Admin access granted:', req.session.user.email);
   
   try {
     const Ticket = require('./models/Ticket');
@@ -372,21 +373,23 @@ app.get('/api/admin/help-queries', async (req, res) => {
 });
 
 app.put('/api/admin/help-queries/:id', async (req, res) => {
-  // Temporary: Allow testing without auth (remove in production)
   console.log('🔍 Admin help query update request received');
   console.log('Session:', req.session);
+  console.log('Request body:', req.body);
   
-  // Check admin access (temporarily commented for testing)
-  /*
+  // Check admin access
   if (!req.session.user) {
+    console.log('❌ No session user found');
     return res.status(401).json({ success: false, error: 'Authentication required' });
   }
   
   const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
   if (!adminEmails.includes(req.session.user.email)) {
+    console.log('❌ User not in admin list:', req.session.user.email);
     return res.status(403).json({ success: false, error: 'Admin access required' });
   }
-  */
+  
+  console.log('✅ Admin access granted:', req.session.user.email);
   
   try {
     const Ticket = require('./models/Ticket');
@@ -416,14 +419,33 @@ app.put('/api/admin/help-queries/:id', async (req, res) => {
     // Handle response update
     if (response) {
       updateData.status = 'resolved';
+      
+      // Get admin user ID from session or use a default admin ID
+      let adminId = null;
+      let adminName = 'Admin';
+      
+      if (req.session && req.session.user) {
+        adminId = req.session.user.id;
+        adminName = req.session.user.fullName || req.session.user.name || 'Admin';
+      } else {
+        // For now, we'll create a system admin response without respondedBy
+        // Later you can create a dedicated admin user in the database
+      }
+      
+      const responseData = {
+        message: response,
+        respondedByName: adminName,
+        respondedAt: new Date(),
+        type: 'admin'
+      };
+      
+      // Only add respondedBy if we have a valid admin ID
+      if (adminId) {
+        responseData.respondedBy = adminId;
+      }
+      
       updateData.$push = {
-        responses: {
-          message: response,
-          respondedBy: 'admin',
-          respondedByName: 'Admin',
-          respondedAt: new Date(),
-          type: 'admin'
-        }
+        responses: responseData
       };
       updateData.lastResponseAt = new Date();
     }
@@ -446,6 +468,103 @@ app.put('/api/admin/help-queries/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to update help query'
+    });
+  }
+});
+
+// Temporary test endpoint for response update (remove in production)
+app.put('/test-response-update/:id', async (req, res) => {
+  console.log('🧪 Testing response update functionality');
+  console.log('Ticket ID:', req.params.id);
+  console.log('Request body:', req.body);
+  
+  try {
+    const Ticket = require('./models/Ticket');
+    const { id } = req.params;
+    const { response } = req.body;
+    
+    if (!response) {
+      return res.status(400).json({
+        success: false,
+        error: 'Response message is required'
+      });
+    }
+    
+    const responseData = {
+      message: response,
+      respondedByName: 'Test Admin',
+      respondedAt: new Date(),
+      type: 'admin'
+    };
+    
+    const updateData = {
+      status: 'resolved',
+      $push: {
+        responses: responseData
+      },
+      lastResponseAt: new Date()
+    };
+    
+    console.log('Updating ticket with data:', updateData);
+    
+    const updatedTicket = await Ticket.findByIdAndUpdate(id, updateData, { new: true });
+    
+    if (!updatedTicket) {
+      return res.status(404).json({
+        success: false,
+        error: 'Ticket not found'
+      });
+    }
+    
+    console.log('✅ Ticket updated successfully');
+    
+    res.json({
+      success: true,
+      message: 'Test response added successfully',
+      ticket: updatedTicket
+    });
+  } catch (error) {
+    console.error('❌ Test response update error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update response: ' + error.message
+    });
+  }
+});
+
+// Temporary admin login for testing (remove in production)
+app.post('/test-admin-login', async (req, res) => {
+  try {
+    const Farmer = require('./models/Farmer');
+    
+    // Find the admin user
+    const adminUser = await Farmer.findOne({ email: 'thanushreddy934@gmail.com' });
+    
+    if (adminUser) {
+      req.session.user = {
+        id: adminUser._id,
+        fullName: adminUser.fullName,
+        email: adminUser.email,
+        phoneNumber: adminUser.phoneNumber,
+        profilePicture: adminUser.profilePicture
+      };
+      
+      res.json({
+        success: true,
+        message: 'Admin test login successful',
+        user: req.session.user
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'Admin user not found'
+      });
+    }
+  } catch (error) {
+    console.error('Test admin login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Test login failed'
     });
   }
 });

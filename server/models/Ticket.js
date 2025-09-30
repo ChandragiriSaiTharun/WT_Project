@@ -9,7 +9,7 @@ const responseSchema = new mongoose.Schema({
   respondedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farmer',
-    required: true
+    required: false // Made optional for system/admin responses
   },
   respondedByName: {
     type: String,
