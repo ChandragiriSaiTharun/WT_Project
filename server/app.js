@@ -58,9 +58,9 @@ app.use((req, res, next) => {
     'Content-Security-Policy',
     `default-src 'self'; ` +
     `img-src 'self' ${baseUrl} data: blob:; ` +
-    `style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
+    `style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; ` +
     `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
-    `font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
+    `font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; ` +
     `connect-src 'self' ${baseUrl};`
   );
   
@@ -85,15 +85,55 @@ app.get('/crop/:filename', (req, res) => {
   // Set proper headers for images
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours cache
-  res.setHeader('Content-Type', 'image/jpeg'); // Default to JPEG, could be enhanced to detect actual type
   
   // Check if file exists and serve it
   if (fs.existsSync(imagePath)) {
+    // Detect content type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    if (ext === '.jpg' || ext === '.jpeg') {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (ext === '.png') {
+      res.setHeader('Content-Type', 'image/png');
+    } else if (ext === '.gif') {
+      res.setHeader('Content-Type', 'image/gif');
+    } else {
+      res.setHeader('Content-Type', 'image/jpeg'); // default
+    }
+    
     res.sendFile(imagePath);
   } else {
-    console.log(`Image not found: ${imagePath}`);
-    res.status(404).json({ error: 'Image not found' });
+    console.log(`Image not found: ${imagePath}, serving default`);
+    // Serve a default placeholder image
+    const defaultImageSvg = `
+      <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f0f0f0"/>
+        <rect x="20" y="20" width="260" height="160" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+        <text x="150" y="90" font-family="Arial" font-size="16" fill="#999" text-anchor="middle">🌾</text>
+        <text x="150" y="115" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Crop Image</text>
+        <text x="150" y="135" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Not Available</text>
+      </svg>
+    `;
+    
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.send(defaultImageSvg);
   }
+});
+
+// Serve default crop image
+app.get('/uploads/crop/default.jpg', (req, res) => {
+  const defaultImageSvg = `
+    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f0f0f0"/>
+      <rect x="20" y="20" width="260" height="160" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
+      <text x="150" y="90" font-family="Arial" font-size="16" fill="#999" text-anchor="middle">🌾</text>
+      <text x="150" y="115" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Crop Image</text>
+      <text x="150" y="135" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Not Available</text>
+    </svg>
+  `;
+  
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.send(defaultImageSvg);
 });
 
 // Serve Landing Page (index.html) at Root
