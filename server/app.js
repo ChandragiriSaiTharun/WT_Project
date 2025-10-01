@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 const registerRoutes = require('./routes/register');
 const loginRoutes = require('./routes/login');
@@ -46,6 +47,26 @@ app.use(session({
   }
 }));
 
+// Content Security Policy for image loading
+app.use((req, res, next) => {
+  const host = req.get('host');
+  const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+  const baseUrl = `${protocol}://${host}`;
+  
+  // Allow images from same origin and current domain
+  res.setHeader(
+    'Content-Security-Policy',
+    `default-src 'self'; ` +
+    `img-src 'self' ${baseUrl} data: blob:; ` +
+    `style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
+    `font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
+    `connect-src 'self' ${baseUrl};`
+  );
+  
+  next();
+});
+
 // Routes
 app.use('/register', registerRoutes);
 app.use('/login', loginRoutes);
@@ -55,6 +76,25 @@ app.use('/api/help', helpRoutes);
 app.use('/api/market-prices', marketPricesRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
+
+// Serve crop images with proper headers
+app.get('/crop/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, '../uploads/crop', filename);
+  
+  // Set proper headers for images
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours cache
+  res.setHeader('Content-Type', 'image/jpeg'); // Default to JPEG, could be enhanced to detect actual type
+  
+  // Check if file exists and serve it
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(imagePath);
+  } else {
+    console.log(`Image not found: ${imagePath}`);
+    res.status(404).json({ error: 'Image not found' });
+  }
+});
 
 // Serve Landing Page (index.html) at Root
 app.get('/', (req, res) => {
