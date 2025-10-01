@@ -3130,6 +3130,12 @@ body.dark-mode .results-info {
       const cartSummaryItems = document.getElementById('cartSummaryItems');
       const cartSummaryTotal = document.getElementById('cartSummaryTotal');
       
+      // Check if all required elements exist
+      if (!cartSummarySection || !cartSummaryCount || !cartSummaryItems || !cartSummaryTotal) {
+        console.warn('Cart summary elements not found in DOM');
+        return;
+      }
+      
       if (!cart || !cart.items || cart.items.length === 0) {
         hideCartSummary();
         hideFloatingCart();
@@ -3187,7 +3193,9 @@ body.dark-mode .results-info {
     // Hide floating cart
     function hideFloatingCart() {
       const floatingWidget = document.getElementById('floatingCartWidget');
-      floatingWidget.style.display = 'none';
+      if (floatingWidget) {
+        floatingWidget.style.display = 'none';
+      }
     }
 
     // Professional Toast Notification System
@@ -3241,7 +3249,9 @@ body.dark-mode .results-info {
     // Hide cart summary
     function hideCartSummary() {
       const cartSummarySection = document.getElementById('cartSummarySection');
-      cartSummarySection.style.display = 'none';
+      if (cartSummarySection) {
+        cartSummarySection.style.display = 'none';
+      }
       hideFloatingCart();
     }
 
@@ -3571,23 +3581,10 @@ body.dark-mode .results-info {
 
     // Handle image loading errors
     function handleImageError(img, cropName) {
-      console.log(`Failed to load image for ${cropName}, using default`);
+      console.log(`Failed to load image for ${cropName}, using server default`);
       
-      // Create a default SVG image as data URL
-      const defaultImageSvg = `
-        <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100%" height="100%" fill="#f0f0f0"/>
-          <rect x="20" y="20" width="260" height="160" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
-          <text x="150" y="90" font-family="Arial" font-size="16" fill="#999" text-anchor="middle">🌾</text>
-          <text x="150" y="115" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">${cropName}</text>
-          <text x="150" y="135" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Image Not Available</text>
-        </svg>
-      `;
-      
-      const svgBlob = new Blob([defaultImageSvg], { type: 'image/svg+xml' });
-      const svgUrl = URL.createObjectURL(svgBlob);
-      
-      img.src = svgUrl;
+      // Use the server's default image endpoint
+      img.src = '/api/image/default';
       img.onerror = null; // Prevent infinite loop
     }
 

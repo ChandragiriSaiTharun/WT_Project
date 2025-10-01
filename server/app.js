@@ -77,6 +77,23 @@ app.use('/api/market-prices', marketPricesRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/ecommerce', ecommerceRoutes);
 
+// Serve default crop image
+app.get('/api/image/default', (req, res) => {
+  const defaultImageSvg = `
+    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f8f9fa"/>
+      <rect x="30" y="30" width="240" height="140" fill="none" stroke="#dee2e6" stroke-width="2" stroke-dasharray="8,4"/>
+      <text x="150" y="90" font-family="Arial, sans-serif" font-size="20" fill="#6c757d" text-anchor="middle">🌾</text>
+      <text x="150" y="115" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Crop Image</text>
+      <text x="150" y="135" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Not Available</text>
+    </svg>
+  `;
+  
+  res.setHeader('Content-Type', 'image/svg+xml');
+  res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+  res.send(defaultImageSvg);
+});
+
 // Serve crop images with proper headers
 app.get('/crop/:filename', (req, res) => {
   const filename = req.params.filename;
@@ -106,15 +123,16 @@ app.get('/crop/:filename', (req, res) => {
     // Serve a default placeholder image
     const defaultImageSvg = `
       <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f0f0f0"/>
-        <rect x="20" y="20" width="260" height="160" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="5,5"/>
-        <text x="150" y="90" font-family="Arial" font-size="16" fill="#999" text-anchor="middle">🌾</text>
-        <text x="150" y="115" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Crop Image</text>
-        <text x="150" y="135" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Not Available</text>
+        <rect width="100%" height="100%" fill="#f8f9fa"/>
+        <rect x="30" y="30" width="240" height="140" fill="none" stroke="#dee2e6" stroke-width="2" stroke-dasharray="8,4"/>
+        <text x="150" y="90" font-family="Arial, sans-serif" font-size="20" fill="#6c757d" text-anchor="middle">🌾</text>
+        <text x="150" y="115" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Crop Image</text>
+        <text x="150" y="135" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Loading...</text>
       </svg>
     `;
     
     res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Cache-Control', 'no-cache');
     res.send(defaultImageSvg);
   }
 });

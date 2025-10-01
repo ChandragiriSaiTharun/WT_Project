@@ -148,10 +148,12 @@ router.get('/', async (req, res) => {
       defaultSeller = await Farmer.findOne();
     }
 
-    // Generate base URL for images
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? `https://${req.get('host')}` 
-      : `http://${req.get('host')}`;
+    // Generate base URL for images with better protocol detection
+    const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+    const host = req.get('host');
+    const baseUrl = `${protocol}://${host}`;
+    
+    console.log(`Image base URL: ${baseUrl}`); // Debug log
 
     // Add full image URL to each crop and convert _id to id for compatibility
     const cropsWithImageUrl = crops.map(crop => ({
