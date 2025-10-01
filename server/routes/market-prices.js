@@ -12,7 +12,58 @@ router.get('/', async (req, res) => {
       filter.category = category;
     }
 
-    const prices = await MarketPrice.find(filter).sort({ name: 1 });
+    let prices = await MarketPrice.find(filter).sort({ name: 1 });
+    
+    // If no prices found, auto-seed the database
+    if (prices.length === 0) {
+      console.log('No market prices found. Auto-seeding database...');
+      
+      const seedData = [
+        // Grains
+        { name: 'Rice (Basmati)', category: 'grains', currentPrice: 85, previousPrice: 82, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Wheat', category: 'grains', currentPrice: 25, previousPrice: 26, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Corn', category: 'grains', currentPrice: 22, previousPrice: 21, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Barley', category: 'grains', currentPrice: 28, previousPrice: 29, unit: 'per kg', market: 'Delhi Mandi' },
+        
+        // Vegetables
+        { name: 'Tomato', category: 'vegetables', currentPrice: 45, previousPrice: 38, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Onion', category: 'vegetables', currentPrice: 35, previousPrice: 42, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Potato', category: 'vegetables', currentPrice: 18, previousPrice: 20, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Carrot', category: 'vegetables', currentPrice: 25, previousPrice: 23, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Cabbage', category: 'vegetables', currentPrice: 15, previousPrice: 16, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Cauliflower', category: 'vegetables', currentPrice: 30, previousPrice: 28, unit: 'per kg', market: 'Delhi Mandi' },
+        
+        // Fruits
+        { name: 'Apple', category: 'fruits', currentPrice: 120, previousPrice: 115, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Banana', category: 'fruits', currentPrice: 40, previousPrice: 38, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Orange', category: 'fruits', currentPrice: 60, previousPrice: 65, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Mango', category: 'fruits', currentPrice: 80, previousPrice: 75, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Grapes', category: 'fruits', currentPrice: 90, previousPrice: 85, unit: 'per kg', market: 'Delhi Mandi' },
+        
+        // Pulses
+        { name: 'Lentils (Red)', category: 'pulses', currentPrice: 95, previousPrice: 92, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Chickpeas', category: 'pulses', currentPrice: 75, previousPrice: 78, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Black Gram', category: 'pulses', currentPrice: 105, previousPrice: 102, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Green Gram', category: 'pulses', currentPrice: 85, previousPrice: 88, unit: 'per kg', market: 'Delhi Mandi' },
+        
+        // Spices
+        { name: 'Turmeric', category: 'spices', currentPrice: 180, previousPrice: 175, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Cumin', category: 'spices', currentPrice: 420, previousPrice: 410, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Coriander', category: 'spices', currentPrice: 150, previousPrice: 145, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Red Chili', category: 'spices', currentPrice: 220, previousPrice: 215, unit: 'per kg', market: 'Delhi Mandi' },
+        
+        // Oilseeds
+        { name: 'Groundnut', category: 'oilseeds', currentPrice: 65, previousPrice: 68, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Sunflower', category: 'oilseeds', currentPrice: 55, previousPrice: 52, unit: 'per kg', market: 'Delhi Mandi' },
+        { name: 'Mustard', category: 'oilseeds', currentPrice: 48, previousPrice: 50, unit: 'per kg', market: 'Delhi Mandi' }
+      ];
+
+      await MarketPrice.insertMany(seedData);
+      console.log(`✅ Auto-seeded ${seedData.length} market prices`);
+      
+      // Re-fetch the data after seeding
+      prices = await MarketPrice.find(filter).sort({ name: 1 });
+    }
     
     res.json({
       success: true,
@@ -170,6 +221,37 @@ router.get('/category/:category', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch prices by category'
+    });
+  }
+});
+
+// GET /api/market-prices/health - Health check and database status
+router.get('/health', async (req, res) => {
+  try {
+    const count = await MarketPrice.countDocuments();
+    const sample = await MarketPrice.findOne();
+    
+    res.json({
+      success: true,
+      status: 'healthy',
+      database: {
+        connected: true,
+        priceCount: count,
+        samplePrice: sample ? {
+          name: sample.name,
+          category: sample.category,
+          currentPrice: sample.currentPrice
+        } : null
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({
+      success: false,
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });
