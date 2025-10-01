@@ -376,18 +376,25 @@
         // Get current user ID for user-specific storage
         let currentUserId = null;
         try {
-          const userResponse = await fetch('/login/check', { credentials: 'include' });
+          const userResponse = await fetch('/user', { credentials: 'include' });
           if (userResponse.ok) {
             const userData = await userResponse.json();
-            currentUserId = userData.user?.id;
+            currentUserId = userData.id;
+            console.log('Current user ID for order storage:', currentUserId);
           }
         } catch (e) {
-          console.log('Could not get user ID for local storage');
+          console.log('Could not get user ID for local storage:', e);
         }
         
         const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
         let localOrders = JSON.parse(localStorage.getItem(localStorageKey)) || [];
         console.log('Existing local orders:', localOrders);
+        
+        // Ensure order has user ID for proper filtering
+        if (currentUserId && order) {
+          order.userId = currentUserId;
+          order.buyerId = currentUserId;
+        }
         
         // Check if order already exists
         const existingIndex = localOrders.findIndex(o => o.orderId === order.orderId);

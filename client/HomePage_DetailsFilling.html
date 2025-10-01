@@ -2933,6 +2933,20 @@ body.dark-mode .results-info {
 
     // View my orders
     async function viewMyOrders() {
+      // Check if user is authenticated first
+      try {
+        const userResponse = await fetch('/user', { credentials: 'include' });
+        if (!userResponse.ok) {
+          alert('Please log in to view your orders');
+          window.location.href = '/login.html';
+          return;
+        }
+      } catch (e) {
+        alert('Please log in to view your orders');
+        window.location.href = '/login.html';
+        return;
+      }
+      
       const modal = new bootstrap.Modal(document.getElementById('ordersModal'));
       modal.show();
       
@@ -2942,6 +2956,23 @@ body.dark-mode .results-info {
       
       try {
         console.log('Loading orders from server...');
+        
+        // Get current user ID first for user-specific localStorage
+        let currentUserId = null;
+        try {
+          const userResponse = await fetch('/user', { credentials: 'include' });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            currentUserId = userData.id;
+            console.log('Current user ID:', currentUserId);
+          } else {
+            console.log('User not authenticated, status:', userResponse.status);
+          }
+        } catch (e) {
+          console.log('Could not get user ID:', e);
+        }
+        
+        // Fetch orders from server (should already be filtered by user)
         const response = await fetch('/api/ecommerce/orders', {
           credentials: 'include'
         });
@@ -2950,27 +2981,25 @@ body.dark-mode .results-info {
         if (response.ok) {
           const data = await response.json();
           serverOrders = data.orders || [];
-          console.log('Server orders:', serverOrders);
+          console.log('Server orders (already filtered by user):', serverOrders);
         } else {
-          console.log('Server orders failed:', response.status);
-        }
-        
-        // Get current user ID for user-specific localStorage
-        let currentUserId = null;
-        try {
-          const userResponse = await fetch('/login/check', { credentials: 'include' });
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            currentUserId = userData.user?.id;
+          console.log('Server orders failed:', response.status, response.statusText);
+          if (response.status === 401) {
+            console.log('User not authenticated for server orders');
           }
-        } catch (e) {
-          console.log('Could not get user ID');
         }
         
         // Get user-specific locally stored orders
         const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
         const localOrders = JSON.parse(localStorage.getItem(localStorageKey)) || [];
         console.log('Local orders for user:', localOrders);
+        
+        // Clean up any legacy orders without user ID filtering
+        if (currentUserId) {
+          // Remove legacy global orders that might have been stored without user specificity
+          localStorage.removeItem('userOrders');
+          console.log('Cleaned up legacy global orders');
+        }
         
         // Merge server and local orders, prioritizing server orders
         const allOrders = [...serverOrders];
@@ -2984,11 +3013,29 @@ body.dark-mode .results-info {
         });
         
         console.log('All orders merged:', allOrders);
+        console.log('Current user ID for validation:', currentUserId);
+        
+        // Additional client-side filtering to ensure only current user's orders are shown
+        let filteredOrders = allOrders;
+        if (currentUserId) {
+          filteredOrders = allOrders.filter(order => {
+            // Check if order belongs to current user
+            const belongsToUser = order.buyerId === currentUserId || 
+                                 order.userId === currentUserId ||
+                                 (!order.buyerId && !order.userId); // fallback for local orders
+            
+            if (!belongsToUser) {
+              console.log('Filtering out order not belonging to user:', order.orderId || order._id);
+            }
+            return belongsToUser;
+          });
+          console.log('Orders after user filtering:', filteredOrders);
+        }
         
         // Sort by creation date (newest first)
-        allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         
-        displayOrders(allOrders);
+        displayOrders(filteredOrders);
         
       } catch (error) {
         console.error('Error loading orders:', error);
@@ -2996,13 +3043,13 @@ body.dark-mode .results-info {
         // Fallback to user-specific local orders only
         let currentUserId = null;
         try {
-          const userResponse = await fetch('/login/check', { credentials: 'include' });
+          const userResponse = await fetch('/user', { credentials: 'include' });
           if (userResponse.ok) {
             const userData = await userResponse.json();
-            currentUserId = userData.user?.id;
+            currentUserId = userData.id;
           }
         } catch (e) {
-          console.log('Could not get user ID for fallback');
+          console.log('Could not get user ID for fallback:', e);
         }
         
         const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
