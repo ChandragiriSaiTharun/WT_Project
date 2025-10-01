@@ -49,6 +49,16 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
   }
 
   try {
+    // Get seller ID from session
+    const sellerId = req.session.user ? req.session.user.id : null;
+    
+    if (!sellerId) {
+      if (filePath && fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath); // Delete uploaded file if not authenticated
+      }
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
     // Create new crop document
     const newCrop = new Crop({
       name: cropName,
@@ -57,7 +67,7 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
       quantity: cropQuantity,
       unit: cropUnit,
       seller: sellerName,
-      sellerId: req.session.userId, // Add the user ID
+      sellerId: sellerId, // Use correct session field
       location
     });
     

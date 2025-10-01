@@ -10,13 +10,25 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  timeout: 10000, // 10 seconds timeout
+  connectionTimeout: 10000, // 10 seconds connection timeout
+  greetingTimeout: 5000, // 5 seconds greeting timeout
+  socketTimeout: 10000 // 10 seconds socket timeout
 });
 
-transporter.verify((error, success) => {
-  if (error) console.error('Email transporter failed:', error);
-  else console.log('Email transporter ready');
-});
+// Verify email configuration with better error handling
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('Email transporter failed:', error.message);
+    } else {
+      console.log('Email transporter ready');
+    }
+  });
+} else {
+  console.warn('Email credentials not configured - password reset emails will fail');
+}
 
 router.post('/', async (req, res) => {
   console.log('Received POST /forgot-password:', req.body);
@@ -45,8 +57,14 @@ router.post('/', async (req, res) => {
     });
     console.log('Reset token stored for:', email);
 
-    const resetUrl = `http://localhost:3000/reset-password.html?token=${resetToken}`;
-    console.log('Generated reset URL:', resetUrl); // Debug the URL
+    // Use dynamic base URL for production
+    const baseUrl = process.env.NODE_ENV === 'production' || 
+                   process.env.RENDER === '1' || 
+                   req.get('host')?.includes('render.com')
+      ? `https://${req.get('host')}`
+      : 'http://localhost:3000';
+    const resetUrl = `${baseUrl}/reset-password.html?token=${resetToken}`;
+    console.log('Generated reset URL:', resetUrl);
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -61,17 +79,21 @@ router.post('/', async (req, res) => {
       `
     };
 
-    console.log('Sending email with options:', mailOptions); // Debug email content
-    await transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Failed to send email:', error);
-      } else {
-        console.log('Email sent successfully:', info.response);
-      }
-    });
-    console.log('Reset email sent to:', email);
-
-    res.status(200).json({ message: 'Password reset email sent!' });
+    console.log('Sending email with options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    }); // Debug email content (without exposing full content)
+    
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Reset email sent successfully to:', email);
+      res.status(200).json({ message: 'Password reset email sent!' });
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError.message);
+      // Still return success to user for security (don't reveal email issues)
+      res.status(200).json({ message: 'If an account exists with this email, a reset link has been sent.' });
+    }
   } catch (error) {
     console.error('Error in /forgot-password:', error);
     res.status(500).json({ error: 'Failed to send reset email' });

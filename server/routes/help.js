@@ -9,17 +9,25 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  timeout: 10000, // 10 seconds timeout
+  connectionTimeout: 10000, // 10 seconds connection timeout
+  greetingTimeout: 5000, // 5 seconds greeting timeout
+  socketTimeout: 10000 // 10 seconds socket timeout
 });
 
-// Verify email transporter
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Email transporter failed:', error);
-  } else {
-    console.log('✅ Email transporter ready for support notifications');
-  }
-});
+// Verify email transporter with better error handling
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('Email transporter failed:', error.message);
+    } else {
+      console.log('✅ Email transporter ready for support notifications');
+    }
+  });
+} else {
+  console.warn('Email credentials not configured - support emails will fail');
+}
 
 // Middleware to check if user is authenticated (optional for help)
 const optionalAuth = (req, res, next) => {
