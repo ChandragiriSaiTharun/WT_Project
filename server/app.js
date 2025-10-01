@@ -41,7 +41,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
@@ -52,7 +52,7 @@ app.use((req, res, next) => {
   const host = req.get('host');
   const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
   const baseUrl = `${protocol}://${host}`;
-  
+
   // Allow images from same origin and current domain
   res.setHeader(
     'Content-Security-Policy',
@@ -63,7 +63,7 @@ app.use((req, res, next) => {
     `font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; ` +
     `connect-src 'self' ${baseUrl};`
   );
-  
+
   next();
 });
 
@@ -88,7 +88,7 @@ app.get('/api/image/default', (req, res) => {
       <text x="150" y="135" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Not Available</text>
     </svg>
   `;
-  
+
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
   res.send(defaultImageSvg);
@@ -98,11 +98,11 @@ app.get('/api/image/default', (req, res) => {
 app.get('/crop/:filename', (req, res) => {
   const filename = req.params.filename;
   const imagePath = path.join(__dirname, '../uploads/crop', filename);
-  
+
   // Set proper headers for images
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours cache
-  
+
   // Check if file exists and serve it
   if (fs.existsSync(imagePath)) {
     // Detect content type based on file extension
@@ -116,7 +116,7 @@ app.get('/crop/:filename', (req, res) => {
     } else {
       res.setHeader('Content-Type', 'image/jpeg'); // default
     }
-    
+
     res.sendFile(imagePath);
   } else {
     console.log(`Image not found: ${imagePath}, serving default`);
@@ -130,7 +130,7 @@ app.get('/crop/:filename', (req, res) => {
         <text x="150" y="135" font-family="Arial, sans-serif" font-size="14" fill="#6c757d" text-anchor="middle">Loading...</text>
       </svg>
     `;
-    
+
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'no-cache');
     res.send(defaultImageSvg);
@@ -148,7 +148,7 @@ app.get('/uploads/crop/default.jpg', (req, res) => {
       <text x="150" y="135" font-family="Arial" font-size="12" fill="#999" text-anchor="middle">Not Available</text>
     </svg>
   `;
-  
+
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400');
   res.send(defaultImageSvg);
@@ -211,7 +211,7 @@ app.get('/api/test/crops', async (req, res) => {
     const Crop = require('./models/Crop');
     const crops = await Crop.find({}).limit(20).sort({ addedDate: -1 });
     const count = await Crop.countDocuments();
-    
+
     res.json({
       message: 'Crops database test successful',
       totalCrops: count,
@@ -231,9 +231,9 @@ app.get('/api/test/crops', async (req, res) => {
     });
   } catch (error) {
     console.error('Crops test error:', error);
-    res.status(500).json({ 
-      error: 'Crops test failed', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Crops test failed',
+      details: error.message
     });
   }
 });
@@ -310,7 +310,7 @@ app.get('/test-tickets', async (req, res) => {
 app.get('/create-test-tickets', async (req, res) => {
   try {
     const Ticket = require('./models/Ticket');
-    
+
     // Create some sample tickets
     const sampleTickets = [
       {
@@ -347,9 +347,9 @@ app.get('/create-test-tickets', async (req, res) => {
         status: 'resolved'
       }
     ];
-    
+
     const createdTickets = await Ticket.insertMany(sampleTickets);
-    
+
     res.json({
       success: true,
       message: 'Sample tickets created successfully',
@@ -408,7 +408,7 @@ app.get('/api/test/farmers', async (req, res) => {
     const Farmer = require('./models/Farmer');
     const farmers = await Farmer.find({}).limit(10);
     const count = await Farmer.countDocuments();
-    
+
     res.json({
       message: 'Database connection test successful',
       totalFarmers: count,
@@ -424,9 +424,9 @@ app.get('/api/test/farmers', async (req, res) => {
     });
   } catch (error) {
     console.error('Database test error:', error);
-    res.status(500).json({ 
-      error: 'Database test failed', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Database test failed',
+      details: error.message
     });
   }
 });
@@ -435,25 +435,25 @@ app.get('/api/test/farmers', async (req, res) => {
 app.get('/api/admin/help-queries', async (req, res) => {
   console.log('🔍 Admin help queries request received');
   console.log('Session:', req.session);
-  
+
   // Check admin access
   if (!req.session.user) {
     console.log('❌ No session user found');
     return res.status(401).json({ success: false, error: 'Authentication required' });
   }
-  
+
   const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
   if (!adminEmails.includes(req.session.user.email)) {
     console.log('❌ User not in admin list:', req.session.user.email);
     return res.status(403).json({ success: false, error: 'Admin access required' });
   }
-  
+
   console.log('✅ Admin access granted:', req.session.user.email);
-  
+
   try {
     const Ticket = require('./models/Ticket');
     const tickets = await Ticket.find({}).sort({ createdAt: -1 });
-    
+
     // Transform tickets to match the expected format
     const queries = tickets.map(ticket => ({
       _id: ticket._id,
@@ -468,7 +468,7 @@ app.get('/api/admin/help-queries', async (req, res) => {
       response: ticket.responses && ticket.responses.length > 0 ? ticket.responses[ticket.responses.length - 1].message : null,
       createdAt: ticket.createdAt
     }));
-    
+
     res.json({
       success: true,
       queries: queries
@@ -486,32 +486,32 @@ app.put('/api/admin/help-queries/:id', async (req, res) => {
   console.log('🔍 Admin help query update request received');
   console.log('Session:', req.session);
   console.log('Request body:', req.body);
-  
+
   // Check admin access
   if (!req.session.user) {
     console.log('❌ No session user found');
     return res.status(401).json({ success: false, error: 'Authentication required' });
   }
-  
+
   const adminEmails = ['admin@kisaanconnect.com', 'support@kisaanconnect.com', 'thanushreddy934@gmail.com'];
   if (!adminEmails.includes(req.session.user.email)) {
     console.log('❌ User not in admin list:', req.session.user.email);
     return res.status(403).json({ success: false, error: 'Admin access required' });
   }
-  
+
   console.log('✅ Admin access granted:', req.session.user.email);
-  
+
   try {
     const Ticket = require('./models/Ticket');
     const { id } = req.params;
     const { status, response } = req.body;
-    
+
     const updateData = {};
-    
+
     // Handle status update
     if (status) {
       // Transform status from frontend format to backend format
-      switch(status) {
+      switch (status) {
         case 'pending':
           updateData.status = 'open';
           break;
@@ -525,15 +525,15 @@ app.put('/api/admin/help-queries/:id', async (req, res) => {
           updateData.status = status;
       }
     }
-    
+
     // Handle response update
     if (response) {
       updateData.status = 'resolved';
-      
+
       // Get admin user ID from session or use a default admin ID
       let adminId = null;
       let adminName = 'Admin';
-      
+
       if (req.session && req.session.user) {
         adminId = req.session.user.id;
         adminName = req.session.user.fullName || req.session.user.name || 'Admin';
@@ -541,34 +541,34 @@ app.put('/api/admin/help-queries/:id', async (req, res) => {
         // For now, we'll create a system admin response without respondedBy
         // Later you can create a dedicated admin user in the database
       }
-      
+
       const responseData = {
         message: response,
         respondedByName: adminName,
         respondedAt: new Date(),
         type: 'admin'
       };
-      
+
       // Only add respondedBy if we have a valid admin ID
       if (adminId) {
         responseData.respondedBy = adminId;
       }
-      
+
       updateData.$push = {
         responses: responseData
       };
       updateData.lastResponseAt = new Date();
     }
-    
+
     const updatedTicket = await Ticket.findByIdAndUpdate(id, updateData, { new: true });
-    
+
     if (!updatedTicket) {
       return res.status(404).json({
         success: false,
         error: 'Query not found'
       });
     }
-    
+
     res.json({
       success: true,
       message: response ? 'Response added successfully' : 'Status updated successfully'
@@ -587,26 +587,26 @@ app.put('/test-response-update/:id', async (req, res) => {
   console.log('🧪 Testing response update functionality');
   console.log('Ticket ID:', req.params.id);
   console.log('Request body:', req.body);
-  
+
   try {
     const Ticket = require('./models/Ticket');
     const { id } = req.params;
     const { response } = req.body;
-    
+
     if (!response) {
       return res.status(400).json({
         success: false,
         error: 'Response message is required'
       });
     }
-    
+
     const responseData = {
       message: response,
       respondedByName: 'Test Admin',
       respondedAt: new Date(),
       type: 'admin'
     };
-    
+
     const updateData = {
       status: 'resolved',
       $push: {
@@ -614,20 +614,20 @@ app.put('/test-response-update/:id', async (req, res) => {
       },
       lastResponseAt: new Date()
     };
-    
+
     console.log('Updating ticket with data:', updateData);
-    
+
     const updatedTicket = await Ticket.findByIdAndUpdate(id, updateData, { new: true });
-    
+
     if (!updatedTicket) {
       return res.status(404).json({
         success: false,
         error: 'Ticket not found'
       });
     }
-    
+
     console.log('✅ Ticket updated successfully');
-    
+
     res.json({
       success: true,
       message: 'Test response added successfully',
@@ -646,10 +646,10 @@ app.put('/test-response-update/:id', async (req, res) => {
 app.post('/test-admin-login', async (req, res) => {
   try {
     const Farmer = require('./models/Farmer');
-    
+
     // Find the admin user
     const adminUser = await Farmer.findOne({ email: 'thanushreddy934@gmail.com' });
-    
+
     if (adminUser) {
       req.session.user = {
         id: adminUser._id,
@@ -658,7 +658,7 @@ app.post('/test-admin-login', async (req, res) => {
         phoneNumber: adminUser.phoneNumber,
         profilePicture: adminUser.profilePicture
       };
-      
+
       res.json({
         success: true,
         message: 'Admin test login successful',
@@ -891,14 +891,14 @@ app.get('/api/market-prices', (req, res) => {
 function generatePriceHistory(basePrice, days) {
   const history = [];
   let price = basePrice;
-  
+
   for (let i = 0; i < days; i++) {
     // Add some randomness to simulate price fluctuations
     const change = (Math.random() - 0.5) * 6; // ±3% change
     price = Math.max(basePrice * 0.8, Math.min(basePrice * 1.2, price + change));
     history.push(Math.floor(price));
   }
-  
+
   return history;
 }
 
@@ -912,7 +912,7 @@ app.get('/api/farmers', async (req, res) => {
 
     const Farmer = require('./models/Farmer');
     const { page = 1, limit = 10, search = '' } = req.query;
-    
+
     const query = search ? {
       $or: [
         { fullName: { $regex: search, $options: 'i' } },
@@ -950,7 +950,7 @@ app.get('/api/farmers/:id', async (req, res) => {
   try {
     const Farmer = require('./models/Farmer');
     const farmer = await Farmer.findById(req.params.id).select('-password -resetToken -resetTokenExpiry');
-    
+
     if (!farmer) {
       return res.status(404).json({ error: 'Farmer not found' });
     }
@@ -979,7 +979,7 @@ app.get('/api/profile', async (req, res) => {
 
     const Farmer = require('./models/Farmer');
     const farmer = await Farmer.findById(req.session.user.id).select('-password -resetToken -resetTokenExpiry');
-    
+
     if (!farmer) {
       return res.status(404).json({ error: 'Profile not found' });
     }
@@ -1029,6 +1029,125 @@ app.put('/api/profile', async (req, res) => {
   }
 });
 
+// Test endpoint to check crop image issues (temporary)
+app.get('/api/test/crop-images', async (req, res) => {
+  try {
+    const Crop = require('./models/Crop');
+    const crops = await Crop.find({ image: { $exists: true, $ne: null, $ne: '' } }).limit(10);
+
+    const uploadsDir = path.join(__dirname, '../uploads/crop');
+    const existingFiles = fs.readdirSync(uploadsDir);
+
+    const analysis = crops.map(crop => {
+      const currentImageName = crop.image;
+      const filePath = path.join(uploadsDir, currentImageName);
+      const fileExists = fs.existsSync(filePath);
+
+      return {
+        cropName: crop.name,
+        imageName: currentImageName,
+        fileExists: fileExists,
+        hasDoubleTimestamp: /^\d+-\d+-/.test(currentImageName)
+      };
+    });
+
+    res.json({
+      success: true,
+      totalFiles: existingFiles.length,
+      sampledCrops: analysis,
+      existingFiles: existingFiles.slice(0, 10)
+    });
+
+  } catch (error) {
+    console.error('Error checking crop images:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Fix crop image filenames endpoint (temporary migration)
+app.get('/api/admin/fix-crop-images', async (req, res) => {
+  // Check admin access
+  if (!req.session.user || req.session.user.email !== 'thanushreddy934@gmail.com') {
+    return res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+
+  try {
+    const Crop = require('./models/Crop');
+    const crops = await Crop.find({ image: { $exists: true, $ne: null, $ne: '' } });
+
+    const uploadsDir = path.join(__dirname, '../uploads/crop');
+    const existingFiles = fs.readdirSync(uploadsDir);
+
+    let fixedCount = 0;
+    let notFoundCount = 0;
+    let alreadyCorrect = 0;
+    const results = [];
+
+    for (const crop of crops) {
+      const currentImageName = crop.image;
+
+      // Check if current image file exists
+      const currentFilePath = path.join(uploadsDir, currentImageName);
+      if (fs.existsSync(currentFilePath)) {
+        alreadyCorrect++;
+        continue; // No need to fix
+      }
+
+      // Extract the original filename pattern
+      const timestampPattern = /^\d+-(.+)$/;
+      const match = currentImageName.match(timestampPattern);
+
+      if (match) {
+        const originalPart = match[1]; // Get the part after the first timestamp
+
+        // Look for a file that ends with this original part
+        const matchingFile = existingFiles.find(file => file.endsWith(originalPart));
+
+        if (matchingFile) {
+          // Update the crop record
+          await Crop.findByIdAndUpdate(crop._id, { image: matchingFile });
+          results.push({
+            cropName: crop.name,
+            oldImage: currentImageName,
+            newImage: matchingFile,
+            status: 'fixed'
+          });
+          fixedCount++;
+        } else {
+          results.push({
+            cropName: crop.name,
+            oldImage: currentImageName,
+            status: 'not_found'
+          });
+          notFoundCount++;
+        }
+      }
+    }
+
+    res.json({
+      success: true,
+      summary: {
+        totalCrops: crops.length,
+        fixed: fixedCount,
+        notFound: notFoundCount,
+        alreadyCorrect: alreadyCorrect
+      },
+      results: results
+    });
+
+  } catch (error) {
+    console.error('Error fixing crop images:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fix crop images',
+      details: error.message
+    });
+  }
+});
+
 // Get dashboard stats (admin only)
 app.get('/api/dashboard/stats', async (req, res) => {
   try {
@@ -1048,10 +1167,10 @@ app.get('/api/dashboard/stats', async (req, res) => {
     ] = await Promise.all([
       Farmer.countDocuments(),
       Crop.countDocuments(),
-      Farmer.countDocuments({ 
+      Farmer.countDocuments({
         createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
       }),
-      Crop.countDocuments({ 
+      Crop.countDocuments({
         createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
       }),
       Farmer.aggregate([
@@ -1105,7 +1224,7 @@ io.on('connection', (socket) => {
   socket.on('send-message', async (data) => {
     try {
       const { chatId, content, messageType = 'text' } = data;
-      
+
       if (!socket.userId) {
         socket.emit('error', { message: 'User not authenticated' });
         return;
@@ -1131,7 +1250,7 @@ io.on('connection', (socket) => {
 
       // Update chat's last message and unread counts
       const otherParticipantId = chat.participants.find(id => !id.equals(socket.userId));
-      
+
       await Chat.findByIdAndUpdate(chatId, {
         $set: {
           'lastMessage.content': content.trim(),
@@ -1166,7 +1285,7 @@ io.on('connection', (socket) => {
 
       // Emit to all participants in the chat
       io.to(`chat_${chatId}`).emit('new-message', formattedMessage);
-      
+
       // Emit to other participant's personal room for notifications
       io.to(`user_${otherParticipantId}`).emit('chat-notification', {
         chatId,
@@ -1198,13 +1317,13 @@ io.on('connection', (socket) => {
   socket.on('mark-messages-read', async (data) => {
     try {
       const { chatId } = data;
-      
+
       // Mark messages as read
       await Message.updateMany(
         { chatId, sender: { $ne: socket.userId }, isRead: false },
-        { 
-          $set: { isRead: true }, 
-          $push: { readBy: { userId: socket.userId } } 
+        {
+          $set: { isRead: true },
+          $push: { readBy: { userId: socket.userId } }
         }
       );
 

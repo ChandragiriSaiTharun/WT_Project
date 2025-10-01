@@ -17,7 +17,18 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const filename = `${Date.now()}-${file.originalname}`;
+    // Extract original filename without any previous timestamps
+    let originalName = file.originalname;
+
+    // If the original name already contains a timestamp pattern, extract just the actual filename
+    const timestampPattern = /^\d+-(.+)$/;
+    const match = originalName.match(timestampPattern);
+    if (match) {
+      originalName = match[1]; // Get the part after the timestamp
+    }
+
+    const filename = `${Date.now()}-${originalName}`;
+    console.log('Generated filename:', filename);
     cb(null, filename);
   }
 });
@@ -51,7 +62,7 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
   try {
     // Get seller ID from session
     const sellerId = req.session.user ? req.session.user.id : null;
-    
+
     if (!sellerId) {
       if (filePath && fs.existsSync(filePath)) {
         fs.unlinkSync(filePath); // Delete uploaded file if not authenticated
@@ -70,7 +81,7 @@ router.post('/', isAuthenticated, upload.single('cropImage'), async (req, res) =
       sellerId: sellerId, // Use correct session field
       location
     });
-    
+
     const savedCrop = await newCrop.save();
     console.log('Crop added successfully:', savedCrop._id);
 
@@ -90,11 +101,11 @@ router.get('/', async (req, res) => {
   console.log('Query parameters:', req.query);
 
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      search = '', 
-      sortBy = 'addedDate', 
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'addedDate',
       sortOrder = 'desc',
       minPrice,
       maxPrice,
@@ -104,7 +115,7 @@ router.get('/', async (req, res) => {
 
     // Build filter query
     const filter = {};
-    
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
@@ -112,17 +123,17 @@ router.get('/', async (req, res) => {
         { location: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
-    
+
     if (location) {
       filter.location = { $regex: location, $options: 'i' };
     }
-    
+
     if (cropType) {
       filter.name = { $regex: cropType, $options: 'i' };
     }
@@ -137,7 +148,7 @@ router.get('/', async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .lean();
-    
+
     const total = await Crop.countDocuments(filter);
 
     console.log(`Fetched ${crops.length} crops out of ${total} total`);
@@ -152,7 +163,7 @@ router.get('/', async (req, res) => {
     const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
     const host = req.get('host');
     const baseUrl = `${protocol}://${host}`;
-    
+
     console.log(`Image base URL: ${baseUrl}`); // Debug log
 
     // Add full image URL to each crop and convert _id to id for compatibility
@@ -204,7 +215,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     const crop = await Crop.findById(req.params.id);
-    
+
     if (!crop) {
       return res.status(404).json({ error: 'Crop not found' });
     }
@@ -242,13 +253,13 @@ router.put('/:id', isAuthenticated, upload.single('cropImage'), async (req, res)
 
   try {
     const crop = await Crop.findById(req.params.id);
-    
+
     if (!crop) {
       return res.status(404).json({ error: 'Crop not found' });
     }
 
     const { cropName, cropUnit, cropQuantity, cropPrice, sellerName, location } = req.body;
-    
+
     // Build update object
     const updateData = {};
     if (cropName) updateData.name = cropName;
@@ -257,7 +268,7 @@ router.put('/:id', isAuthenticated, upload.single('cropImage'), async (req, res)
     if (cropPrice) updateData.price = cropPrice;
     if (sellerName) updateData.seller = sellerName;
     if (location) updateData.location = location;
-    
+
     // Handle new image upload
     if (req.file) {
       // Delete old image if exists
@@ -277,8 +288,8 @@ router.put('/:id', isAuthenticated, upload.single('cropImage'), async (req, res)
     );
 
     console.log('Crop updated successfully:', updatedCrop._id);
-    res.status(200).json({ 
-      message: 'Crop updated successfully!', 
+    res.status(200).json({
+      message: 'Crop updated successfully!',
       crop: {
         id: updatedCrop._id,
         name: updatedCrop.name,
@@ -306,7 +317,7 @@ router.delete('/:id', isAuthenticated, async (req, res) => {
 
   try {
     const crop = await Crop.findById(req.params.id);
-    
+
     if (!crop) {
       return res.status(404).json({ error: 'Crop not found' });
     }
@@ -321,7 +332,7 @@ router.delete('/:id', isAuthenticated, async (req, res) => {
     }
 
     await Crop.findByIdAndDelete(req.params.id);
-    
+
     console.log('Crop deleted successfully:', req.params.id);
     res.status(200).json({ message: 'Crop deleted successfully!' });
   } catch (error) {
@@ -336,10 +347,10 @@ router.delete('/:id', isAuthenticated, async (req, res) => {
 // GET /crops/search/suggestions - Get crop name suggestions for autocomplete
 router.get('/search/suggestions', async (req, res) => {
   console.log('Received GET /crops/search/suggestions request');
-  
+
   try {
     const { q = '' } = req.query;
-    
+
     if (q.length < 2) {
       return res.json({ suggestions: [] });
     }
