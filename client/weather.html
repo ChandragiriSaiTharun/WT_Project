@@ -167,16 +167,22 @@
       const city = document.getElementById('weather-city-input').value.trim() || 'Delhi';
       const weatherInfo = document.getElementById('weather-info');
 
+      console.log('Fetching weather for:', city);
       weatherInfo.innerHTML = `<div class="weather-info">⏳ Fetching weather for <b>${city}</b>...</div>`;
 
-      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+      console.log('API URL:', apiUrl);
+
+      fetch(apiUrl)
         .then(response => {
+          console.log('API Response status:', response.status);
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           return response.json();
         })
         .then(data => {
+          console.log('Weather data received:', data);
           const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
 
           weatherInfo.innerHTML = `
@@ -187,17 +193,47 @@
                 <p><strong>${data.main.temp}°C</strong> - ${data.weather[0].description}</p>
                 <p>💧 Humidity: ${data.main.humidity}%</p>
                 <p>🌬️ Wind Speed: ${data.wind.speed} m/s</p>
+                <p>🌡️ Feels like: ${data.main.feels_like}°C</p>
+                <p>📍 Country: ${data.sys.country}</p>
               </div>
             </div>
           `;
         })
         .catch(error => {
-          weatherInfo.innerHTML = `<div class="weather-info">❌ Unable to fetch weather for "${city}". Please check the city name.</div>`;
           console.error('Error fetching weather:', error);
+          weatherInfo.innerHTML = `
+            <div class="weather-info" style="color: red;">
+              <h3>❌ Unable to fetch weather for "${city}"</h3>
+              <p><strong>Error:</strong> ${error.message}</p>
+              <p>Please check:</p>
+              <ul style="text-align: left; margin: 10px 0;">
+                <li>Internet connection</li>
+                <li>City name spelling</li>
+                <li>Browser console for details</li>
+              </ul>
+              <button onclick="fetchWeather()" style="margin-top: 10px; padding: 5px 15px;">Try Again</button>
+            </div>
+          `;
         });
     }
 
-    window.onload = fetchWeather;
+    // Auto-fetch weather on page load
+    window.onload = function() {
+      console.log('Page loaded, fetching default weather...');
+      fetchWeather();
+    };
+
+    // Allow Enter key to trigger search
+    document.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('weather-city-input');
+      if (input) {
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            fetchWeather();
+          }
+        });
+      }
+    });
   </script>
 
 </body>
