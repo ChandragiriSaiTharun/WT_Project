@@ -2944,9 +2944,22 @@ body.dark-mode .results-info {
           console.log('Server orders failed:', response.status);
         }
         
-        // Get locally stored orders
-        const localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
-        console.log('Local orders:', localOrders);
+        // Get current user ID for user-specific localStorage
+        let currentUserId = null;
+        try {
+          const userResponse = await fetch('/login/check', { credentials: 'include' });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            currentUserId = userData.user?.id;
+          }
+        } catch (e) {
+          console.log('Could not get user ID');
+        }
+        
+        // Get user-specific locally stored orders
+        const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
+        const localOrders = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+        console.log('Local orders for user:', localOrders);
         
         // Merge server and local orders, prioritizing server orders
         const allOrders = [...serverOrders];
@@ -2969,8 +2982,20 @@ body.dark-mode .results-info {
       } catch (error) {
         console.error('Error loading orders:', error);
         
-        // Fallback to local orders only
-        const localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+        // Fallback to user-specific local orders only
+        let currentUserId = null;
+        try {
+          const userResponse = await fetch('/login/check', { credentials: 'include' });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            currentUserId = userData.user?.id;
+          }
+        } catch (e) {
+          console.log('Could not get user ID for fallback');
+        }
+        
+        const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
+        const localOrders = JSON.parse(localStorage.getItem(localStorageKey)) || [];
         console.log('Fallback to local orders:', localOrders);
         if (localOrders.length > 0) {
           displayOrders(localOrders);

@@ -148,6 +148,11 @@ router.get('/', async (req, res) => {
       defaultSeller = await Farmer.findOne();
     }
 
+    // Generate base URL for images
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? `https://${req.get('host')}` 
+      : `http://${req.get('host')}`;
+
     // Add full image URL to each crop and convert _id to id for compatibility
     const cropsWithImageUrl = crops.map(crop => ({
       id: crop._id,
@@ -160,7 +165,7 @@ router.get('/', async (req, res) => {
       sellerId: crop.sellerId || (defaultSeller ? defaultSeller._id : null),
       location: crop.location,
       added_date: crop.addedDate,
-      imageUrl: crop.image ? `/crop/${crop.image}` : null,
+      imageUrl: crop.image ? `${baseUrl}/crop/${crop.image}` : null,
       createdAt: crop.createdAt,
       updatedAt: crop.updatedAt
     }));

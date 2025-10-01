@@ -369,10 +369,24 @@
       storeOrderLocally(tempOrder);
     }
 
-    function storeOrderLocally(order) {
+    async function storeOrderLocally(order) {
       try {
         console.log('Storing order locally:', order);
-        let localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+        
+        // Get current user ID for user-specific storage
+        let currentUserId = null;
+        try {
+          const userResponse = await fetch('/login/check', { credentials: 'include' });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            currentUserId = userData.user?.id;
+          }
+        } catch (e) {
+          console.log('Could not get user ID for local storage');
+        }
+        
+        const localStorageKey = currentUserId ? `userOrders_${currentUserId}` : 'userOrders';
+        let localOrders = JSON.parse(localStorage.getItem(localStorageKey)) || [];
         console.log('Existing local orders:', localOrders);
         
         // Check if order already exists
@@ -387,7 +401,7 @@
         
         // Keep only last 20 orders
         localOrders = localOrders.slice(0, 20);
-        localStorage.setItem('userOrders', JSON.stringify(localOrders));
+        localStorage.setItem(localStorageKey, JSON.stringify(localOrders));
         console.log('Orders stored successfully:', localOrders.length, 'total orders');
       } catch (error) {
         console.error('Error storing order locally:', error);

@@ -3,18 +3,42 @@ const router = express.Router();
 const Ticket = require('../models/Ticket');
 const nodemailer = require('nodemailer');
 
-// Email transporter configuration
+// Email transporter configuration with improved error handling
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  timeout: 10000, // 10 seconds timeout
-  connectionTimeout: 10000, // 10 seconds connection timeout
-  greetingTimeout: 5000, // 5 seconds greeting timeout
-  socketTimeout: 10000 // 10 seconds socket timeout
+  timeout: 15000, // 15 seconds timeout
+  connectionTimeout: 15000, // 15 seconds connection timeout
+  greetingTimeout: 10000, // 10 seconds greeting timeout
+  socketTimeout: 15000, // 15 seconds socket timeout
+  pool: true, // Use connection pooling
+  maxConnections: 1, // Limit concurrent connections
+  rateLimit: 3 // Limit to 3 emails per second
 });
+
+// Safe email sending function with fallback
+async function sendEmailSafely(mailOptions) {
+  try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.log('Email credentials not configured - skipping email');
+      return { success: false, reason: 'not_configured' };
+    }
+    
+    console.log('Attempting to send email...');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent successfully:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Error sending email:', error.message);
+    
+    // Log the ticket anyway even if email fails
+    console.log('Email failed but ticket was still created successfully');
+    return { success: false, error: error.message };
+  }
+}
 
 // Verify email transporter with better error handling
 if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
@@ -94,15 +118,22 @@ function validateTicketData(data) {
 // Email notification functions
 async function sendSupportNotificationEmails(ticket) {
   try {
+    console.log(`📧 Attempting to send email notifications for ticket ${ticket.ticketId}`);
+    
     // Send notification to admin (thanushreddy934@gmail.com)
-    await sendAdminNotification(ticket);
+    const adminResult = await sendAdminNotification(ticket);
     
     // Send confirmation to user
-    await sendUserConfirmation(ticket);
+    const userResult = await sendUserConfirmation(ticket);
     
-    console.log(`📧 Email notifications sent for ticket ${ticket.ticketId}`);
+    if (adminResult.success || userResult.success) {
+      console.log(`✅ Email notifications processed for ticket ${ticket.ticketId}`);
+    } else {
+      console.log(`⚠️ Email notifications failed for ticket ${ticket.ticketId}, but ticket was created successfully`);
+    }
   } catch (error) {
     console.error('Error sending email notifications:', error);
+    console.log('Ticket creation will continue despite email failure');
   }
 }
 
@@ -183,7 +214,7 @@ async function sendAdminNotification(ticket) {
     `
   };
 
-  return transporter.sendMail(mailOptions);
+  return sendEmailSafely(mailOptions);
 }
 
 async function sendUserConfirmation(ticket) {
@@ -234,7 +265,7 @@ async function sendUserConfirmation(ticket) {
     `
   };
 
-  return transporter.sendMail(mailOptions);
+  return sendEmailSafely(mailOptions);
 }
 
 function getExpectedResponseTime(priority) {
@@ -301,8 +332,12 @@ async function sendResponseNotification(ticket, responseMessage, adminName) {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log(`📧 Response notification sent to ${ticket.email} for ticket ${ticket.ticketId}`);
+    const result = await sendEmailSafely(mailOptions);
+    if (result.success) {
+      console.log(`📧 Response notification sent to ${ticket.email} for ticket ${ticket.ticketId}`);
+    } else {
+      console.log(`⚠️ Failed to send response notification to ${ticket.email} for ticket ${ticket.ticketId}`);
+    }
   } catch (error) {
     console.error('Error sending response notification:', error);
   }
