@@ -53,15 +53,15 @@ app.use((req, res, next) => {
   const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
   const baseUrl = `${protocol}://${host}`;
 
-  // Allow images from same origin and current domain
+  // Allow images from same origin and current domain, plus weather API
   res.setHeader(
     'Content-Security-Policy',
     `default-src 'self'; ` +
-    `img-src 'self' ${baseUrl} data: blob:; ` +
+    `img-src 'self' ${baseUrl} data: blob: https://openweathermap.org; ` +
     `style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; ` +
     `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ` +
     `font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; ` +
-    `connect-src 'self' ${baseUrl};`
+    `connect-src 'self' ${baseUrl} https://api.openweathermap.org https://openweathermap.org;`
   );
 
   next();
