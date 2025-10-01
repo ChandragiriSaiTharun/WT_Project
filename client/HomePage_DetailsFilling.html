@@ -3097,14 +3097,14 @@ body.dark-mode .results-info {
             </div>
             
             <div class="mb-3">
-              ${order.items.map(item => `
+              ${(order.items || []).map(item => `
                 <div class="d-flex align-items-center mb-2">
-                  <img src="${item.cropId?.imageUrl || '/uploads/crop/default.jpg'}" 
+                  <img src="${item.cropId?.imageUrl || item.imageUrl || '/uploads/crop/default.jpg'}" 
                        class="rounded" style="width: 50px; height: 50px; object-fit: cover;" 
                        onerror="this.src='/uploads/crop/default.jpg'">
                   <div class="ms-3">
-                    <h6 class="mb-0">${item.cropName || 'Product'}</h6>
-                    <small class="text-muted">Qty: ${item.quantity} ${item.unit} × ₹${item.pricePerUnit}</small>
+                    <h6 class="mb-0">${item.cropName || item.name || 'Product'}</h6>
+                    <small class="text-muted">Qty: ${item.quantity || 1} ${item.unit || 'kg'} × ₹${item.pricePerUnit || item.price || 0}</small>
                   </div>
                 </div>
               `).join('')}

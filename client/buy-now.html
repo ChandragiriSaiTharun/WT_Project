@@ -653,10 +653,17 @@
             const quantity = parseInt(document.getElementById('quantity').value);
             const totalAmount = parseFloat(document.getElementById('summary-total').textContent);
             
-            // Store order details for success page
+            // Store order details for success page (including address)
             localStorage.setItem('lastOrderCrop', currentProduct.name);
             localStorage.setItem('lastOrderAmount', totalAmount);
             localStorage.setItem('lastOrderQuantity', quantity);
+            localStorage.setItem('lastOrderAddress', JSON.stringify(selectedAddress));
+            localStorage.setItem('lastOrderProduct', JSON.stringify({
+                id: currentProduct._id,
+                name: currentProduct.name,
+                price: currentProduct.price,
+                imageUrl: currentProduct.imageUrl
+            }));
             
             const orderData = {
                 items: [{

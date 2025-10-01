@@ -330,6 +330,8 @@
           displayOrderDetails(data.order);
           // Store order locally for My Orders
           storeOrderLocally(data.order);
+          // Clean up temporary data since we got real order from server
+          cleanupTemporaryOrderData();
         } else {
           console.log('Server responded with error:', response.status);
           throw new Error('Order not found on server');
@@ -347,6 +349,35 @@
       const amount = localStorage.getItem('lastOrderAmount') || '999';
       const cropName = localStorage.getItem('lastOrderCrop') || 'Fresh Produce';
       
+      // Get stored address and product info
+      let shippingAddress = null;
+      let productInfo = null;
+      
+      try {
+        const addressData = localStorage.getItem('lastOrderAddress');
+        if (addressData) {
+          shippingAddress = JSON.parse(addressData);
+        }
+        
+        const productData = localStorage.getItem('lastOrderProduct');
+        if (productData) {
+          productInfo = JSON.parse(productData);
+        }
+      } catch (e) {
+        console.log('Error parsing stored order data:', e);
+      }
+      
+      // Default address if none stored
+      if (!shippingAddress) {
+        shippingAddress = {
+          fullName: 'Customer',
+          addressLine1: 'Address not available',
+          city: 'N/A',
+          state: 'N/A',
+          pincode: '000000'
+        };
+      }
+      
       const tempOrder = {
         orderId: orderId,
         orderStatus: 'pending',
@@ -355,7 +386,13 @@
         createdAt: new Date().toISOString(),
         estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         paymentMethod: 'cod',
+        shippingAddress: shippingAddress, // Add the shipping address
         items: [{
+          cropId: productInfo ? { 
+            _id: productInfo.id,
+            name: productInfo.name,
+            imageUrl: productInfo.imageUrl
+          } : null,
           cropName: cropName,
           quantity: quantity,
           unit: 'kg',
@@ -364,9 +401,12 @@
         }]
       };
       
-      console.log('Created temporary order:', tempOrder);
+      console.log('Created temporary order with address:', tempOrder);
       displayOrderDetails(tempOrder);
       storeOrderLocally(tempOrder);
+      
+      // Clean up temporary localStorage data after creating the order
+      cleanupTemporaryOrderData();
     }
 
     async function storeOrderLocally(order) {
@@ -444,11 +484,18 @@
           <div class="col-md-6">
             <h6 class="text-success mb-3">Shipping Address</h6>
             <div class="text-muted">
-              <strong>${order.shippingAddress.fullName}</strong><br>
-              ${order.shippingAddress.addressLine1}<br>
-              ${order.shippingAddress.addressLine2 ? order.shippingAddress.addressLine2 + '<br>' : ''}
-              ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}<br>
-              <small>Phone: ${order.shippingAddress.phoneNumber}</small>
+              ${order.shippingAddress ? `
+                <strong>${order.shippingAddress.fullName || 'Customer'}</strong><br>
+                ${order.shippingAddress.addressLine1 || 'Address not available'}<br>
+                ${order.shippingAddress.addressLine2 ? order.shippingAddress.addressLine2 + '<br>' : ''}
+                ${order.shippingAddress.city || 'N/A'}, ${order.shippingAddress.state || 'N/A'} - ${order.shippingAddress.pincode || '000000'}<br>
+                ${order.shippingAddress.phoneNumber ? `<small>Phone: ${order.shippingAddress.phoneNumber}</small>` : ''}
+              ` : `
+                <div class="text-warning">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  Address information not available
+                </div>
+              `}
             </div>
           </div>
         </div>
@@ -549,14 +596,14 @@
             </div>
             
             <div class="mb-3">
-              ${order.items.map(item => `
+              ${(order.items || []).map(item => `
                 <div class="d-flex align-items-center mb-2">
-                  <img src="${item.cropId?.image || '/uploads/crop/default.jpg'}" 
+                  <img src="${item.cropId?.imageUrl || item.imageUrl || '/uploads/crop/default.jpg'}" 
                        class="rounded" style="width: 50px; height: 50px; object-fit: cover;" 
                        onerror="this.src='/uploads/crop/default.jpg'">
                   <div class="ms-3">
-                    <h6 class="mb-0">${item.cropName || 'Product'}</h6>
-                    <small class="text-muted">Qty: ${item.quantity} ${item.unit} × ₹${item.pricePerUnit}</small>
+                    <h6 class="mb-0">${item.cropName || item.name || 'Product'}</h6>
+                    <small class="text-muted">Qty: ${item.quantity || 1} ${item.unit || 'kg'} × ₹${item.pricePerUnit || item.price || 0}</small>
                   </div>
                 </div>
               `).join('')}
@@ -582,6 +629,20 @@
         case 'delivered': return 'success';
         case 'cancelled': return 'danger';
         default: return 'secondary';
+      }
+    }
+
+    // Clean up temporary order data from localStorage
+    function cleanupTemporaryOrderData() {
+      try {
+        localStorage.removeItem('lastOrderCrop');
+        localStorage.removeItem('lastOrderAmount');
+        localStorage.removeItem('lastOrderQuantity');
+        localStorage.removeItem('lastOrderAddress');
+        localStorage.removeItem('lastOrderProduct');
+        console.log('Cleaned up temporary order data from localStorage');
+      } catch (error) {
+        console.error('Error cleaning up localStorage:', error);
       }
     }
   </script>
