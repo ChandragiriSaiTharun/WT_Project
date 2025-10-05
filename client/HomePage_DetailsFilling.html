@@ -2215,7 +2215,7 @@ body.dark-mode .results-info {
       // Set profile picture with default fallback
       const profilePicElement = document.getElementById('profilePic');
       if (user.profilePicture) {
-        profilePicElement.src = `/profile/${user.profilePicture}`;
+        profilePicElement.src = `/uploads/profile/${user.profilePicture}`;
         profilePicElement.onerror = function() {
           this.src = '/uploads/profile/default-avatar.png';
         };

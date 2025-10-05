@@ -33,16 +33,24 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Add debugging middleware to check file serving
-app.use((req, res, next) => {
-  if (req.url.startsWith('/crop/') || req.url.startsWith('/profile/') || req.url.includes('.html')) {
-    console.log(`📁 Static file request: ${req.method} ${req.url}`);
-    console.log(`📁 __dirname: ${__dirname}`);
-    console.log(`📁 Client path: ${path.join(__dirname, '../client')}`);
-    console.log(`📁 Crop path: ${path.join(__dirname, '../uploads/crop')}`);
+// Alternative static file serving approach
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+  setHeaders: (res, filePath) => {
+    // Set proper headers for all uploaded files
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    
+    // Set proper content type based on file extension
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.jpg' || ext === '.jpeg') {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (ext === '.png') {
+      res.setHeader('Content-Type', 'image/png');
+    } else if (ext === '.gif') {
+      res.setHeader('Content-Type', 'image/gif');
+    }
   }
-  next();
-});
+}));
 
 app.use(express.static(path.join(__dirname, '../client')));
 app.use('/profile', express.static(path.join(__dirname, '../uploads/profile')));

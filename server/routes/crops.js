@@ -178,7 +178,7 @@ router.get('/', async (req, res) => {
       sellerId: crop.sellerId || (defaultSeller ? defaultSeller._id : null),
       location: crop.location,
       added_date: crop.addedDate,
-      imageUrl: crop.image ? `${baseUrl}/crop/${crop.image}` : null,
+      imageUrl: crop.image ? `${baseUrl}/uploads/crop/${crop.image}` : null,
       createdAt: crop.createdAt,
       updatedAt: crop.updatedAt
     }));
@@ -231,7 +231,7 @@ router.get('/:id', async (req, res) => {
       sellerId: crop.sellerId,
       location: crop.location,
       added_date: crop.addedDate,
-      imageUrl: crop.image ? `/crop/${crop.image}` : null,
+      imageUrl: crop.image ? `/uploads/crop/${crop.image}` : null,
       createdAt: crop.createdAt,
       updatedAt: crop.updatedAt
     };
@@ -299,7 +299,7 @@ router.put('/:id', isAuthenticated, upload.single('cropImage'), async (req, res)
         unit: updatedCrop.unit,
         seller: updatedCrop.seller,
         location: updatedCrop.location,
-        imageUrl: updatedCrop.image ? `/crop/${updatedCrop.image}` : null
+        imageUrl: updatedCrop.image ? `/uploads/crop/${updatedCrop.image}` : null
       }
     });
   } catch (error) {
