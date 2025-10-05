@@ -32,6 +32,18 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add debugging middleware to check file serving
+app.use((req, res, next) => {
+  if (req.url.startsWith('/crop/') || req.url.startsWith('/profile/') || req.url.includes('.html')) {
+    console.log(`📁 Static file request: ${req.method} ${req.url}`);
+    console.log(`📁 __dirname: ${__dirname}`);
+    console.log(`📁 Client path: ${path.join(__dirname, '../client')}`);
+    console.log(`📁 Crop path: ${path.join(__dirname, '../uploads/crop')}`);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '../client')));
 app.use('/profile', express.static(path.join(__dirname, '../uploads/profile')));
 app.use('/crop', express.static(path.join(__dirname, '../uploads/crop')));
@@ -92,6 +104,46 @@ app.get('/api/image/default', (req, res) => {
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
   res.send(defaultImageSvg);
+});
+
+// Debug endpoint to check file system
+app.get('/api/debug/files', (req, res) => {
+  try {
+    const clientPath = path.join(__dirname, '../client');
+    const cropPath = path.join(__dirname, '../uploads/crop');
+    const profilePath = path.join(__dirname, '../uploads/profile');
+    
+    const clientExists = fs.existsSync(clientPath);
+    const cropExists = fs.existsSync(cropPath);
+    const profileExists = fs.existsSync(profilePath);
+    
+    let clientFiles = [];
+    let cropFiles = [];
+    let profileFiles = [];
+    
+    if (clientExists) {
+      clientFiles = fs.readdirSync(clientPath).slice(0, 5); // First 5 files
+    }
+    if (cropExists) {
+      cropFiles = fs.readdirSync(cropPath).slice(0, 10); // First 10 files
+    }
+    if (profileExists) {
+      profileFiles = fs.readdirSync(profilePath).slice(0, 5); // First 5 files
+    }
+    
+    res.json({
+      server_dir: __dirname,
+      paths: {
+        client: { path: clientPath, exists: clientExists, files: clientFiles },
+        crop: { path: cropPath, exists: cropExists, files: cropFiles },
+        profile: { path: profilePath, exists: profileExists, files: profileFiles }
+      },
+      cwd: process.cwd(),
+      env: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Serve crop images with proper headers
