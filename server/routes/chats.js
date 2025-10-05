@@ -67,8 +67,9 @@ router.get('/', requireAuth, async (req, res) => {
 router.post('/start', requireAuth, async (req, res) => {
   try {
     const { participantId, cropId } = req.body;
+    const currentUserId = req.session.user.id;
     console.log('🔥 Chat start request:', { 
-      userId: req.session.userId,
+      userId: currentUserId,
       user: req.session.user,
       participantId, 
       cropId,
@@ -80,7 +81,7 @@ router.post('/start', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Participant ID is required' });
     }
 
-    if (participantId === req.session.userId) {
+    if (participantId === currentUserId) {
       console.log('❌ User trying to chat with themselves');
       return res.status(400).json({ error: 'Cannot start chat with yourself' });
     }
@@ -94,13 +95,13 @@ router.post('/start', requireAuth, async (req, res) => {
     }
 
     // Check if chat already exists
-    let chat = await Chat.findChatBetweenUsers(req.session.userId, participantId, cropId);
+    let chat = await Chat.findChatBetweenUsers(currentUserId, participantId, cropId);
     
     if (!chat) {
       console.log('💬 Creating new chat');
       // Create new chat
       chat = new Chat({
-        participants: [req.session.userId, participantId],
+        participants: [currentUserId, participantId],
         cropId: cropId || undefined
       });
       await chat.save();
@@ -112,7 +113,7 @@ router.post('/start', requireAuth, async (req, res) => {
       console.log('💬 Using existing chat');
     }
 
-    const otherParticipant = chat.participants.find(p => !p._id.equals(req.session.userId));
+    const otherParticipant = chat.participants.find(p => !p._id.equals(currentUserId));
     
     console.log('✅ Chat ready:', chat._id);
     res.json({
@@ -122,7 +123,7 @@ router.post('/start', requireAuth, async (req, res) => {
         participant: {
           id: otherParticipant._id,
           name: otherParticipant.fullName,
-          profilePicture: otherParticipant.profilePicture
+          profilePicture: otherParticipant.profilePicture || '/uploads/profile/default-avatar.png'
         },
         crop: chat.cropId ? {
           id: chat.cropId._id,

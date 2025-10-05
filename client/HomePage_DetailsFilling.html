@@ -882,6 +882,52 @@ body.dark-mode .vibrating-text {
   }
 }
 
+/* Cart Summary Section */
+.cart-summary-section {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-width: 300px;
+  font-size: 14px;
+}
+
+body.dark-mode .cart-summary-section {
+  background: #2c2c2c;
+  border-color: #404040;
+  color: #e0e0e0;
+}
+
+.cart-summary-content h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #28a745;
+}
+
+body.dark-mode .cart-summary-content h4 {
+  color: #4ade80;
+}
+
+.cart-summary-details p {
+  margin: 5px 0;
+}
+
+.cart-total {
+  font-weight: bold;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+body.dark-mode .cart-total {
+  border-top-color: #404040;
+}
+
 .crop-card {
   background: white;
   border-radius: 15px;
@@ -2040,6 +2086,18 @@ body.dark-mode .results-info {
     <!-- Crops will be added here dynamically -->
   </div>
 
+  <!-- Cart Summary Section -->
+  <div id="cartSummarySection" class="cart-summary-section" style="display: none;">
+    <div class="cart-summary-content">
+      <h4>Cart Summary</h4>
+      <div class="cart-summary-details">
+        <p>Items: <span id="cartSummaryCount">0</span></p>
+        <div id="cartSummaryItems"></div>
+        <p class="cart-total">Total: ₹<span id="cartSummaryTotal">0</span></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
     <!-- Toasts will be dynamically added here -->
@@ -2153,9 +2211,18 @@ body.dark-mode .results-info {
       document.getElementById('farmerName').textContent = user.fullName;
       document.getElementById('farmerPhone').textContent = user.phoneNumber;
       document.getElementById('farmerEmail').textContent = user.email || 'Not provided';
+      
+      // Set profile picture with default fallback
+      const profilePicElement = document.getElementById('profilePic');
       if (user.profilePicture) {
-        document.getElementById('profilePic').src = `/profile/${user.profilePicture}`; // Adjusted path
+        profilePicElement.src = `/profile/${user.profilePicture}`;
+        profilePicElement.onerror = function() {
+          this.src = '/uploads/profile/default-avatar.png';
+        };
+      } else {
+        profilePicElement.src = '/uploads/profile/default-avatar.png';
       }
+      
       farmerDetails.classList.toggle('show');
     }
 

@@ -115,6 +115,32 @@
       transform: scale(1.05);
     }
 
+    .back-to-home {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #2980b9;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-to-home:hover {
+      background-color: #2980b9;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
     .weather-info {
       margin-top: 20px;
       color: #fff;
@@ -152,6 +178,10 @@
   </style>
 </head>
 <body>
+  <!-- Back to Home Button -->
+  <a href="HomePage_DetailsFilling.html" class="back-to-home">
+    <span>🏠</span> Back to Home
+  </a>
     <h1>Weather Updates</h1>
   <div class="weather-container">
     <div class="weather-input">
