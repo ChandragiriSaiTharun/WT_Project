@@ -8,107 +8,743 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
-      background-color: #f1f8e9;
+      background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%);
       color: #1b5e20;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding-top: 30px;
+      min-height: 100vh;
+    }
+    .hero-section {
+      background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: white;
+      padding: 4rem 0;
+      margin-bottom: 3rem;
+      border-radius: 0 0 50px 50px;
     }
     .card-custom {
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 16px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      border: none;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
     .card-custom:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     }
     .btn-custom {
-      background-color: #2e7d32;
+      background: linear-gradient(45deg, #2e7d32, #4caf50);
       color: white;
       border: none;
+      border-radius: 25px;
+      padding: 12px 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
     .btn-custom:hover {
-      background-color: #1b5e20;
+      background: linear-gradient(45deg, #1b5e20, #388e3c);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
     }
     .response-box {
-      margin-top: 10px;
-      font-weight: bold;
+      margin-top: 15px;
+      border-radius: 10px;
+      padding: 15px;
+    }
+    .faq-item {
+      border: none;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      background: linear-gradient(45deg, #e8f5e8, #c8e6c9);
       color: #2e7d32;
+      font-size: 24px;
+    }
+    .admin-link {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .priority-badge {
+      border-radius: 15px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
     }
   </style>
 </head>
 <body>
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="container text-center">
+      <h1 class="display-4 mb-3">
+        <i class="fas fa-headset me-3"></i>Help & Support Center
+      </h1>
+      <p class="lead mb-4">Your farming success is our priority. Get instant help from our expert support team.</p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <span class="badge bg-light text-dark fs-6 p-2">
+          <i class="fas fa-clock me-1"></i>24/7 Support
+        </span>
+        <span class="badge bg-light text-dark fs-6 p-2">
+          <i class="fas fa-phone me-1"></i>Expert Guidance
+        </span>
+        <span class="badge bg-light text-dark fs-6 p-2">
+          <i class="fas fa-leaf me-1"></i>Farming Solutions
+        </span>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
-    <div class="text-center mb-5">
-      <h1 class="text-success">Help & Support - Kisaan Connect</h1>
-      <p class="lead">If you're a farmer and need help, reach out using the form below or check our FAQ!</p>
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-4">
+        <div class="card card-custom p-4 text-center h-100">
+          <div class="feature-icon">
+            <i class="fas fa-question-circle"></i>
+          </div>
+          <h5 class="text-success">Quick Questions</h5>
+          <p class="text-muted">Get instant answers to common farming questions</p>
+          <button class="btn btn-custom" onclick="showQuickHelp()">Ask Now</button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-custom p-4 text-center h-100">
+          <div class="feature-icon">
+            <i class="fas fa-video"></i>
+          </div>
+          <h5 class="text-success">Video Tutorials</h5>
+          <p class="text-muted">Step-by-step video guides for better farming</p>
+          <button class="btn btn-custom" onclick="showTutorials()">Watch Videos</button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-custom p-4 text-center h-100">
+          <div class="feature-icon">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <h5 class="text-success">Emergency Help</h5>
+          <p class="text-muted">Urgent farming issues? Get immediate assistance</p>
+          <a href="tel:+919876543210" class="btn btn-danger">
+            <i class="fas fa-phone me-1"></i>Call Now
+          </a>
+        </div>
+      </div>
     </div>
 
     <div class="row g-4">
-      <div class="col-md-6 col-lg-4">
+      <div class="col-md-6">
         <div class="card card-custom p-4 h-100">
-          <h2 class="h5 text-success">Submit a Query</h2>
-          <p>Describe your issue, and our support team will respond quickly.</p>
-          <input type="text" id="farmerName" class="form-control mb-2" placeholder="Your Name">
-          <input type="text" id="cropType" class="form-control mb-2" placeholder="Crop Type">
-          <textarea id="queryMsg" rows="4" class="form-control mb-2" placeholder="Describe your issue..."></textarea>
-          <button class="btn btn-custom w-100" onclick="submitQuery()">Submit</button>
+          <div class="d-flex align-items-center mb-3">
+            <div class="feature-icon me-3" style="width: 40px; height: 40px; font-size: 16px;">
+              <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div>
+              <h4 class="text-success mb-0">Submit Support Ticket</h4>
+              <small class="text-muted">Get personalized help from our experts</small>
+            </div>
+          </div>
+          
+          <form id="supportForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="farmerName" class="form-label">Full Name</label>
+                  <input type="text" id="farmerName" class="form-control" placeholder="Enter your name" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="farmerEmail" class="form-label">Email Address</label>
+                  <input type="email" id="farmerEmail" class="form-control" placeholder="your@email.com" required>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="priority" class="form-label">Priority Level</label>
+                  <select id="priority" class="form-select" required>
+                    <option value="low">Low - General inquiry</option>
+                    <option value="medium" selected>Medium - Need help soon</option>
+                    <option value="high">High - Important issue</option>
+                    <option value="urgent">Urgent - Emergency</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="category" class="form-label">Issue Category</label>
+                  <select id="category" class="form-select" required>
+                    <option value="">Select category</option>
+                    <option value="crop_disease">Crop Disease/Pest</option>
+                    <option value="market_price">Market Pricing</option>
+                    <option value="technical">Technical Support</option>
+                    <option value="account">Account Issues</option>
+                    <option value="weather">Weather Related</option>
+                    <option value="equipment">Equipment Help</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="cropType" class="form-label">Crop Type (if applicable)</label>
+              <input type="text" id="cropType" class="form-control" placeholder="e.g., Rice, Wheat, Cotton">
+            </div>
+            
+            <div class="mb-3">
+              <label for="queryMsg" class="form-label">Describe your issue in detail</label>
+              <textarea id="queryMsg" rows="4" class="form-control" placeholder="Please provide as much detail as possible to help us assist you better..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-custom w-100">
+              <i class="fas fa-paper-plane me-2"></i>Submit Support Request
+            </button>
+          </form>
           <div id="response" class="response-box"></div>
         </div>
       </div>
 
-      <div class="col-md-6 col-lg-4">
-        <div class="card card-custom p-4 h-100">
-          <h2 class="h5 text-success">Contact Us</h2>
-          <p><strong>Email:</strong> support@kisaanconnect.in</p>
-          <p><strong>Phone:</strong> +91-9876543210</p>
-          <p><strong>Office Hours:</strong> 9 AM - 5 PM</p>
-        </div>
-      </div>
+      <div class="col-md-6">
+        <div class="row g-4">
+          <!-- Contact Information -->
+          <div class="col-12">
+            <div class="card card-custom p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                  <i class="fas fa-address-book"></i>
+                </div>
+                <h4 class="text-success mb-0">Contact Information</h4>
+              </div>
+              
+              <div class="row text-center">
+                <div class="col-md-4">
+                  <div class="p-3">
+                    <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                    <h6>Email Support</h6>
+                    <p class="mb-0">
+                      <a href="mailto:support@kisaanconnect.com" class="text-decoration-none">
+                        support@kisaanconnect.com
+                      </a>
+                    </p>
+                    <small class="text-muted">Response in 2-4 hours</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3">
+                    <i class="fas fa-phone fa-2x text-success mb-2"></i>
+                    <h6>Phone Support</h6>
+                    <p class="mb-0">
+                      <a href="tel:+919876543210" class="text-decoration-none">
+                        +91-9876543210
+                      </a>
+                    </p>
+                    <small class="text-muted">9 AM - 8 PM Daily</small>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3">
+                    <i class="fas fa-comment fa-2x text-warning mb-2"></i>
+                    <h6>WhatsApp</h6>
+                    <p class="mb-0">
+                      <a href="https://wa.me/919876543210" class="text-decoration-none">
+                        Chat with us
+                      </a>
+                    </p>
+                    <small class="text-muted">24/7 Available</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div class="col-md-12 col-lg-4">
-        <div class="card card-custom p-4 h-100">
-          <h2 class="h5 text-success">FAQs</h2>
-          <p><strong>Q:</strong> How can I track my crop price?<br>
-          <strong>A:</strong> Login and visit the Dashboard > Crop Price section.</p>
-
-          <p><strong>Q:</strong> How long does support take to respond?<br>
-          <strong>A:</strong> Usually within 24 hours.</p>
+          <!-- FAQ Section -->
+          <div class="col-12">
+            <div class="card card-custom p-4">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="d-flex align-items-center">
+                  <div class="feature-icon me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                    <i class="fas fa-question-circle"></i>
+                  </div>
+                  <h4 class="text-success mb-0">Frequently Asked Questions</h4>
+                </div>
+                <button class="btn btn-outline-success btn-sm" onclick="showAllFAQs()">
+                  View All <i class="fas fa-external-link-alt ms-1"></i>
+                </button>
+              </div>
+              
+              <div class="accordion" id="faqAccordion">
+                <div class="accordion-item faq-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                      How can I track my crop prices in real-time?
+                    </button>
+                  </h2>
+                  <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                      Login to your account and visit the Marketplace section. You can view current market prices, add your crops, and track price trends for better selling decisions.
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="accordion-item faq-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                      How quickly does support respond to queries?
+                    </button>
+                  </h2>
+                  <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                      <strong>Email:</strong> 2-4 hours during business hours<br>
+                      <strong>Phone:</strong> Immediate response 9 AM - 8 PM<br>
+                      <strong>WhatsApp:</strong> Within 30 minutes, 24/7<br>
+                      <strong>Urgent issues:</strong> Immediate response guaranteed
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="accordion-item faq-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                      Can I get help with crop disease identification?
+                    </button>
+                  </h2>
+                  <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                      Yes! Our agricultural experts can help identify crop diseases. Submit a support ticket with photos and description of the issue. You can also call our expert helpline for immediate guidance.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-    function submitQuery() {
-      const name = document.getElementById("farmerName").value;
-      const crop = document.getElementById("cropType").value;
-      const message = document.getElementById("queryMsg").value;
-      const responseBox = document.getElementById("response");
+  <!-- Admin Access Button -->
+  <div class="admin-link">
+    <button id="adminAccessBtn" class="btn btn-warning rounded-circle p-3" onclick="checkAdminAccess()" title="Admin Access" style="display: none;">
+      <i class="fas fa-shield-alt fa-lg"></i>
+    </button>
+  </div>
 
-      if (!name || !crop || !message) {
-        responseBox.innerText = "Please fill all fields.";
+  <script src="admin-check.js"></script>
+  <script>
+    let currentUser = null;
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Check if user is admin and redirect immediately
+      await checkAndRedirectAdmin();
+      
+      // Check if user is logged in and load their data
+      await loadUserData();
+      
+      // Set up form submission
+      document.getElementById('supportForm').addEventListener('submit', submitSupportTicket);
+      
+      // Check if user is admin and show admin button
+      if (adminAuth.isAdmin()) {
+        document.getElementById('adminAccessBtn').style.display = 'block';
+      }
+    });
+
+    // Check if user is admin and redirect to admin panel
+    async function checkAndRedirectAdmin() {
+      try {
+        const response = await fetch('/api/user/admin-check', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.isAdmin && result.email === 'thanushreddy934@gmail.com') {
+            // Show a brief message before redirecting
+            document.body.innerHTML = `
+              <div class="d-flex justify-content-center align-items-center" style="height: 100vh; background: linear-gradient(135deg, #2e7d32, #4caf50);">
+                <div class="text-center text-white">
+                  <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                  <h3>Admin Access Detected</h3>
+                  <p>Redirecting to Admin Dashboard...</p>
+                  <div class="spinner-border text-light mt-3" role="status"></div>
+                </div>
+              </div>
+            `;
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+              window.location.href = '/admin-help.html';
+            }, 1500);
+            return true;
+          }
+        }
+      } catch (error) {
+        console.log('Not logged in or error checking admin status');
+      }
+      return false;
+    }
+
+    // Load current user data
+    async function loadUserData() {
+      try {
+        const response = await fetch('/user', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          currentUser = await response.json();
+          // Pre-fill form with user data
+          if (currentUser.fullName) {
+            document.getElementById('farmerName').value = currentUser.fullName;
+          }
+          if (currentUser.email) {
+            document.getElementById('farmerEmail').value = currentUser.email;
+          }
+        }
+      } catch (error) {
+        console.log('User not logged in or error loading data');
+      }
+    }
+
+    // Submit support ticket
+    async function submitSupportTicket(e) {
+      e.preventDefault();
+      
+      const formData = {
+        name: document.getElementById('farmerName').value.trim(),
+        email: document.getElementById('farmerEmail').value.trim(),
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        cropType: document.getElementById('cropType').value.trim(),
+        message: document.getElementById('queryMsg').value.trim()
+      };
+
+      const responseBox = document.getElementById('response');
+      
+      // Basic validation
+      if (!formData.name || !formData.email || !formData.category || !formData.message) {
+        showResponse('Please fill all required fields.', 'error');
         return;
       }
 
-      fetch("https://api.kisaanconnect.in/help", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name, crop, message })
-      })
-      .then(res => res.json())
-      .then(data => {
-        responseBox.innerText = "Your query has been submitted successfully!";
-      })
-      .catch(err => {
-        console.error(err);
-        responseBox.innerText = "Something went wrong. Please try again later.";
-      });
+      // Show loading state
+      const submitBtn = document.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/help/tickets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showResponse(
+            `✅ Support ticket submitted successfully!<br>
+            <strong>Ticket ID:</strong> #${result.ticketId}<br>
+            <small>You will receive an email confirmation shortly. Expected response time: ${getResponseTime(formData.priority)}</small>`, 
+            'success'
+          );
+          document.getElementById('supportForm').reset();
+          
+          // Show follow-up options
+          setTimeout(() => {
+            showFollowUpOptions(result.ticketId);
+          }, 3000);
+        } else {
+          showResponse(`❌ ${result.error || 'Failed to submit ticket. Please try again.'}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error submitting ticket:', error);
+        showResponse('❌ Network error. Please check your connection and try again.', 'error');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Show response message
+    function showResponse(message, type) {
+      const responseBox = document.getElementById('response');
+      responseBox.className = `response-box alert ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+      responseBox.innerHTML = message;
+      responseBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Get expected response time based on priority
+    function getResponseTime(priority) {
+      const times = {
+        urgent: 'Within 1 hour',
+        high: '2-4 hours',
+        medium: '4-8 hours',
+        low: '24-48 hours'
+      };
+      return times[priority] || '24-48 hours';
+    }
+
+    // Show follow-up options after ticket submission
+    function showFollowUpOptions(ticketId) {
+      const responseBox = document.getElementById('response');
+      responseBox.innerHTML += `
+        <div class="mt-3 p-3 bg-light rounded">
+          <h6>What's next?</h6>
+          <div class="btn-group-vertical w-100" role="group">
+            <a href="tel:+919876543210" class="btn btn-outline-success btn-sm mb-2">
+              <i class="fas fa-phone me-2"></i>Call for urgent help: +91-9876543210
+            </a>
+            <a href="https://wa.me/919876543210?text=My%20ticket%20ID%20is%20${ticketId}" class="btn btn-outline-primary btn-sm mb-2">
+              <i class="fab fa-whatsapp me-2"></i>WhatsApp us about ticket #${ticketId}
+            </a>
+            <button class="btn btn-outline-info btn-sm" onclick="trackTicket('${ticketId}')">
+              <i class="fas fa-search me-2"></i>Track this ticket
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Quick help functions
+    function showQuickHelp() {
+      const commonQuestions = [
+        "How to identify crop diseases?",
+        "Best time to plant crops?",
+        "Weather alerts and warnings",
+        "Market price updates",
+        "Fertilizer recommendations"
+      ];
+      
+      const questionsList = commonQuestions.map((q, i) => 
+        `<button class="btn btn-outline-success w-100 mb-2" onclick="askQuestion('${q}')">${q}</button>`
+      ).join('');
+      
+      showModal('Quick Help', `
+        <p>Select a common question or type your own:</p>
+        <div class="mb-3">${questionsList}</div>
+        <div class="input-group">
+          <input type="text" id="quickQuestion" class="form-control" placeholder="Type your question...">
+          <button class="btn btn-success" onclick="askQuestion(document.getElementById('quickQuestion').value)">Ask</button>
+        </div>
+      `);
+    }
+
+    function askQuestion(question) {
+      if (!question.trim()) return;
+      
+      // Auto-fill the main form
+      document.getElementById('queryMsg').value = question;
+      document.getElementById('category').value = 'other';
+      document.getElementById('priority').value = 'medium';
+      
+      // Close modal and scroll to form
+      bootstrap.Modal.getInstance(document.getElementById('helpModal')).hide();
+      document.getElementById('queryMsg').focus();
+      document.getElementById('queryMsg').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showTutorials() {
+      showModal('Video Tutorials', `
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-seedling fa-3x text-success mb-2"></i>
+                <h6>Crop Planting Guide</h6>
+                <p class="small text-muted">Learn proper planting techniques</p>
+                <a href="https://www.youtube.com/watch?v=uIh7g_Lgaeo" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-bug fa-3x text-warning mb-2"></i>
+                <h6>Pest Management</h6>
+                <p class="small text-muted">Identify and control crop pests</p>
+                <a href="https://www.youtube.com/watch?v=JIODRqrKx6Q" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-info mb-2"></i>
+                <h6>Market Analysis</h6>
+                <p class="small text-muted">Understanding crop market trends</p>
+                <a href="https://www.youtube.com/watch?v=K_0fKZKhbMo" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-cloud-rain fa-3x text-primary mb-2"></i>
+                <h6>Weather Monitoring</h6>
+                <p class="small text-muted">Using weather data for farming</p>
+                <a href="https://www.youtube.com/watch?v=xgpol4kkzZ8" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-tint fa-3x text-primary mb-2"></i>
+                <h6>Irrigation Techniques</h6>
+                <p class="small text-muted">Water management for crops</p>
+                <a href="https://www.youtube.com/watch?v=S3QryFqHBT0" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-flask fa-3x text-success mb-2"></i>
+                <h6>Soil Testing</h6>
+                <p class="small text-muted">Testing soil health and nutrients</p>
+                <a href="https://www.youtube.com/watch?v=2nHRQFrmvE4" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-leaf fa-3x text-success mb-2"></i>
+                <h6>Organic Farming</h6>
+                <p class="small text-muted">Sustainable farming practices</p>
+                <a href="https://www.youtube.com/watch?v=H1JRgIg9674" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-tools fa-3x text-warning mb-2"></i>
+                <h6>Farm Equipment</h6>
+                <p class="small text-muted">Modern farming tools and machinery</p>
+                <a href="https://www.youtube.com/watch?v=F4neLJQC1_E" target="_blank" class="btn btn-success btn-sm">
+                  <i class="fab fa-youtube me-1"></i>Watch Now
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 text-center">
+          <p class="text-muted small">
+            <i class="fas fa-info-circle me-1"></i>
+            Videos will open in a new tab. Subscribe to our YouTube channel for more farming tips!
+          </p>
+          <a href="https://www.youtube.com/@KisaanConnect" target="_blank" class="btn btn-outline-danger btn-sm">
+            <i class="fab fa-youtube me-1"></i>Visit Our Channel
+          </a>
+        </div>
+      `);
+    }
+
+    function showAllFAQs() {
+      window.open('/faq.html', '_blank');
+    }
+
+    function trackTicket(ticketId) {
+      showModal('Track Ticket', `
+        <div class="text-center">
+          <i class="fas fa-search fa-3x text-primary mb-3"></i>
+          <h5>Ticket #${ticketId}</h5>
+          <p>Enter your email to track this ticket:</p>
+          <div class="input-group mb-3">
+            <input type="email" class="form-control" id="trackEmail" placeholder="Your email address">
+            <button class="btn btn-primary" onclick="doTrackTicket('${ticketId}')">Track</button>
+          </div>
+          <small class="text-muted">You can also track via WhatsApp or phone</small>
+        </div>
+      `);
+    }
+
+    function doTrackTicket(ticketId) {
+      const email = document.getElementById('trackEmail').value;
+      if (!email) {
+        alert('Please enter your email address');
+        return;
+      }
+      
+      // Implementation for ticket tracking
+      alert(`Tracking information for ticket #${ticketId} will be sent to ${email}`);
+      bootstrap.Modal.getInstance(document.getElementById('helpModal')).hide();
+    }
+
+    function checkAdminAccess() {
+      window.location.href = '/admin-help.html';
+    }
+
+    // Generic modal function
+    function showModal(title, content) {
+      // Create modal if it doesn't exist
+      let modal = document.getElementById('helpModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'helpModal';
+        modal.innerHTML = `
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="helpModalTitle">${title}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body" id="helpModalBody">${content}</div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      } else {
+        document.getElementById('helpModalTitle').textContent = title;
+        document.getElementById('helpModalBody').innerHTML = content;
+      }
+      
+      new bootstrap.Modal(modal).show();
     }
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="admin-redirect.js"></script>
 </body>
 </html>

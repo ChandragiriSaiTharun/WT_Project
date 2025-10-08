@@ -1,0 +1,5 @@
+# Default Crop Image Placeholder
+
+This is a simple SVG placeholder for crop images that fail to load.
+
+The server will serve this when crop images are missing.

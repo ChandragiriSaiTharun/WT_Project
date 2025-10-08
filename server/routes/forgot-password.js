@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../config/db');
+const Farmer = require('../models/Farmer');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -10,13 +10,25 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  timeout: 10000, // 10 seconds timeout
+  connectionTimeout: 10000, // 10 seconds connection timeout
+  greetingTimeout: 5000, // 5 seconds greeting timeout
+  socketTimeout: 10000 // 10 seconds socket timeout
 });
 
-transporter.verify((error, success) => {
-  if (error) console.error('Email transporter failed:', error);
-  else console.log('Email transporter ready');
-});
+// Verify email configuration with better error handling
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('Email transporter failed:', error.message);
+    } else {
+      console.log('Email transporter ready');
+    }
+  });
+} else {
+  console.warn('Email credentials not configured - password reset emails will fail');
+}
 
 router.post('/', async (req, res) => {
   console.log('Received POST /forgot-password:', req.body);
@@ -28,25 +40,31 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const [users] = await db.promise().query('SELECT * FROM farmers WHERE email = ?', [email]);
-    console.log('Database query result:', users);
-    if (users.length === 0) {
+    const user = await Farmer.findOne({ email });
+    console.log('Database query result:', user);
+    if (!user) {
       console.log('No user found for email:', email);
       return res.status(404).json({ error: 'No account found with this email' });
     }
 
-    const user = users[0];
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000;
 
-    await db.promise().query(
-      'UPDATE farmers SET reset_token = ?, reset_token_expiry = ? WHERE email = ?',
-      [resetToken, resetTokenExpiry, email]
-    );
+    // Update user with reset token
+    await Farmer.findByIdAndUpdate(user._id, {
+      resetToken,
+      resetTokenExpiry
+    });
     console.log('Reset token stored for:', email);
 
-    const resetUrl = `http://localhost:3000/reset-password.html?token=${resetToken}`;
-    console.log('Generated reset URL:', resetUrl); // Debug the URL
+    // Use dynamic base URL for production
+    const baseUrl = process.env.NODE_ENV === 'production' || 
+                   process.env.RENDER === '1' || 
+                   req.get('host')?.includes('render.com')
+      ? `https://${req.get('host')}`
+      : 'http://localhost:3000';
+    const resetUrl = `${baseUrl}/reset-password.html?token=${resetToken}`;
+    console.log('Generated reset URL:', resetUrl);
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -61,17 +79,21 @@ router.post('/', async (req, res) => {
       `
     };
 
-    console.log('Sending email with options:', mailOptions); // Debug email content
-    await transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Failed to send email:', error);
-      } else {
-        console.log('Email sent successfully:', info.response);
-      }
-    });
-    console.log('Reset email sent to:', email);
-
-    res.status(200).json({ message: 'Password reset email sent!' });
+    console.log('Sending email with options:', {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject
+    }); // Debug email content (without exposing full content)
+    
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Reset email sent successfully to:', email);
+      res.status(200).json({ message: 'Password reset email sent!' });
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError.message);
+      // Still return success to user for security (don't reveal email issues)
+      res.status(200).json({ message: 'If an account exists with this email, a reset link has been sent.' });
+    }
   } catch (error) {
     console.error('Error in /forgot-password:', error);
     res.status(500).json({ error: 'Failed to send reset email' });
@@ -89,24 +111,25 @@ router.post('/reset', async (req, res) => {
   
     try {
       console.log('Querying database with token:', token);
-      const [users] = await db.promise().query(
-        'SELECT * FROM farmers WHERE reset_token = ? AND reset_token_expiry > ?',
-        [token, Date.now()]
-      );
-      console.log('Query result:', users);
-      if (users.length === 0) {
+      const user = await Farmer.findOne({
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() }
+      });
+      console.log('Query result:', user);
+      if (!user) {
         console.log('No user found for token');
         return res.status(400).json({ error: 'Invalid or expired reset token' });
       }
   
-      const user = users[0];
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       console.log('Hashed new password');
   
-      await db.promise().query(
-        'UPDATE farmers SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
-        [hashedPassword, user.id]
-      );
+      // Update password and clear reset token
+      await Farmer.findByIdAndUpdate(user._id, {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
+      });
       console.log('Password reset for user:', user.email);
   
       res.status(200).json({ message: 'Password reset successfully!' });

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help Queries Admin - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .query-card {
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .status-pending { border-left: 4px solid #ffc107; }
+    .status-in-progress { border-left: 4px solid #17a2b8; }
+    .status-resolved { border-left: 4px solid #28a745; }
+    .refresh-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="text-success">Help Queries Dashboard</h1>
+      <div>
+        <button class="btn btn-outline-success" onclick="loadQueries()">
+          <i class="fas fa-refresh"></i> Refresh
+        </button>
+        <a href="/" class="btn btn-success ms-2">Back to Home</a>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-warning">Pending</h5>
+            <h3 id="pendingCount">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-info">In Progress</h5>
+            <h3 id="progressCount">0</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-success">Resolved</h5>
+            <h3 id="resolvedCount">0</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="queriesContainer">
+      <!-- Queries will be loaded here -->
+    </div>
+
+    <div id="loadingSpinner" class="text-center d-none">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allQueries = [];
+
+    async function loadQueries() {
+      console.log('🔄 Loading help queries...');
+      const spinner = document.getElementById('loadingSpinner');
+      const container = document.getElementById('queriesContainer');
+      
+      spinner.classList.remove('d-none');
+      
+      try {
+        console.log('📡 Making API request to /api/admin/help-queries');
+        const response = await fetch('/api/admin/help-queries');
+        console.log('📡 Response status:', response.status);
+        const data = await response.json();
+        console.log('📡 Response data:', data);
+        
+        if (data.success) {
+          allQueries = data.queries;
+          displayQueries(allQueries);
+          updateCounts();
+        } else {
+          container.innerHTML = '<div class="alert alert-danger">Failed to load queries</div>';
+        }
+      } catch (error) {
+        console.error('Error loading queries:', error);
+        container.innerHTML = '<div class="alert alert-danger">Error loading queries</div>';
+      } finally {
+        spinner.classList.add('d-none');
+      }
+    }
+
+    function displayQueries(queries) {
+      const container = document.getElementById('queriesContainer');
+      
+      if (queries.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No help queries found</div>';
+        return;
+      }
+
+      const html = queries.map(query => `
+        <div class="card query-card status-${query.status}">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${query.farmerName}</strong> - ${query.cropType}
+              <span class="badge bg-${getStatusColor(query.status)} ms-2">${query.status.toUpperCase()}</span>
+              ${query.contactInfo.email ? '<i class="fas fa-envelope text-info ms-2" title="Email provided"></i>' : ''}
+              ${query.contactInfo.phone ? '<i class="fas fa-phone text-success ms-1" title="Phone provided"></i>' : ''}
+            </div>
+            <small class="text-muted">${new Date(query.createdAt).toLocaleDateString()} ${new Date(query.createdAt).toLocaleTimeString()}</small>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <p><strong>🌾 Query:</strong> ${query.message}</p>
+                ${query.contactInfo.email ? `<p><strong>📧 Email:</strong> <a href="mailto:${query.contactInfo.email}">${query.contactInfo.email}</a></p>` : ''}
+                ${query.contactInfo.phone ? `<p><strong>📱 Phone:</strong> <a href="tel:${query.contactInfo.phone}">${query.contactInfo.phone}</a></p>` : ''}
+                ${query.response ? `
+                  <div class="alert alert-success">
+                    <strong>💡 Your Response:</strong><br>
+                    ${query.response}
+                    ${query.status === 'resolved' && query.contactInfo.email ? '<br><small class="text-muted"><i class="fas fa-check"></i> User notified via email</small>' : ''}
+                  </div>
+                ` : ''}
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex flex-column gap-2">
+                  <select class="form-select" onchange="updateStatus('${query._id}', this.value)">
+                    <option value="pending" ${query.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                    <option value="in-progress" ${query.status === 'in-progress' ? 'selected' : ''}>🔄 In Progress</option>
+                    <option value="resolved" ${query.status === 'resolved' ? 'selected' : ''}>✅ Resolved</option>
+                  </select>
+                  <button class="btn btn-sm btn-primary" onclick="addResponse('${query._id}')">
+                    ${query.response ? '✏️ Update Response' : '💬 Add Response'}
+                  </button>
+                  ${query.contactInfo.email && query.status === 'resolved' ? 
+                    `<small class="text-success"><i class="fas fa-paper-plane"></i> Email sent to farmer</small>` : 
+                    ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = html;
+    }
+
+    function getStatusColor(status) {
+      switch(status) {
+        case 'pending': return 'warning';
+        case 'in-progress': return 'info';
+        case 'resolved': return 'success';
+        default: return 'secondary';
+      }
+    }
+
+    function updateCounts() {
+      const pending = allQueries.filter(q => q.status === 'pending').length;
+      const progress = allQueries.filter(q => q.status === 'in-progress').length;
+      const resolved = allQueries.filter(q => q.status === 'resolved').length;
+      
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('progressCount').textContent = progress;
+      document.getElementById('resolvedCount').textContent = resolved;
+    }
+
+    async function updateStatus(queryId, newStatus) {
+      try {
+        const response = await fetch(`/api/admin/help-queries/${queryId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          loadQueries(); // Reload queries
+        } else {
+          alert('Failed to update status');
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+        alert('Error updating status');
+      }
+    }
+
+    function addResponse(queryId) {
+      // Create a modal-like prompt with better UX
+      const response = prompt(`📝 Enter your detailed response to help the farmer:
+
+💡 Tips for a good response:
+• Be specific and actionable
+• Include relevant farming techniques
+• Suggest next steps if needed
+• Be empathetic and supportive
+
+Your response:`);
+      
+      if (response && response.trim()) {
+        if (response.trim().length < 10) {
+          alert('⚠️ Please provide a more detailed response (at least 10 characters)');
+          return;
+        }
+        updateQueryResponse(queryId, response.trim());
+      }
+    }
+
+    async function updateQueryResponse(queryId, response) {
+      try {
+        const res = await fetch(`/api/admin/help-queries/${queryId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ response: response, status: 'resolved' })
+        });
+        
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Response sent successfully! The farmer will be notified via email.');
+          loadQueries(); // Reload queries
+        } else {
+          alert('❌ Failed to add response: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error adding response:', error);
+        alert('❌ Error adding response: ' + error.message);
+      }
+    }
+
+    // Load queries when page loads
+    console.log('🚀 Admin help page loaded - initializing...');
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📄 DOM Content Loaded - calling loadQueries()');
+      loadQueries();
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

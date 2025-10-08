@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Kisaan Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .checkout-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    
+    .step {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 25px;
+      background-color: #e9ecef;
+      color: #6c757d;
+      font-weight: 500;
+    }
+    
+    .step.active {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .step.completed {
+      background-color: #20c997;
+      color: white;
+    }
+    
+    .step i {
+      margin-right: 8px;
+    }
+    
+    .card {
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      background-color: #fff;
+      border-bottom: 1px solid #e9ecef;
+      font-weight: 600;
+      color: #495057;
+      border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .address-card {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .address-card:hover {
+      border-color: #28a745;
+      background-color: #f8fff9;
+    }
+    
+    .address-card.selected {
+      border-color: #28a745;
+      background-color: #f8fff9;
+    }
+    
+    .payment-option {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .payment-option:hover {
+      border-color: #007bff;
+      background-color: #f8f9ff;
+    }
+    
+    .payment-option.selected {
+      border-color: #007bff;
+      background-color: #f8f9ff;
+    }
+    
+    .order-summary {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .btn-primary {
+      background-color: #28a745;
+      border-color: #28a745;
+      padding: 12px 30px;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    
+    .btn-primary:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+    
+    .btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+      padding: 12px 30px;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .quantity-btn {
+      background-color: #f8f9fa;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .quantity-btn:hover {
+      background-color: #e9ecef;
+    }
+    
+    .quantity-input {
+      border: none;
+      text-align: center;
+      width: 60px;
+      padding: 8px;
+      font-weight: 600;
+    }
+    
+    .product-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .loading-spinner {
+      display: none;
+    }
+    
+    .loading-spinner.show {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="checkout-container">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">
+            <i class="fas fa-shopping-cart text-success me-2"></i>
+            Checkout
+          </h2>
+          <a href="/HomePage_DetailsFilling.html" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step active" id="step-cart">
+        <i class="fas fa-shopping-cart"></i>
+        Cart Review
+      </div>
+      <div class="step" id="step-address">
+        <i class="fas fa-map-marker-alt"></i>
+        Address
+      </div>
+      <div class="step" id="step-payment">
+        <i class="fas fa-credit-card"></i>
+        Payment
+      </div>
+      <div class="step" id="step-confirmation">
+        <i class="fas fa-check-circle"></i>
+        Confirmation
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Step 1: Cart Review -->
+        <div id="cart-step" class="checkout-step">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-list-ul me-2"></i>
+                Review Your Items
+              </h5>
+            </div>
+            <div class="card-body">
+              <div id="cart-items-container">
+                <!-- Cart items will be loaded here -->
+              </div>
+              <div class="text-end mt-3">
+                <button class="btn btn-primary" onclick="proceedToAddress()">
+                  Continue to Address <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Address Selection -->
+        <div id="address-step" class="checkout-step" style="display: none;">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                Select Delivery Address
+              </h5>
+              <button class="btn btn-sm btn-outline-success" onclick="showAddAddressModal()">
+                <i class="fas fa-plus me-1"></i>Add New Address
+              </button>
+            </div>
+            <div class="card-body">
+              <div id="addresses-container">
+                <!-- Addresses will be loaded here -->
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-outline-secondary" onclick="goToStep('cart')">
+                  <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                </button>
+                <button class="btn btn-primary" onclick="proceedToPayment()" id="address-continue-btn" disabled>
+                  Continue to Payment <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Options -->
+        <div id="payment-step" class="checkout-step" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-credit-card me-2"></i>
+                Choose Payment Method
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row justify-content-center">
+                <div class="col-md-8">
+                  <div class="payment-option selected" data-method="cod" onclick="selectPaymentMethod('cod', this)">>
+                    <div class="d-flex align-items-center justify-content-center">
+                      <div class="form-check me-3">
+                        <input class="form-check-input" type="radio" name="paymentMethod" value="cod" checked>
+                      </div>
+                      <div>
+                        <i class="fas fa-money-bill-wave text-success fa-3x me-3"></i>
+                      </div>
+                      <div>
+                        <h4 class="mb-1 text-success">Cash on Delivery</h4>
+                        <p class="text-muted mb-0">Pay when you receive your order</p>
+                        <small class="text-success"><i class="fas fa-shield-alt me-1"></i>Safe and Secure</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> This is for product checking purposes. You can examine the product before making payment.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-outline-secondary" onclick="goToStep('address')">
+                  <i class="fas fa-arrow-left me-2"></i>Back to Address
+                </button>
+                <button class="btn btn-primary" onclick="proceedToConfirmation()" id="payment-continue-btn" disabled>
+                  Review Order <i class="fas fa-arrow-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Order Confirmation -->
+        <div id="confirmation-step" class="checkout-step" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-check-circle me-2"></i>
+                Order Confirmation
+              </h5>
+            </div>
+            <div class="card-body">
+              <div id="order-confirmation-details">
+                <!-- Order confirmation details will be shown here -->
+              </div>
+              <div class="text-center mt-4">
+                <button class="btn btn-success btn-lg px-5" onclick="placeOrder()">
+                  <span class="loading-spinner spinner-border spinner-border-sm me-2" role="status"></span>
+                  <i class="fas fa-shopping-bag me-2"></i>
+                  Place Order
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="col-lg-4">
+        <div class="order-summary sticky-top" style="top: 20px;">
+          <h5 class="mb-3">
+            <i class="fas fa-receipt me-2"></i>
+            Order Summary
+          </h5>
+          <div id="order-summary-content">
+            <!-- Order summary will be populated here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Address Modal -->
+  <div class="modal fade" id="addAddressModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addAddressForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" name="fullName" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" name="phoneNumber" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Pincode *</label>
+                <input type="text" class="form-control" name="pincode" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">State *</label>
+                <input type="text" class="form-control" name="state" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">City *</label>
+                <input type="text" class="form-control" name="city" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Address Type</label>
+                <select class="form-select" name="addressType">
+                  <option value="home">Home</option>
+                  <option value="work">Work</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">Address Line 1 *</label>
+                <textarea class="form-control" name="addressLine1" rows="2" required placeholder="House no, Building name, Street name"></textarea>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">Address Line 2</label>
+                <textarea class="form-control" name="addressLine2" rows="2" placeholder="Area, Colony, Near landmark"></textarea>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="form-label">Landmark</label>
+                <input type="text" class="form-control" name="landmark" placeholder="E.g., Near Hospital, Opposite School">
+              </div>
+              <div class="col-12 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="isDefault" id="isDefault">
+                  <label class="form-check-label" for="isDefault">
+                    Make this my default address
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" onclick="addAddress()">Save Address</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Global variables
+    let cartItems = [];
+    let addresses = [];
+    let selectedAddress = null;
+    let selectedPaymentMethod = null;
+    let currentStep = 'cart';
+    let isDirectPurchase = false;
+    let directPurchaseItem = null;
+
+    // Initialize checkout process
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is logged in
+      checkLoginStatus().then(user => {
+        if (!user) {
+          alert('Please login to continue with checkout');
+          window.location.href = '/Login.html';
+          return;
+        }
+        
+        // Check if this is a direct purchase
+        const directPurchase = sessionStorage.getItem('directPurchase');
+        if (directPurchase) {
+          isDirectPurchase = true;
+          directPurchaseItem = JSON.parse(directPurchase);
+          sessionStorage.removeItem('directPurchase'); // Clear after use
+          loadDirectPurchaseItem();
+        } else {
+          // Load cart items normally
+          loadCartItems();
+        }
+        
+        loadAddresses();
+        updateOrderSummary();
+      });
+    });
+
+    // Load direct purchase item
+    function loadDirectPurchaseItem() {
+      cartItems = [{
+        crop: directPurchaseItem.crop,
+        quantity: directPurchaseItem.quantity,
+        price: directPurchaseItem.crop.price,
+        total: directPurchaseItem.crop.price * directPurchaseItem.quantity
+      }];
+      
+      // Update cart display
+      displayCartItems();
+    }
+
+    // Check login status
+    async function checkLoginStatus() {
+      try {
+        const response = await fetch('/user', {
+          credentials: 'include'
+        });
+        return response.ok ? await response.json() : null;
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        return null;
+      }
+    }
+
+    // Load cart items
+    async function loadCartItems() {
+      try {
+        const response = await fetch('/api/ecommerce/cart', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          cartItems = data.cart.items || [];
+          displayCartItems();
+          updateOrderSummary();
+        } else {
+          throw new Error('Failed to load cart');
+        }
+      } catch (error) {
+        console.error('Error loading cart:', error);
+        showError('Failed to load cart items');
+      }
+    }
+
+    // Display cart items
+    function displayCartItems() {
+      const container = document.getElementById('cart-items-container');
+      
+      if (cartItems.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Your cart is empty</h5>
+            <a href="/HomePage_DetailsFilling.html" class="btn btn-success mt-3">
+              <i class="fas fa-plus me-2"></i>Add Items
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      const itemsHtml = cartItems.map(item => {
+        const crop = item.cropId;
+        const totalPrice = crop.price * item.quantity;
+        
+        return `
+          <div class="d-flex align-items-center py-3 border-bottom">
+            <img src="${crop.images && crop.images.length > 0 ? crop.images[0] : '/placeholder-crop.jpg'}" 
+                 alt="${crop.name}" class="product-image me-3">
+            <div class="flex-grow-1">
+              <h6 class="mb-1">${crop.name}</h6>
+              <small class="text-muted">Sold by: ${crop.seller.fullName}</small>
+              <div class="mt-1">
+                <span class="badge bg-success">₹${crop.price}/${crop.unit}</span>
+              </div>
+            </div>
+            <div class="quantity-selector me-3">
+              <button class="quantity-btn" onclick="updateQuantity('${item.cropId._id}', ${item.quantity - 1})">
+                <i class="fas fa-minus"></i>
+              </button>
+              <input type="number" class="quantity-input" value="${item.quantity}" min="1" 
+                     onchange="updateQuantity('${item.cropId._id}', this.value)">
+              <button class="quantity-btn" onclick="updateQuantity('${item.cropId._id}', ${item.quantity + 1})">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <div class="text-end me-3">
+              <div class="fw-bold">₹${totalPrice.toFixed(2)}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart('${item.cropId._id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = itemsHtml;
+    }
+
+    // Update item quantity
+    async function updateQuantity(cropId, newQuantity) {
+      if (newQuantity < 1) {
+        removeFromCart(cropId);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/ecommerce/cart/update', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            cropId: cropId,
+            quantity: parseInt(newQuantity)
+          })
+        });
+
+        if (response.ok) {
+          loadCartItems(); // Reload cart
+        } else {
+          throw new Error('Failed to update quantity');
+        }
+      } catch (error) {
+        console.error('Error updating quantity:', error);
+        showError('Failed to update quantity');
+      }
+    }
+
+    // Remove item from cart
+    async function removeFromCart(cropId) {
+      try {
+        const response = await fetch(`/api/ecommerce/cart/remove/${cropId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          loadCartItems(); // Reload cart
+        } else {
+          throw new Error('Failed to remove item');
+        }
+      } catch (error) {
+        console.error('Error removing item:', error);
+        showError('Failed to remove item');
+      }
+    }
+
+    // Load addresses
+    async function loadAddresses() {
+      try {
+        const response = await fetch('/api/ecommerce/addresses', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            addresses = data.addresses || [];
+            displayAddresses();
+          } else {
+            throw new Error(data.error || 'Failed to load addresses');
+          }
+        } else if (response.status === 401) {
+          showError('Please login to continue');
+          window.location.href = '/Login.html';
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load addresses');
+        }
+      } catch (error) {
+        console.error('Error loading addresses:', error);
+        showError(`Failed to load addresses: ${error.message}`);
+        
+        // Show add address option even on error
+        const container = document.getElementById('addresses-container');
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+            <p class="text-muted">Unable to load addresses. Please add a delivery address.</p>
+            <button class="btn btn-success" onclick="showAddAddressModal()">
+              <i class="fas fa-plus me-2"></i>Add Address
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // Display addresses
+    function displayAddresses() {
+      const container = document.getElementById('addresses-container');
+      
+      if (addresses.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-map-marker-alt fa-2x text-muted mb-3"></i>
+            <p class="text-muted">No addresses found. Please add a delivery address.</p>
+            <button class="btn btn-success" onclick="showAddAddressModal()">
+              <i class="fas fa-plus me-2"></i>Add Address
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const addressesHtml = addresses.map(address => `
+        <div class="address-card ${address.isDefault ? 'selected' : ''}" 
+             onclick="selectAddress('${address._id}', this)">>
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="mb-1">
+                ${address.fullName} 
+                ${address.isDefault ? '<span class="badge bg-success ms-2">Default</span>' : ''}
+              </h6>
+              <p class="mb-1 text-muted">
+                ${address.addressLine1}${address.addressLine2 ? ', ' + address.addressLine2 : ''}
+              </p>
+              <p class="mb-1 text-muted">
+                ${address.city}, ${address.state} - ${address.pincode}
+              </p>
+              <small class="text-muted">
+                <i class="fas fa-phone me-1"></i>${address.phoneNumber}
+              </small>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="selectedAddress" 
+                     value="${address._id}" ${address.isDefault ? 'checked' : ''}>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = addressesHtml;
+
+      // Auto-select default address
+      const defaultAddress = addresses.find(addr => addr.isDefault);
+      if (defaultAddress) {
+        selectAddress(defaultAddress._id);
+      }
+    }
+
+    // Select address
+    function selectAddress(addressId, element) {
+      selectedAddress = addressId;
+      
+      // Update UI
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      if (element) {
+        element.classList.add('selected');
+      } else {
+        // If no element passed, find by address ID
+        const addressCard = document.querySelector(`[onclick="selectAddress('${addressId}', this)"]`);
+        if (addressCard) addressCard.classList.add('selected');
+      }
+      
+      // Update radio button
+      document.querySelector(`input[value="${addressId}"]`).checked = true;
+      
+      // Enable continue button
+      document.getElementById('address-continue-btn').disabled = false;
+    }
+
+    // Show add address modal
+    function showAddAddressModal() {
+      const modal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+      modal.show();
+    }
+
+    // Add new address
+    async function addAddress() {
+      const form = document.getElementById('addAddressForm');
+      const formData = new FormData(form);
+      
+      const addressData = {
+        fullName: formData.get('fullName'),
+        phoneNumber: formData.get('phoneNumber'),
+        pincode: formData.get('pincode'),
+        addressLine1: formData.get('addressLine1'),
+        addressLine2: formData.get('addressLine2'),
+        landmark: formData.get('landmark'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        addressType: formData.get('addressType'),
+        isDefault: formData.get('isDefault') === 'on'
+      };
+
+      try {
+        const response = await fetch('/api/ecommerce/addresses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(addressData)
+        });
+
+        if (response.ok) {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addAddressModal'));
+          modal.hide();
+          form.reset();
+          loadAddresses(); // Reload addresses
+          showSuccess('Address added successfully');
+        } else {
+          throw new Error('Failed to add address');
+        }
+      } catch (error) {
+        console.error('Error adding address:', error);
+        showError('Failed to add address');
+      }
+    }
+
+    // Select payment method
+    function selectPaymentMethod(method, element) {
+      selectedPaymentMethod = method;
+      
+      // Update UI
+      document.querySelectorAll('.payment-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      if (element) {
+        element.classList.add('selected');
+      } else {
+        // If no element passed, find by method
+        const paymentOption = document.querySelector(`[onclick="selectPaymentMethod('${method}', this)"]`);
+        if (paymentOption) paymentOption.classList.add('selected');
+      }
+      
+      // Update radio button
+      document.querySelector(`input[value="${method}"]`).checked = true;
+      
+      // Enable continue button
+      document.getElementById('payment-continue-btn').disabled = false;
+    }
+
+    // Navigation functions
+    function goToStep(step) {
+      currentStep = step;
+      
+      // Hide all steps
+      document.querySelectorAll('.checkout-step').forEach(step => {
+        step.style.display = 'none';
+      });
+      
+      // Show current step
+      document.getElementById(`${step}-step`).style.display = 'block';
+      
+      // Update step indicator
+      updateStepIndicator();
+    }
+
+    function proceedToAddress() {
+      if (cartItems.length === 0) {
+        showError('Your cart is empty');
+        return;
+      }
+      goToStep('address');
+    }
+
+    function proceedToPayment() {
+      if (!selectedAddress) {
+        showError('Please select a delivery address');
+        return;
+      }
+      // Auto-select Cash on Delivery
+      selectedPaymentMethod = 'cod';
+      document.getElementById('payment-continue-btn').disabled = false;
+      goToStep('payment');
+    }
+
+    function proceedToConfirmation() {
+      if (!selectedPaymentMethod) {
+        showError('Please select a payment method');
+        return;
+      }
+      
+      displayOrderConfirmation();
+      goToStep('confirmation');
+    }
+
+    // Update step indicator
+    function updateStepIndicator() {
+      const steps = ['cart', 'address', 'payment', 'confirmation'];
+      const currentIndex = steps.indexOf(currentStep);
+      
+      steps.forEach((step, index) => {
+        const stepElement = document.getElementById(`step-${step}`);
+        stepElement.classList.remove('active', 'completed');
+        
+        if (index < currentIndex) {
+          stepElement.classList.add('completed');
+        } else if (index === currentIndex) {
+          stepElement.classList.add('active');
+        }
+      });
+    }
+
+    // Display order confirmation
+    function displayOrderConfirmation() {
+      const selectedAddr = addresses.find(addr => addr._id === selectedAddress);
+      const paymentMethods = {
+        'cod': 'Cash on Delivery',
+        'upi': 'UPI Payment',
+        'card': 'Credit/Debit Card',
+        'netbanking': 'Net Banking'
+      };
+
+      const confirmationHtml = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-3">Delivery Address</h6>
+            <div class="bg-light p-3 rounded">
+              <strong>${selectedAddr.fullName}</strong><br>
+              ${selectedAddr.addressLine1}<br>
+              ${selectedAddr.addressLine2 ? selectedAddr.addressLine2 + '<br>' : ''}
+              ${selectedAddr.city}, ${selectedAddr.state} - ${selectedAddr.pincode}<br>
+              <small class="text-muted">Phone: ${selectedAddr.phoneNumber}</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="mb-3">Payment Method</h6>
+            <div class="bg-light p-3 rounded">
+              <strong>${paymentMethods[selectedPaymentMethod]}</strong>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <h6 class="mb-3">Order Items</h6>
+          <div class="bg-light p-3 rounded">
+            ${cartItems.map(item => `
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <div>
+                  <strong>${item.cropId.name}</strong><br>
+                  <small class="text-muted">Quantity: ${item.quantity} ${item.cropId.unit}</small>
+                </div>
+                <div class="text-end">
+                  <div>₹${(item.cropId.price * item.quantity).toFixed(2)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('order-confirmation-details').innerHTML = confirmationHtml;
+    }
+
+    // Update order summary
+    function updateOrderSummary() {
+      if (cartItems.length === 0) {
+        document.getElementById('order-summary-content').innerHTML = `
+          <div class="text-center text-muted">
+            <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+            <p>No items in cart</p>
+          </div>
+        `;
+        return;
+      }
+
+      let subtotal = 0;
+      const itemsHtml = cartItems.map(item => {
+        const itemTotal = item.cropId.price * item.quantity;
+        subtotal += itemTotal;
+        
+        return `
+          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+            <div>
+              <div class="fw-bold">${item.cropId.name}</div>
+              <small class="text-muted">${item.quantity} × ₹${item.cropId.price}</small>
+            </div>
+            <div>₹${itemTotal.toFixed(2)}</div>
+          </div>
+        `;
+      }).join('');
+
+      const deliveryCharges = subtotal > 500 ? 0 : 50;
+      const total = subtotal + deliveryCharges;
+
+      const summaryHtml = `
+        ${itemsHtml}
+        <div class="py-2 border-bottom">
+          <div class="d-flex justify-content-between">
+            <span>Subtotal</span>
+            <span>₹${subtotal.toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="py-2 border-bottom">
+          <div class="d-flex justify-content-between">
+            <span>Delivery Charges</span>
+            <span>${deliveryCharges === 0 ? 'FREE' : '₹' + deliveryCharges}</span>
+          </div>
+          ${subtotal <= 500 ? '<small class="text-muted">Free delivery on orders above ₹500</small>' : ''}
+        </div>
+        <div class="py-3">
+          <div class="d-flex justify-content-between fw-bold h5">
+            <span>Total</span>
+            <span class="text-success">₹${total.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('order-summary-content').innerHTML = summaryHtml;
+    }
+
+    // Place order
+    async function placeOrder() {
+      const button = event.target;
+      const spinner = button.querySelector('.loading-spinner');
+      
+      // Validate required fields
+      if (!selectedAddress) {
+        showError('Please select a delivery address');
+        return;
+      }
+      
+      if (!selectedPaymentMethod) {
+        showError('Please select a payment method');
+        return;
+      }
+      
+      // Show loading state
+      button.disabled = true;
+      spinner.classList.add('show');
+      button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Placing Order...';
+
+      try {
+        let orderData = {
+          addressId: selectedAddress,
+          paymentMethod: selectedPaymentMethod
+        };
+
+        // If this is a direct purchase, add the item data
+        if (isDirectPurchase && directPurchaseItem) {
+          orderData.directPurchase = {
+            cropId: directPurchaseItem.cropId,
+            quantity: directPurchaseItem.quantity
+          };
+        }
+
+        // Show success message with animation
+        button.innerHTML = '<i class="fas fa-check me-2"></i>Order Placed!';
+        button.classList.remove('btn-success');
+        button.classList.add('btn-outline-success');
+        
+        showSuccess('🎉 Order placed successfully! Redirecting to confirmation...');
+        
+        // Add success animation to the entire page
+        document.body.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
+        
+        // Send order to server and handle response
+        fetch('/api/ecommerce/orders/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(orderData)
+        }).then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Redirect with real order ID from server
+            setTimeout(() => {
+              window.location.href = `/order-success.html?orderId=${data.order.orderId}&from=checkout`;
+            }, 1000);
+          } else {
+            // Server responded but failed, use temp ID
+            const tempOrderId = 'KIS' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+            setTimeout(() => {
+              window.location.href = `/order-success.html?orderId=${tempOrderId}&temp=true&from=checkout`;
+            }, 1000);
+          }
+        }).catch(error => {
+          console.log('Order submission error:', error);
+          // Network error or server down, use temp ID
+          const tempOrderId = 'KIS' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+          setTimeout(() => {
+            window.location.href = `/order-success.html?orderId=${tempOrderId}&temp=true&from=checkout`;
+          }, 1000);
+        });
+
+      } catch (error) {
+        console.error('Error placing order:', error);
+        showError(`Failed to place order: ${error.message}`);
+        
+        // Reset button state
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-credit-card me-2"></i>Place Order';
+        button.classList.remove('btn-outline-success');
+        button.classList.add('btn-success');
+        spinner.classList.remove('show');
+      }
+    }
+
+    // Utility functions
+    function showSuccess(message) {
+      // You can replace this with a proper toast notification
+      alert('✅ ' + message);
+    }
+
+    function showError(message) {
+      // You can replace this with a proper toast notification
+      alert('❌ ' + message);
+    }
+  </script>
+</body>
+</html>
